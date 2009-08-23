@@ -23,15 +23,6 @@
     </layout>
   </appender>
 
-  <!-- This log appender must not be used for classes involved
-       in logging itself! So it must not be used to log database access!
-    -->
-  <appender name="LOG_SERVICE" class="info.akshaal.mywire2.system.logger.LogServiceAppender">
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d %-5p [%c] (%t:%x) %m%n" />
-    </layout>
-  </appender>
-
   <category name="java.sql">
      <priority value="INFO"/>
   </category>
