@@ -17,11 +17,11 @@ import Predefs._
 import utils.TimeUnit
 
 /**
- * This module is supposed to help instantiate all classes needed for mywire
+ * This module is supposed to help instantiate all classes needed for jacore
  * to work.
  */
 class Module extends GuiceModule {
-    lazy val prefsResource = "/mywire.properties"
+    lazy val prefsResource = "/jacore.properties"
     lazy val prefs = new Prefs (prefsResource)
 
     lazy val monitoringInterval = prefs.getTimeUnit("jacore.monitoring.interval")

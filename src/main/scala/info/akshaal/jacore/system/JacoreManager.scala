@@ -1,5 +1,5 @@
 /*
- * MywireManager.scala
+ * JacoreManager.scala
  *
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
@@ -17,8 +17,7 @@ import scheduler.Scheduler
 import logger.{LogActor, LogServiceAppender}
 
 @Singleton
-class MywireManager @Inject() (
-                    logActor : LogActor,
+class JacoreManager @Inject() (
                     fileActor : FileActor,
                     daemonStatusActor : DaemonStatusActor,
                     monitoringActors : MonitoringActors,
@@ -41,13 +40,9 @@ class MywireManager @Inject() (
     // Init code
 
     final lazy val start : Unit = {
-        // Init logger
-        LogServiceAppender.logActor = Some (logActor)
-
         // Run actors
         val actors =
-            (logActor
-             :: fileActor
+            (fileActor
              :: daemonStatusActor
              :: monitoringActors.monitoringActor1
              :: monitoringActors.monitoringActor2
