@@ -21,7 +21,7 @@ import logger.DummyLogging
 import jmx.{SimpleJmx, JmxAttr, JmxOper}
 
 @Singleton
-private[system] final class DaemonStatus @Inject() (
+final class DaemonStatus @Inject() (
                  @Named("jacore.status.jmx.name") val jmxObjectName : String)
               extends DummyLogging with SimpleJmx
 {
@@ -37,7 +37,7 @@ private[system] final class DaemonStatus @Inject() (
     /**
      * List of exposed JMX attributes.
      */
-    override lazy val jmxAttributes = List (
+    override protected lazy val jmxAttributes = List (
         JmxAttr ("dying",           Some (() => dying),          None),
         JmxAttr ("shuttingDown",    Some (() => shuttingDown),   None)
     )
@@ -45,7 +45,7 @@ private[system] final class DaemonStatus @Inject() (
     /**
      * List of exposed JMX operations.
      */
-    override lazy val jmxOperations = List (
+    override protected lazy val jmxOperations = List (
         JmxOper ("shutdown", () => shutdown)
     )
 
@@ -72,7 +72,8 @@ private[system] final class DaemonStatus @Inject() (
     /**
      * Called by monitoring actor to set
      */
-    final def monitoringAlive () = lastAliveTimestamp = System.nanoTime.nanoseconds
+    final def monitoringAlive () = lastAliveTimestamp =
+                    System.nanoTime.nanoseconds
 
     /**
      * Called when application is no more reliable and must die.
