@@ -3,7 +3,6 @@
 package info.akshaal.jacore
 package system.test.unit.logger
 
-import system.daemon.Daemon
 import system.logger.Logger
 import system.test.unit.BaseUnitTest
 

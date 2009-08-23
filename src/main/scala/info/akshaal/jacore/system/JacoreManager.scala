@@ -14,7 +14,6 @@ import fs.FileActor
 import daemon.DaemonStatusActor
 import actor.{ActorManager, MonitoringActors, Actor}
 import scheduler.Scheduler
-import logger.{LogActor, LogServiceAppender}
 
 @Singleton
 class JacoreManager @Inject() (

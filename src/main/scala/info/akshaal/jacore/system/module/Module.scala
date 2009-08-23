@@ -14,7 +14,7 @@ import com.google.inject.{Module => GuiceModule, Binder,
 import com.google.inject.name.Names
 
 import Predefs._
-import utils.TimeUnit
+import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
 
 /**
  * This module is supposed to help instantiate all classes needed for jacore
@@ -55,8 +55,15 @@ class Module extends GuiceModule {
     // - - - - - - - - - - - - Bindings - - - - - - - - - -
 
     override def configure (binder : Binder) = {
+        binder.bind (classOf[ThreadPriorityChanger])
+              .to (classOf[DummyThreadPriorityChanger])
+
+        // - - - - - - - - - - - - Instances - - - - - - - - -  -- - 
+
         binder.bind (classOf[Prefs])
               .toInstance (prefs)
+
+        //  - - - - - - - - - - -  Named - - - - - - - - - -  - - - -
 
         binder.bind (classOf[Int])
               .annotatedWith (Names.named ("jacore.file.buffer.limit"))

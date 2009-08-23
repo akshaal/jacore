@@ -59,7 +59,7 @@ object TestModule extends Module {
     override lazy val daemonStatusFile = "/tmp/jacore-test.status"
 
     val injector = Guice.createInjector (this)
-    val jacoreeManager = injector.getInstance (classOf[JacoreManager])
+    val jacoreManager = injector.getInstance (classOf[JacoreManager])
 
     jacoreManager.start
 }
