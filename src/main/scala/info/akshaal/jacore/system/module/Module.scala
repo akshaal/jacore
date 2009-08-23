@@ -46,6 +46,9 @@ class Module extends GuiceModule {
 
     lazy val fileReadBytesLimit = 1024*1024
 
+    lazy val threadPriorityChangerImplClass : Class[T] forSome {type T <: ThreadPriorityChanger} =
+                    classOf[DummyThreadPriorityChanger]
+
     // -- tests
 
     require (daemonStatusUpdateInterval > monitoringInterval * 2,
@@ -56,7 +59,7 @@ class Module extends GuiceModule {
 
     override def configure (binder : Binder) = {
         binder.bind (classOf[ThreadPriorityChanger])
-              .to (classOf[DummyThreadPriorityChanger])
+              .to (threadPriorityChangerImplClass)
 
         // - - - - - - - - - - - - Instances - - - - - - - - -  -- - 
 
