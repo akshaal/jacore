@@ -59,7 +59,7 @@ object JmxTestObject extends SimpleJmx {
 
     var operCalled = false
               
-    override lazy val jmxObjectName = "mywire:name=jmxTestObject"
+    override lazy val jmxObjectName = "jacore:name=jmxTestObject"
 
     override lazy val jmxAttributes = List (
         JmxAttr ("r",    Some (() => r),   None),

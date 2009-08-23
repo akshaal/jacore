@@ -11,7 +11,7 @@ package system.test.unit
 import com.google.inject.{Guice, Injector}
 
 import Predefs._
-import system.MywireManager
+import system.JacoreManager
 import system.actor.{Actor, ActorManager}
 import system.module.Module
 import system.daemon.DaemonStatus
@@ -21,12 +21,12 @@ import system.utils.{HiPriorityPool, NormalPriorityPool, ThreadPriorityChanger}
 
 
 object UnitTestModule extends Module {
-    override lazy val daemonStatusJmxName = "mywire:name=testStatus"
+    override lazy val daemonStatusJmxName = "jacore:name=testStatus"
 
     val injector = Guice.createInjector (this)
-    val mywireManager = injector.getInstance (classOf[MywireManager])
+    val jacoreManager = injector.getInstance (classOf[JacoreManager])
 
-    mywireManager.start
+    jacoreManager.start
 
     val daemonStatus = injector.getInstance (classOf[DaemonStatus])
     val scheduler = injector.getInstance (classOf[Scheduler])

@@ -19,7 +19,7 @@ import javax.management.ObjectName
 
 import Predefs._
 import system.module.Module
-import system.MywireManager
+import system.JacoreManager
 import common.BaseTest
 
 class ModuleTest extends BaseTest {
@@ -54,12 +54,12 @@ object TestModule extends Module {
 
     override lazy val schedulerLatencyLimit = 4.milliseconds
 
-    override lazy val daemonStatusJmxName = "mywire:name=integrationTestStatus"
+    override lazy val daemonStatusJmxName = "jacore:name=integrationTestStatus"
     override lazy val daemonStatusUpdateInterval = 5.seconds
     override lazy val daemonStatusFile = "/tmp/jacore-test.status"
 
     val injector = Guice.createInjector (this)
-    val mywireManager = injector.getInstance (classOf[MywireManager])
+    val jacoreeManager = injector.getInstance (classOf[JacoreManager])
 
-    mywireManager.start
+    jacoreManager.start
 }

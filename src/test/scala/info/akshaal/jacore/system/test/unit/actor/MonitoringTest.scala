@@ -5,7 +5,7 @@ import com.google.inject.{Guice, Injector}
 
 import Predefs._
 import system.module.Module
-import system.MywireManager
+import system.JacoreManager
 import system.scheduler.Scheduler
 import system.test.unit.BaseUnitTest
 import system.utils.HiPriorityPool
@@ -22,12 +22,12 @@ import javax.management.ObjectName
 // it to dying state!, so we redefine some objects
 
 object MonitoringTestModule extends Module {
-    override lazy val daemonStatusJmxName = "mywire:name=monitoringTestDaemonStatus"
+    override lazy val daemonStatusJmxName = "jacore:name=monitoringTestDaemonStatus"
 
     val injector = Guice.createInjector (this)
-    val mywireManager = injector.getInstance (classOf[MywireManager])
+    val jacoreManager = injector.getInstance (classOf[JacoreManager])
 
-    mywireManager.start
+    jacoreManager.start
 
     val actorManager = injector.getInstance (classOf[ActorManager])
     val daemonStatus = injector.getInstance (classOf[DaemonStatus])
