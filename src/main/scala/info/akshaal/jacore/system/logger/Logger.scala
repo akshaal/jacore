@@ -1,4 +1,4 @@
-package info.akshaal.mywire2.system.logger
+package info.akshaal.jacore.system.logger
 
 import org.slf4j.LoggerFactory
 import org.slf4j.{Logger => SlfLogger}

@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.mywire2.system.logger
+package info.akshaal.jacore.system.logger
 
 private[logger] trait AbstractLogging {
     protected[logger] implicit val logger : Logger

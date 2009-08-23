@@ -1,4 +1,4 @@
-package info.akshaal.mywire2.system.domain
+package info.akshaal.jacore.system.domain
 
 import java.util.Date
 import scala.reflect.BeanProperty

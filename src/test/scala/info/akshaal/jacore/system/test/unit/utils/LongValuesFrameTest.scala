@@ -2,7 +2,7 @@
  * Akshaal (C) 2009. GNU GPL. http://akshaal.info
  */
 
-package info.akshaal.mywire2
+package info.akshaal.jacore
 package system
 package test.unit.utils
 

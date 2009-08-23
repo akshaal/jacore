@@ -1,6 +1,6 @@
 /** Akshaal (C) 2009. GNU GPL. http://akshaal.info */
 
-package info.akshaal.mywire2.system.daemon
+package info.akshaal.jacore.system.daemon
 
 /**
  * Daemon.

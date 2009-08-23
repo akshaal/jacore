@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.mywire2
+package info.akshaal.jacore
 package test
 package integration
 
@@ -56,7 +56,7 @@ object TestModule extends Module {
 
     override lazy val daemonStatusJmxName = "mywire:name=integrationTestStatus"
     override lazy val daemonStatusUpdateInterval = 5.seconds
-    override lazy val daemonStatusFile = "/tmp/mywire2-test.status"
+    override lazy val daemonStatusFile = "/tmp/jacore-test.status"
 
     val injector = Guice.createInjector (this)
     val mywireManager = injector.getInstance (classOf[MywireManager])

@@ -1,5 +1,5 @@
 
-package info.akshaal.mywire2
+package info.akshaal.jacore
 package system
 package daemon
 

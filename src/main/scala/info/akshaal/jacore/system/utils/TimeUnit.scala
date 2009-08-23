@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.mywire2
+package info.akshaal.jacore
 package system.utils
 
 import Predefs._
@@ -63,7 +63,7 @@ final class TimeUnit (nano : Long) extends NotNull
     def >  (that: TimeUnit)     : Boolean = compare(that) > 0
 }
 
-private[mywire2] object TimeUnit {
+private[jacore] object TimeUnit {
     private[utils] val nsInUs   = 1000L
     private[utils] val nsInMs   = 1000000L
     private[utils] val nsInSec  = 1000000000L

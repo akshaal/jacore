@@ -1,4 +1,4 @@
-package info.akshaal.mywire2.system.dao
+package info.akshaal.jacore.system.dao
 
 import com.ibatis.common.resources.Resources
 import com.ibatis.sqlmap.client.SqlMapClientBuilder

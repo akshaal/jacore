@@ -1,4 +1,4 @@
-package info.akshaal.mywire2
+package info.akshaal.jacore
 package system.test.unit.actor
 
 import com.google.inject.{Guice, Injector}

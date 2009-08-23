@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.mywire2
+package info.akshaal.jacore
 package system.test.unit.jmx
 
 import java.lang.management.ManagementFactory

@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.mywire2
+package info.akshaal.jacore
 package system.test.unit.fs
 
 import collection.immutable.List
@@ -22,7 +22,7 @@ class FileActorTest extends BaseUnitTest {
     def testWrite () = {
         UnitTestModule.actorManager.startActor (WriteTestActor)
 
-        val file = File.createTempFile ("mywire2", "test")
+        val file = File.createTempFile ("jacore", "test")
         file.deleteOnExit
 
         assertNull (WriteTestActor.payload)
