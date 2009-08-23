@@ -16,7 +16,7 @@ import actor.{ActorManager, MonitoringActors, Actor}
 import scheduler.Scheduler
 
 @Singleton
-class JacoreManager @Inject() (
+final class JacoreManager @Inject() (
                     fileActor : FileActor,
                     daemonStatusActor : DaemonStatusActor,
                     monitoringActors : MonitoringActors,
@@ -27,18 +27,18 @@ class JacoreManager @Inject() (
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Useful addons
 
-    final def startActors (it : Iterable[Actor]) = {
+    def startActors (it : Iterable[Actor]) = {
         it.foreach (actorManager.startActor (_))
     }
 
-    final def stopActors (it : Iterable[Actor]) = {
+    def stopActors (it : Iterable[Actor]) = {
         it.foreach (actorManager.stopActor (_))
     }
 
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Init code
 
-    final lazy val start : Unit = {
+    lazy val start : Unit = {
         // Run actors
         val actors =
             (fileActor
