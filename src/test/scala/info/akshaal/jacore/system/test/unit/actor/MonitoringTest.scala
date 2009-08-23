@@ -9,7 +9,8 @@ import system.JacoreManager
 import system.scheduler.Scheduler
 import system.test.unit.BaseUnitTest
 import system.utils.HiPriorityPool
-import system.actor.{Monitoring, MonitoringActor, ActorManager, Actor}
+import system.actor.{Monitoring, MonitoringActor, ActorManager,
+                     Actor, HiPriorityActorEnv}
 import system.daemon.DaemonStatus
 
 import org.testng.annotations.Test
@@ -33,10 +34,10 @@ object MonitoringTestModule extends Module {
     val daemonStatus = injector.getInstance (classOf[DaemonStatus])
     val scheduler = injector.getInstance (classOf[Scheduler])
     val hiPriorityPool = injector.getInstance (classOf[HiPriorityPool])
+    val hiPriorityActorEnv = injector.getInstance (classOf[HiPriorityActorEnv])
 
     abstract class HiPriorityActor extends Actor (
-                     scheduler = scheduler,
-                     pool = hiPriorityPool)
+                                        actorEnv = hiPriorityActorEnv)
 }
 
 class MonitoringTest extends BaseUnitTest {

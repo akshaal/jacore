@@ -21,10 +21,8 @@ import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 
 import Predefs._
-import actor.Actor
+import actor.{Actor, NormalPriorityActorEnv}
 import logger.Logging
-import utils.NormalPriorityPool
-import scheduler.Scheduler
 
 abstract sealed class FileMessage extends NotNull
 
@@ -64,12 +62,10 @@ final case class ReadFileFailed (file : File,
  */
 @Singleton
 private[system] final class FileActor @Inject() (
-                       pool : NormalPriorityPool,
-                       scheduler : Scheduler,
+                       normalPriorityActorEnv : NormalPriorityActorEnv,
                        @Named("jacore.file.buffer.limit") readBytesLimit : Int,
                        prefs : Prefs)
-                    extends Actor (pool = pool,
-                                   scheduler = scheduler)
+                    extends Actor (actorEnv = normalPriorityActorEnv)
 {
     private val encoding = prefs.getString("jacore.os.file.encoding")
     private val encoder = Charset.forName(encoding).newEncoder()

@@ -18,7 +18,7 @@ trait ThreadPriorityChanger {
     def change (priority : Priority) : Unit
 }
 
-private[system] object ThreadPriorityChanger {
+object ThreadPriorityChanger {
     abstract sealed class Priority
     case object LowPriority extends Priority
     case object NormalPriority extends Priority

@@ -33,7 +33,6 @@
 
   <category name="info.akshaal">
      <priority value="TRACE"/>
-     <appender-ref ref="LOG_SERVICE" />
   </category>
   
   <root>

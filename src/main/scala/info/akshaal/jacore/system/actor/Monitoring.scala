@@ -10,8 +10,8 @@ import scala.collection.mutable.HashSet
 import scala.collection.mutable.Set
 
 import daemon.DaemonStatus
-import scheduler.{TimeOut, Scheduler, UnfixedScheduling}
-import utils.{TimeUnit, NormalPriorityPool}
+import scheduler.{UnfixedScheduling, TimeOut}
+import utils.TimeUnit
 
 @Singleton
 private[system] final class Monitoring @Inject()
@@ -45,12 +45,10 @@ private[actor] case object Pong extends MonitoringCommand
 private[actor] case object Monitor extends MonitoringCommand
 
 private[system] final class MonitoringActor @Inject() (
-                     pool : NormalPriorityPool,
-                     scheduler : Scheduler,
+                     normalPriorityActorEnv : NormalPriorityActorEnv,
                      @Named("jacore.monitoring.interval") interval : TimeUnit,
                      daemonStatus : DaemonStatus)
-            extends Actor (pool = pool,
-                           scheduler = scheduler)
+            extends Actor (actorEnv = normalPriorityActorEnv)
             with UnfixedScheduling
 {
     schedule payload Monitor every interval

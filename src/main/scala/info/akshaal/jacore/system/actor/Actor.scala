@@ -7,14 +7,13 @@ import org.jetlang.core.BatchExecutor
 
 import Predefs._
 import logger.Logging
-import utils.{Pool, TimeUnit}
-import scheduler.Scheduler
+import utils.TimeUnit
 
 /**
  * Very simple and hopefully fast implementation of actors
+ * @param actorEnv environment for actor
  */
-abstract class Actor (pool : Pool,
-                      scheduler : Scheduler)
+abstract class Actor (actorEnv : ActorEnv)
                 extends Logging with NotNull
 {
     /**
@@ -25,7 +24,8 @@ abstract class Actor (pool : Pool,
     // ===================================================================
     // Concrete methods
 
-    protected final val schedule = new ActorSchedule (this, scheduler)
+    protected final val schedule =
+                        new ActorSchedule (this, actorEnv.scheduler)
 
     /**
      * Current sender. Only valid when act method is called.
@@ -36,21 +36,23 @@ abstract class Actor (pool : Pool,
      * A fiber used by this actor.
      */
     private[this] val fiber =
-        new PoolFiberFactory (pool.executors).create (new ActorExecutor (this))
+        new PoolFiberFactory (actorEnv.pool.executors)
+                        .create (new ActorExecutor (this))
 
     /**
      * Send a message to the actor.
      */
     final def !(msg: Any): Unit = {
         val sentFrom = ThreadLocalState.current.get
-        val runTimingFinisher = pool.latencyTiming.createFinisher
+        val runTimingFinisher = actorEnv.pool.latencyTiming.createFinisher
 
         // This runner will be executed by executor when time has come
         // to process the message
         val runner = mkRunnable {
             runTimingFinisher ("[latency] Actor started for message: " + msg)
 
-            val executeTimingFinisher = pool.executionTiming.createFinisher
+            val executeTimingFinisher =
+                        actorEnv.pool.executionTiming.createFinisher
 
             // Execute            
             msg match {
