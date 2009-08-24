@@ -39,6 +39,13 @@ abstract class Actor (actorEnv : ActorEnv)
         new PoolFiberFactory (actorEnv.pool.executors)
                         .create (new ActorExecutor (this))
 
+
+    /**
+     * Queue message for processing by this actor.
+     * @param msg message to process
+     */
+    final def queue (msg: Any): Unit = this ! msg
+
     /**
      * Send a message to the actor.
      */
