@@ -51,6 +51,9 @@ private[scheduler] final class SchedulerThread
     def shutdown () = {
         shutdownFlag = true
         locked { condition.signal () }
+
+        // Join thread
+        this.join (1000) // Give it a second to join
     }
 
     override def run () {

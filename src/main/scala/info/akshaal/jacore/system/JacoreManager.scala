@@ -24,6 +24,9 @@ final class JacoreManager @Inject() (
                     scheduler : Scheduler
                 )
 {
+    private[this] var stopped = false
+    private[this] var started = false
+
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Useful addons
 
@@ -47,18 +50,39 @@ final class JacoreManager @Inject() (
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Init code
 
-    lazy val start : Unit = {
-        // Run actors
-        val actors =
-            (fileActor
-             :: daemonStatusActor
-             :: monitoringActors.monitoringActor1
-             :: monitoringActors.monitoringActor2
-             :: Nil)
+    // Actors
+    private[this] val actors =
+        (fileActor
+         :: daemonStatusActor
+         :: monitoringActors.monitoringActor1
+         :: monitoringActors.monitoringActor2
+         :: Nil)
 
-        startActors (actors)
+    lazy val start : Unit = {
+        require (!stopped,
+            "Unable to start JacoreManager. JacoreManager has been stopped")
+
+        // Set flags
+        started = true
 
         // Start scheduling
         scheduler.start ()
+
+        // Start actors
+        startActors (actors)
+    }
+
+    lazy val stop : Unit = {
+        require (started,
+                 "Unable to stop JacoreManager. JacoreManager is not started")
+
+        // Set flags
+        stopped = true
+
+        // Stop scheduling
+        scheduler.shutdown ()
+
+        // Stop actors
+        stopActors (actors)
     }
 }
