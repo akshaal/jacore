@@ -27,12 +27,21 @@ final class JacoreManager @Inject() (
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Useful addons
 
-    def startActors (it : Iterable[Actor]) = {
-        it.foreach (actorManager.startActor (_))
+    def startActor (actor : Actor) = {
+        actorManager.startActor (actor)
     }
 
+    def startActors (it : Iterable[Actor]) = {
+        it.foreach (startActor (_))
+    }
+
+    def stopActor (actor : Actor) = {
+        actorManager.stopActor (actor)
+    }
+
+
     def stopActors (it : Iterable[Actor]) = {
-        it.foreach (actorManager.stopActor (_))
+        it.foreach (stopActor (_))
     }
 
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
