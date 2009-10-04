@@ -14,6 +14,7 @@ import fs.FileActor
 import daemon.{DaemonStatusActor, DaemonStatus}
 import actor.{ActorManager, MonitoringActors, Actor}
 import scheduler.Scheduler
+import logger.Logging
 
 @Singleton
 final class JacoreManager @Inject() (
@@ -23,7 +24,7 @@ final class JacoreManager @Inject() (
                     monitoringActors : MonitoringActors,
                     actorManager : ActorManager,
                     scheduler : Scheduler
-                )
+                ) extends Logging
 {
     private[this] var stopped = false
     private[this] var started = false
@@ -63,6 +64,8 @@ final class JacoreManager @Inject() (
         require (!stopped,
             "Unable to start JacoreManager. JacoreManager has been stopped")
 
+        debug ("Starting Jacore")
+
         // Set flags
         started = true
 
@@ -71,11 +74,15 @@ final class JacoreManager @Inject() (
 
         // Start actors
         startActors (actors)
+
+        debug ("Jacore started")
     }
 
     lazy val stop : Unit = {
         require (started,
                  "Unable to stop JacoreManager. JacoreManager is not started")
+
+        debug ("Stopping Jacore")
 
         // Set flags
         stopped = true
@@ -88,5 +95,7 @@ final class JacoreManager @Inject() (
 
         // Unregister daemon status jmx bean
         daemonStatus.unregisterJmxBean
+
+        debug ("Jacore stopped")
     }
 }
