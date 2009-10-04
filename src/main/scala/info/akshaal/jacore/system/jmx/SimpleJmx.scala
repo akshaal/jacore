@@ -25,6 +25,8 @@ trait SimpleJmx {
 
     private val attrMap : Map[String, JmxGeneralAttr] = new HashMap ()
     private val operMap : Map[String, JmxOper] = new HashMap ()
+    
+    private val jmxTrueObjectName = new ObjectName(jmxObjectName)
 
     // Fill in attribute and operation maps
     for (jmxAttr <- jmxAttributes) {
@@ -35,9 +37,16 @@ trait SimpleJmx {
         operMap (jmxOper.name) = jmxOper
     }
 
-    // Register
+    // Register automatically
     ManagementFactory.getPlatformMBeanServer()
-                     .registerMBean (MBean, new ObjectName(jmxObjectName))
+                     .registerMBean (MBean, jmxTrueObjectName)
+
+    /**
+     * Unregisters object.
+     */
+    lazy val unregisterJmxBean =
+        ManagementFactory.getPlatformMBeanServer()
+                         .unregisterMBean (jmxTrueObjectName)
 
     /**
      * MBean definition.

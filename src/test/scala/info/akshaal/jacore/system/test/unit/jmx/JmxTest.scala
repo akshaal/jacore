@@ -50,6 +50,33 @@ class JmxTest extends BaseUnitTest {
         srv.invoke (obj, "invoke", Array(), Array())
         assertTrue (JmxTestObject.operCalled)
     }
+
+    @Test (groups=Array("unit"))
+    def testUnregister () = {
+        val srv = ManagementFactory.getPlatformMBeanServer()
+
+        val inst1 = new JmxTestSimple
+        val objName = new ObjectName (inst1.jmxObjectName)
+
+        // Test inst1
+        assertEquals (srv.getAttribute (objName, "r"), 1)
+        assertEquals (srv.getAttribute (objName, "r"), 2)
+        assertEquals (srv.getAttribute (objName, "r"), 3)
+
+        // Unregister inst1
+        inst1.unregisterJmxBean
+
+        // Create new instance
+        val inst2 = new JmxTestSimple
+
+        // Test inst2
+        assertEquals (srv.getAttribute (objName, "r"), 1)
+        assertEquals (srv.getAttribute (objName, "r"), 2)
+        assertEquals (srv.getAttribute (objName, "r"), 3)
+
+        // Unregister inst2
+        inst2.unregisterJmxBean
+    }
 }
 
 object JmxTestObject extends SimpleJmx {
@@ -58,7 +85,7 @@ object JmxTestObject extends SimpleJmx {
     var rw : Int = 3
 
     var operCalled = false
-              
+
     override lazy val jmxObjectName = "jacore:name=jmxTestObject"
 
     override lazy val jmxAttributes = List (
@@ -69,5 +96,15 @@ object JmxTestObject extends SimpleJmx {
 
     override lazy val jmxOperations = List (
         JmxOper ("invoke", () => operCalled = true)
+    )
+}
+
+class JmxTestSimple extends SimpleJmx {
+    private var r = 0
+              
+    override lazy val jmxObjectName = "jacore:name=jmxTestSimple"
+
+    override lazy val jmxAttributes = List (
+        JmxAttr ("r",    Some (() => {r+=1; r}),   None)
     )
 }

@@ -11,7 +11,7 @@ package system
 import com.google.inject.{Singleton, Inject}
 
 import fs.FileActor
-import daemon.DaemonStatusActor
+import daemon.{DaemonStatusActor, DaemonStatus}
 import actor.{ActorManager, MonitoringActors, Actor}
 import scheduler.Scheduler
 
@@ -19,6 +19,7 @@ import scheduler.Scheduler
 final class JacoreManager @Inject() (
                     fileActor : FileActor,
                     daemonStatusActor : DaemonStatusActor,
+                    daemonStatus : DaemonStatus,
                     monitoringActors : MonitoringActors,
                     actorManager : ActorManager,
                     scheduler : Scheduler
@@ -84,5 +85,8 @@ final class JacoreManager @Inject() (
 
         // Stop actors
         stopActors (actors)
+
+        // Unregister daemon status jmx bean
+        daemonStatus.unregisterJmxBean
     }
 }

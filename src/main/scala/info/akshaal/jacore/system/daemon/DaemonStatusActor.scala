@@ -8,7 +8,7 @@ import com.google.inject.name.Named
 
 import Predefs._
 import actor.{Actor, NormalPriorityActorEnv}
-import scheduler.Scheduler
+import scheduler.{Scheduler, TimeOut}
 import utils.TimeUnit
 
 @Singleton
@@ -25,8 +25,8 @@ private[system] final class DaemonStatusActor @Inject() (
      * Process messages
      */
     final def act () = {
-        case UpdateStatus => {
-            // TODO: Implement it
+        case TimeOut (UpdateStatus) => {
+            // TODO
         }
     }
 
