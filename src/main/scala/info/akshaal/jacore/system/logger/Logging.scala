@@ -35,6 +35,12 @@ private[logger] trait AbstractLogging {
     def infoLazy (obj : AnyRef, e : Throwable)  = logger.infoLazy (obj, e)
     def warnLazy (obj : AnyRef, e : Throwable)  = logger.warnLazy (obj, e)
     def errorLazy (obj : AnyRef, e : Throwable) = logger.errorLazy (obj, e)
+
+    // Levels
+    def isDebugEnabled = logger.isDebugEnabled
+    def isInfoEnabled = logger.isInfoEnabled
+    def isWarnEnabled = logger.isWarnEnabled
+    def isErrorEnabled = logger.isErrorEnabled
 }
 
 trait Logging extends AbstractLogging {
