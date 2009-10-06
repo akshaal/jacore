@@ -26,6 +26,11 @@ sealed abstract class Logger extends NotNull {
     def infoLazy (obj : AnyRef, e : Throwable) : Unit
     def warnLazy (obj : AnyRef, e : Throwable) : Unit
     def errorLazy (obj : AnyRef, e : Throwable) : Unit
+
+    def isDebugEnabled : Boolean
+    def isInfoEnabled : Boolean
+    def isWarnEnabled : Boolean
+    def isErrorEnabled : Boolean
 }
 
 /**
@@ -112,6 +117,12 @@ final class DefaultLogger (slfLogger : SlfLogger) extends Logger {
     @inline
     override def errorLazy (obj : AnyRef, e : Throwable) =
         if (slfLogger.isErrorEnabled) this.error (obj.toString, e)
+
+    // Logging levels
+    def isDebugEnabled = slfLogger.isDebugEnabled
+    def isInfoEnabled = slfLogger.isInfoEnabled
+    def isWarnEnabled = slfLogger.isWarnEnabled
+    def isErrorEnabled = slfLogger.isErrorEnabled
 }
 
 /**
@@ -180,4 +191,10 @@ object DummyLogger extends Logger {
 
     @inline
     override def errorLazy (obj : AnyRef, e : Throwable) = error (obj.toString, e)
+
+    // Logging levels
+    def isDebugEnabled = false
+    def isInfoEnabled = true
+    def isWarnEnabled = true
+    def isErrorEnabled = true
 }
