@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.aop;
+package info.akshaal.jacore.system.actor;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,4 +14,4 @@ import java.lang.annotation.ElementType;
 
 @Retention (RetentionPolicy.RUNTIME)
 @Target (ElementType.METHOD)
-@interface Async {}
+public @interface CallByMessage {}

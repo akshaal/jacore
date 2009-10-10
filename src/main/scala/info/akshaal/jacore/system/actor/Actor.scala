@@ -2,12 +2,11 @@ package info.akshaal.jacore
 package system
 package actor
 
-import org.jetlang.fibers.{PoolFiberFactory, Fiber}
+import org.jetlang.fibers.PoolFiberFactory
 import org.jetlang.core.BatchExecutor
 
 import Predefs._
 import logger.Logging
-import utils.TimeUnit
 
 /**
  * Very simple and hopefully fast implementation of actors
@@ -61,10 +60,9 @@ abstract class Actor (actorEnv : ActorEnv)
             val executeTimingFinisher =
                         actorEnv.pool.executionTiming.createFinisher
 
-            // Execute            
-            msg match {
-                case Ping => sentFrom.foreach (_ ! Pong)
-                case other => invokeAct (msg, sentFrom)
+            // Execute
+            logIgnoredException ("Error processing message: " + msg) {
+                invokeAct (msg, sentFrom)
             }
 
             // Show complete latency
@@ -79,16 +77,17 @@ abstract class Actor (actorEnv : ActorEnv)
      */
     private[this] def invokeAct (msg : Any, sentFrom : Option[Actor]) =
     {
-        if (act.isDefinedAt (msg)) {
-            sender = sentFrom
+        sender = sentFrom
 
-            logIgnoredException ("Error processing message: " + msg) {
-                act () (msg)
+        try {
+            msg match {
+                case Ping => sentFrom.foreach (_ ! Pong)
+                case call @ Call (inv) => CallByMessageMethodInterceptor.call (call)
+                case other if act.isDefinedAt (msg) => act () (msg)
+                case other => warn ("Ignored message: " + msg)
             }
-
+        } finally {
             sender = None
-        } else {
-            warn ("Ignored message: " + msg)
         }
     }
 
@@ -116,7 +115,7 @@ abstract class Actor (actorEnv : ActorEnv)
  */
 private[actor] class ActorExecutor (actor : Actor)
                 extends BatchExecutor {
-    final def execute (commands: Array[Runnable]) = {
+    final override def execute (commands: Array[Runnable]) = {
         // Remember the current actor in thread local variable.
         // So later it may be referenced from ! method of other actors
         ThreadLocalState.current.set(Some(actor))

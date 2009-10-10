@@ -11,10 +11,12 @@ package module
 
 import com.google.inject.{Module => GuiceModule, Binder,
                           Singleton, Inject}
+import com.google.inject.matcher.Matchers
 import com.google.inject.name.Names
 
 import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
+import actor.{CallByMessageMethodInterceptor, CallByMessage, Actor}
 
 /**
  * This module is supposed to help instantiate all classes needed for jacore
@@ -52,14 +54,20 @@ class Module extends GuiceModule {
     // -- tests
 
     require (daemonStatusUpdateInterval > monitoringInterval * 2,
-        "daemonStatusUpdateInterval must at least be greater"
-        + " than 2*monitoringInterval")
+             "daemonStatusUpdateInterval must at least be greater"
+             + " than 2*monitoringInterval")
 
     // - - - - - - - - - - - - Bindings - - - - - - - - - -
 
     override def configure (binder : Binder) = {
         binder.bind (classOf[ThreadPriorityChanger])
               .to (threadPriorityChangerImplClass)
+
+        // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
+        
+        binder.bindInterceptor(Matchers.subclassesOf(classOf[Actor]),
+                               Matchers.annotatedWith (classOf[CallByMessage]),
+                               new CallByMessageMethodInterceptor)
 
         // - - - - - - - - - - - - Instances - - - - - - - - -  -- - 
 
