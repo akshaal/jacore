@@ -52,15 +52,13 @@ class CallByMessageMethodInterceptor extends MethodInterceptor with Logging {
      */
     override def invoke (invocation : MethodInvocation) : Object = {
         if (CallByMessageMethodInterceptor.callNow.get) {
+            CallByMessageMethodInterceptor.callNow.set (false)
+
             debugLazy ("Proceeding with invocation on object "
                        + invocation.getThis + " of method "
                        + invocation.getMethod.getName)
 
-            try {
-                invocation.proceed
-            } finally {
-                CallByMessageMethodInterceptor.callNow.set (false)
-            }
+            invocation.proceed
         } else {
             debugLazy ("Wrapping invocation on object "
                        + invocation.getThis + " of method "
