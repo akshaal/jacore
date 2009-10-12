@@ -11,8 +11,11 @@ package system.test.unit.actor
 import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 import org.testng.annotations.Test
 import org.testng.Assert._
-import system.annotation.CallByMessage
+import system.annotation.{CallByMessage, Act}
 
+/**
+ * Test for aspected things of actors.
+ */
 class AopTest extends BaseUnitTest {
     @Test (groups=Array("unit"))
     def testMethodInterceptor () = {
@@ -35,8 +38,21 @@ class AopTest extends BaseUnitTest {
 
         UnitTestModule.actorManager.stopActor (aopTestActor)
     }
+
+    @Test (groups=Array("unit"))
+    def testActAnnotation () = {
+        val injector = UnitTestModule.injector
+
+        val actor = injector.getInstance (classOf[ActAnnotationTestActor])
+
+        UnitTestModule.actorManager.startActor (actor)
+        UnitTestModule.actorManager.stopActor (actor)
+    }
 }
 
+/**
+ * Actor to test @CallByMessage annotation.
+ */
 class AopTestActor extends HiPriorityActor {
     var sum = 0
 
@@ -44,8 +60,10 @@ class AopTestActor extends HiPriorityActor {
     def inc () = {
         sum = sum + 1
     }
+}
 
-    def act () = {
-        case x => error ("Unexpected message: " + x)
-    }
+/**
+ * Actor to test @Act annotation.
+ */
+class ActAnnotationTestActor extends HiPriorityActor {
 }

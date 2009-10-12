@@ -16,9 +16,12 @@ abstract class Actor (actorEnv : ActorEnv)
                 extends Logging with NotNull
 {
     /**
-     * Implementing class is supposed to provide a body of the actor.
+     * Method returns a partial function which must process
+     * messages handled by actor. Function returns by default actor
+     * processes no messages.
      */
-    protected def act(): PartialFunction[Any, Unit]
+    protected def act(): PartialFunction[Any, Unit] =
+                                        Actor.defaultActMessageHandler
 
     // ===================================================================
     // Concrete methods
@@ -106,6 +109,20 @@ abstract class Actor (actorEnv : ActorEnv)
         debug ("About to stop")
         fiber.dispose
     }
+}
+
+/**
+ * Helper object for the Actor class.
+ */
+private[actor] object Actor {
+    /**
+     * Default body of action handler. Processes no messages.
+     */
+    protected final val defaultActMessageHandler =
+        new PartialFunction[Any, Unit] {
+            def isDefinedAt (msg : Any) = false
+            def apply (msg : Any) = ()
+        }
 }
 
 /**

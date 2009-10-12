@@ -51,7 +51,7 @@ object SampleActor extends HiPriorityActor {
     var accuString : List[String] = Nil
     var accuInt : List[Int] = Nil
 
-    def act () = {
+    override def act () = {
         case x : Int => {
             debug ("Received [Int] message: " + x)
             accuInt = x :: accuInt
@@ -66,7 +66,7 @@ object SampleActor extends HiPriorityActor {
 }
 
 object ToStringActor extends HiPriorityActor {
-    def act () = {
+    override def act () = {
         case x => {
             debug ("Received message: " + x)
             sender.foreach(_ ! ("x" + x))
@@ -77,7 +77,7 @@ object ToStringActor extends HiPriorityActor {
 object UnstableActor extends HiPriorityActor {
     var sum = 0
 
-    def act () = {
+    override def act () = {
         case x : Int => {
             if (x % 2 == 0) {
                 throw new IllegalArgumentException ()

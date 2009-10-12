@@ -78,7 +78,7 @@ object WriteTestActor extends HiPriorityActor {
     var excs = 0
     var payload : Any = null
 
-    def act () = {
+    override def act () = {
         case msg @ (file : File, content : String, payl) => {
             debug ("Received message: " + msg)
             UnitTestModule.fileActor ! (WriteFile (file, content, payl))

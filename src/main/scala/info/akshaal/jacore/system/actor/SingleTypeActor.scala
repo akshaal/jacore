@@ -13,7 +13,7 @@ package info.akshaal.jacore.system.actor
 abstract class SingleTypeActor[T <: AnyRef] (actorEnv : ActorEnv)
                     extends Actor (actorEnv : ActorEnv)                    
 {
-    final def act () = {
+    final override def act () = {
         case x : T if supported(x) => act (x.asInstanceOf[T])
     }
 

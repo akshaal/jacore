@@ -74,7 +74,7 @@ class SchedulerTest extends BaseUnitTest {
 object OneTimeTestActor extends HiPriorityActor {
     var executed = false
 
-    def act () = {
+    override def act () = {
         case TimeOut (x : Int) => {
             debug ("Received [Int] message: " + x)
             executed = true
@@ -85,7 +85,7 @@ object OneTimeTestActor extends HiPriorityActor {
 object OneTimeTestActor2 extends HiPriorityActor {
     var executed = false
 
-    def act () = {
+    override def act () = {
         case TimeOut (x : Int) => {
             debug ("Received [Int] message: " + x)
             executed = true
@@ -98,7 +98,7 @@ object RecurrentTestActor extends HiPriorityActor {
     
     var invocations = 0
 
-    def act () = {
+    override def act () = {
         case TimeOut (x : String) => {
             debug ("Received message: " + x)
             invocations += 1

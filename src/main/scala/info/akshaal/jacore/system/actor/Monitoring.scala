@@ -56,7 +56,7 @@ private[system] final class MonitoringActor @Inject() (
     private val currentActors : Set[Actor] = new HashSet[Actor]
     private var monitoringActors : Set[Actor] = new HashSet[Actor]
 
-    final def act () = {
+    final override def act () = {
         case Add (actor)    => currentActors += actor
         case Remove (actor) => currentActors -= actor
 

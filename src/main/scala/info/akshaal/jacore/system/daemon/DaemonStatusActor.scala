@@ -24,7 +24,7 @@ private[system] final class DaemonStatusActor @Inject() (
     /**
      * Process messages
      */
-    final def act () = {
+    final override def act () = {
         case TimeOut (UpdateStatus) => {
             // TODO
         }

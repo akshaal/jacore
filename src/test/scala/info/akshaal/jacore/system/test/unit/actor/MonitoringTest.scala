@@ -72,7 +72,7 @@ class MonitoringTest extends BaseUnitTest {
 }
 
 object BadActor extends MonitoringTestModule.HiPriorityActor {
-    def act () = {
+    override def act () = {
         case x => {
             debug ("Starting to sleep")
             Thread.sleep (MonitoringTestModule.monitoringInterval.asMilliseconds * 2)
