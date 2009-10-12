@@ -9,14 +9,14 @@ package info.akshaal.jacore
 package system
 package module
 
-import com.google.inject.{Module => GuiceModule, Binder,
-                          Singleton, Inject}
+import com.google.inject.{Module => GuiceModule, Binder, Singleton, Inject}
 import com.google.inject.matcher.Matchers
 import com.google.inject.name.Names
 
 import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
-import actor.{CallByMessageMethodInterceptor, CallByMessage, Actor}
+import actor.{CallByMessageMethodInterceptor, Actor}
+import annotation.CallByMessage
 
 /**
  * This module is supposed to help instantiate all classes needed for jacore

@@ -11,7 +11,7 @@ package system.test.unit.actor
 import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 import org.testng.annotations.Test
 import org.testng.Assert._
-import system.actor.CallByMessage
+import system.annotation.CallByMessage
 
 class AopTest extends BaseUnitTest {
     @Test (groups=Array("unit"))

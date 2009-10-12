@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.actor;
+package info.akshaal.jacore.system.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
