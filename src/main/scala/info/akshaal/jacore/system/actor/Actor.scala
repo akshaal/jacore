@@ -5,8 +5,11 @@ package actor
 import org.jetlang.fibers.PoolFiberFactory
 import org.jetlang.core.BatchExecutor
 
+import java.lang.reflect.Modifier
+
 import Predefs._
 import logger.Logging
+import annotation.Act
 
 /**
  * Implementation of actors.
@@ -123,6 +126,43 @@ abstract class Actor (actorEnv : ActorEnv)
      * annotated method of this object. It also subscribes.
      */
     private def createDispatcherAndSubscribe : MethodDispatcher = {
+        // Check methods and collect information
+        var methods : List[(String, Class[_])] = Nil
+
+        for (val method <- getClass.getMethods if method.isAnnotationPresent (classOf[Act])) {
+            val methodName = method.getName
+
+            def unrecover (str : String) {
+                throw new UnrecoverableError ("Action method " + methodName + " " + str)
+            }
+
+            // Checks
+            val modifiers = method.getModifiers
+
+            if (Modifier.isPrivate (modifiers)) {
+                unrecover ("must not be private")
+            }
+
+            if (Modifier.isStatic (modifiers)) {
+                unrecover ("must not be static")
+            }
+
+            val returnType = method.getReturnType
+            if (!returnType.equals (classOf[Void])) {
+                unrecover ("must return nothing")
+            }
+
+            val paramTypes = method.getParameterTypes
+            if (paramTypes.length != 1) {
+                unrecover ("must have only one argument")
+            }
+
+            methods = (methodName, paramTypes(0)) :: methods
+        }
+
+        // TODO: groupBy to find duplicates
+        // TODO: sortWith to order
+
         null
     }
 
