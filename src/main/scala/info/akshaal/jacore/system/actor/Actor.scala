@@ -9,7 +9,7 @@ import Predefs._
 import logger.Logging
 
 /**
- * Very simple and hopefully fast implementation of actors.
+ * Implementation of actors.
  *
  * @param actorEnv environment for actor
  */
@@ -17,18 +17,23 @@ abstract class Actor (actorEnv : ActorEnv)
                 extends Logging with NotNull
 {
     /**
-     * Method returns a partial function which must process
-     * messages handled by actor. Function returns by default actor
-     * processes no messages.
+     * Method dispatcher. Forwards message processing request to
+     * an appropriate method of this class.
      */
-    protected def act(): PartialFunction[Any, Unit] =
-                                        Actor.defaultActMessageHandler
+    private[this] final val dispatcher = createDispatcherAndSubscribe
 
-    // ===================================================================
-    // Concrete methods
-
+    /**
+     * Schedule to be used by this actor.
+     */
     protected final val schedule =
-                        new ActorSchedule (this, actorEnv.scheduler)
+                    new ActorSchedule (this, actorEnv.scheduler)
+
+    /**
+     * A fiber used by this actor.
+     */
+    private[this] final val fiber =
+        new PoolFiberFactory (actorEnv.pool.executors)
+                        .create (new ActorExecutor (this))
 
     /**
      * Current sender. Only valid when act method is called.
@@ -36,15 +41,16 @@ abstract class Actor (actorEnv : ActorEnv)
     protected var sender : Option[Actor] = None
 
     /**
-     * A fiber used by this actor.
+     * Method returns a partial function which must process
+     * messages handled by actor. Function returns by default actor
+     * processes no messages.
      */
-    private[this] val fiber =
-        new PoolFiberFactory (actorEnv.pool.executors)
-                        .create (new ActorExecutor (this))
-
+    protected def act(): PartialFunction[Any, Unit] =
+                    Actor.defaultActMessageHandler
 
     /**
-     * Queue message for processing by this actor.
+     * Queue message for processing by this actor. This is alias for ! method.
+     *
      * @param msg message to process
      */
     final def queue (msg: Any): Unit = this ! msg
@@ -79,7 +85,7 @@ abstract class Actor (actorEnv : ActorEnv)
     /**
      * Invokes this actor's act() method.
      */
-    private[this] def invokeAct (msg : Any, sentFrom : Option[Actor]) =
+    private def invokeAct (msg : Any, sentFrom : Option[Actor]) =
     {
         sender = sentFrom
 
@@ -110,24 +116,29 @@ abstract class Actor (actorEnv : ActorEnv)
         debug ("About to stop")
         fiber.dispose
     }
-}
 
-/**
- * Helper object for the Actor class.
- */
-private[actor] object Actor {
     /**
-     * Default body of action handler. Processes no messages.
+     * Scans this actor and creates an implementation of MethodDispatcher
+     * suitable to forward request for message processing to an appropriate
+     * annotated method of this object. It also subscribes.
      */
-    protected final val defaultActMessageHandler =
-        new PartialFunction[Any, Unit] {
-            def isDefinedAt (msg : Any) = false
-            def apply (msg : Any) = ()
-        }
+    private def createDispatcherAndSubscribe : MethodDispatcher = {
+        null
+    }
+
+    /**
+     * Concrete implementation of this class is supposed to forward
+     * a message processing request to an annotated method of the
+     * enclosed class.
+     */
+    protected abstract class MethodDispatcher {
+        def dispatch (msg : Any) : Unit
+    }
 }
 
 /**
  * Executor of queued actors.
+ *
  * @param actor this actor will be used as a current actor
  *        when processing messages of the actor.
  */
@@ -153,4 +164,18 @@ private[actor] class ActorExecutor (actor : Actor)
  */
 private[actor] object ThreadLocalState {
     final val current = new ThreadLocal[Option[Actor]]()
+}
+
+/**
+ * Helper object for the Actor class.
+ */
+private[actor] object Actor {
+    /**
+     * Default body of action handler. Processes no messages.
+     */
+    protected val defaultActMessageHandler =
+        new PartialFunction[Any, Unit] {
+            def isDefinedAt (msg : Any) = false
+            def apply (msg : Any) = ()
+        }    
 }
