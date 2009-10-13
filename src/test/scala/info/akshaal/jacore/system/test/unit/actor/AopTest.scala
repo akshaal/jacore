@@ -28,12 +28,12 @@ class AopTest extends BaseUnitTest {
 
         UnitTestModule.actorManager.startActor (aopTestActor)
         
-        Thread.sleep (1000)
+        sleep
         assertEquals (aopTestActor.sum, 1)
 
         aopTestActor.inc ()
 
-        Thread.sleep (1000)
+        sleep
         assertEquals (aopTestActor.sum, 2)
 
         UnitTestModule.actorManager.stopActor (aopTestActor)
@@ -46,8 +46,35 @@ class AopTest extends BaseUnitTest {
         val actor = injector.getInstance (classOf[ActAnnotationTestActor])
 
         UnitTestModule.actorManager.startActor (actor)
+
+        // Initial values
+        assertNull (actor.obj)
+        assertNull (actor.str)
+        assertEquals (actor.int, -1)
+
+        // Test sending int
+        actor ! 2
+        sleep
+        assertNull (actor.obj)
+        assertNull (actor.str)
+        assertEquals (actor.int, 2)
+
+        // Test sending string
+        actor ! "Hullo"
+        assertNull (actor.obj)
+        assertEquals (actor.str, "Hullo")
+        assertEquals (actor.int, 2)
+
+        // Test sending object
+        actor ! 'ArbObject
+        assertEquals (actor.obj, 'ArbObject)
+        assertEquals (actor.str, "Hullo")
+        assertEquals (actor.int, 2)
+        
         UnitTestModule.actorManager.stopActor (actor)
     }
+
+    def sleep : Unit = Thread.sleep (1000)
 }
 
 /**
@@ -66,4 +93,22 @@ class AopTestActor extends HiPriorityActor {
  * Actor to test @Act annotation.
  */
 class ActAnnotationTestActor extends HiPriorityActor {
+    var obj : Object = null
+    var int : Int = -1
+    var str : String = null
+
+    @Act
+    def onMessage (msg : Object) : Unit = {
+
+    }
+
+    @Act
+    def onMessage (msg : Int) : Unit = {
+
+    }
+
+    @Act
+    def onMessage (msg : String) : Unit = {
+
+    }
 }

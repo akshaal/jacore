@@ -9,7 +9,8 @@ import Predefs._
 import logger.Logging
 
 /**
- * Very simple and hopefully fast implementation of actors
+ * Very simple and hopefully fast implementation of actors.
+ *
  * @param actorEnv environment for actor
  */
 abstract class Actor (actorEnv : ActorEnv)
