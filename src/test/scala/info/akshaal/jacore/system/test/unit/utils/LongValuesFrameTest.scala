@@ -30,6 +30,7 @@ class LongValuesFrameTest extends BaseUnitTest {
     def zeroWidth () = {
         val frame = new LongValueFrame (0)
         frame.put (1)
+        assertFalse (true)
     }
 
     /**
@@ -41,6 +42,7 @@ class LongValuesFrameTest extends BaseUnitTest {
     def negativeWidth () = {
         val frame = new LongValueFrame (-2)
         frame.put (1)
+        assertFalse (true)
     }
 
     /**

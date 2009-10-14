@@ -129,7 +129,7 @@ abstract class Actor (actorEnv : ActorEnv)
         // Check methods and collect information
         var methods : List[(String, Class[_])] = Nil
 
-        for (val method <- getClass.getMethods if method.isAnnotationPresent (classOf[Act])) {
+        for (method <- getClass.getMethods if method.isAnnotationPresent (classOf[Act])) {
             val methodName = method.getName
 
             def unrecover (str : String) {
@@ -148,14 +148,16 @@ abstract class Actor (actorEnv : ActorEnv)
             }
 
             val returnType = method.getReturnType
-            if (!returnType.equals (classOf[Void])) {
-                unrecover ("must return nothing")
+            if (returnType != Void.TYPE) {
+                unrecover ("must return nothing, but returns " + returnType.getName)
             }
 
             val paramTypes = method.getParameterTypes
-            if (paramTypes.length != 1) {
-                unrecover ("must have only one argument")
+            if (paramTypes.length == 0) {
+                unrecover ("must have at least one argument")
             }
+
+            // TODO: Check if overloaded, prohibit it
 
             methods = (methodName, paramTypes(0)) :: methods
         }

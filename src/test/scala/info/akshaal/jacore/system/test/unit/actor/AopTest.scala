@@ -12,6 +12,7 @@ import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 import org.testng.annotations.Test
 import org.testng.Assert._
 import system.annotation.{CallByMessage, Act}
+import com.google.inject.ProvisionException
 
 /**
  * Test for aspected things of actors.
@@ -74,6 +75,42 @@ class AopTest extends BaseUnitTest {
         UnitTestModule.actorManager.stopActor (actor)
     }
 
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor1 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor1])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor2 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor2])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor3 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor3])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor4 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor4])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor5 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor5])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor6 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor6])
+        assertTrue (false)
+    }
+
     def sleep : Unit = Thread.sleep (1000)
 }
 
@@ -98,17 +135,73 @@ class ActAnnotationTestActor extends HiPriorityActor {
     var str : String = null
 
     @Act
-    def onMessage (msg : Object) : Unit = {
-
+    def onObjectMessage (msg : Object) : Unit = {
+        this.obj = msg
     }
 
     @Act
-    def onMessage (msg : Int) : Unit = {
-
+    def onIntegerMessage (msg : Int) : Unit = {
+        this.int = msg
     }
 
     @Act
-    def onMessage (msg : String) : Unit = {
-
+    def onStringMessage (msg : String) : Unit = {
+        this.str = msg
     }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor1 extends HiPriorityActor {
+    @Act
+    def onMessage : Unit = {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor2 extends HiPriorityActor {
+    @Act
+    private def onMessage : Unit = {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor3 extends HiPriorityActor {
+    @Act
+    def onMessage (x : Int) : Int = x
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor4 extends HiPriorityActor {
+    @Act
+    def onMessage (x : Int) : Unit = {}
+    
+    @Act
+    def onMessage (x : String) : Unit = {}
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor5 extends HiPriorityActor {
+    @Act
+    def onMessage (x : String, y : String) : Unit = {}
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor6 extends HiPriorityActor {
+    @Act
+    def onMessage (x : String) : Unit = {}
+
+    @Act
+    def onMessage2 (x : String) : Unit = {}
 }
