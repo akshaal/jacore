@@ -127,7 +127,7 @@ abstract class Actor (actorEnv : ActorEnv)
      */
     private def createDispatcherAndSubscribe : MethodDispatcher = {
         // Check methods and collect information
-        var methods : List[(String, Class[_])] = Nil
+        var methods : List[ActMethodDesc] = Nil
 
         for (method <- getClass.getMethods if method.isAnnotationPresent (classOf[Act])) {
             val methodName = method.getName
@@ -157,7 +157,11 @@ abstract class Actor (actorEnv : ActorEnv)
                 unrecover ("must have at least one argument")
             }
 
-            methods = (methodName, paramTypes(0)) :: methods
+            // Gather information
+            val actAnnotation = method.getAnnotation (classOf[Act])
+
+            methods ::= ActMethodDesc (name = methodName,
+                                       subscribe = actAnnotation.subscribe)
         }
 
         // TODO: groupBy to find duplicates
@@ -175,6 +179,15 @@ abstract class Actor (actorEnv : ActorEnv)
         def dispatch (msg : Any) : Unit
     }
 }
+
+/**
+ * Describes a method annotated with @Act annotation.
+ */
+private[actor] sealed case class ActMethodDesc (name : String,
+                                                subscribe : Boolean)
+
+private[actor] sealed case class ActMethodParamDesc (clazz : Class[Any],
+                                                     extractor : Option[Class[Any]])
 
 /**
  * Executor of queued actors.

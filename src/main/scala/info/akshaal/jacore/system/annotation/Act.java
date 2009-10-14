@@ -13,5 +13,5 @@ import java.lang.annotation.ElementType;
 @Retention (RetentionPolicy.RUNTIME)
 @Target (ElementType.METHOD)
 public @interface Act {
-    boolean subscribed () default false;
+    boolean subscribe () default false;
 }
