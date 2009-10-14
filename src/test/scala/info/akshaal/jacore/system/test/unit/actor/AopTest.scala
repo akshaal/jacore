@@ -10,8 +10,9 @@ package system.test.unit.actor
 
 import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 import org.testng.annotations.Test
+import info.akshaal.jacore.system.actor.MessageExtractor
 import org.testng.Assert._
-import system.annotation.{CallByMessage, Act}
+import system.annotation.{CallByMessage, Act, ExtractBy}
 import com.google.inject.ProvisionException
 
 /**
@@ -111,6 +112,24 @@ class AopTest extends BaseUnitTest {
         assertTrue (false)
     }
 
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor7 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor7])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor8 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor8])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor9 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor9])
+        assertTrue (false)
+    }
+
     def sleep : Unit = Thread.sleep (1000)
 }
 
@@ -204,4 +223,42 @@ class InvalidTestActor6 extends HiPriorityActor {
 
     @Act
     def onMessage2 (x : String) : Unit = {}
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor7 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : Object,
+                   @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor8 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : String,
+                   @ExtractBy(classOf[StringIdentityExtractor]) y : String,
+                   @ExtractBy(classOf[StringIdentityExtractor]) z : String) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor9 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : String,
+                   @ExtractBy(classOf[StringIdentityExtractor]) y : Int) : Unit =
+    {
+    }
+}
+
+class StringIdentityExtractor extends MessageExtractor[String, String] {
+    override def extractFrom (msg : String) = msg
 }

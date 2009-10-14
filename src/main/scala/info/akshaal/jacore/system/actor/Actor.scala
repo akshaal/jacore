@@ -157,8 +157,6 @@ abstract class Actor (actorEnv : ActorEnv)
                 unrecover ("must have at least one argument")
             }
 
-            // TODO: Check if overloaded, prohibit it
-
             methods = (methodName, paramTypes(0)) :: methods
         }
 
