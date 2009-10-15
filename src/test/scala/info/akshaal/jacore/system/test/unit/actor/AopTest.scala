@@ -83,12 +83,6 @@ class AopTest extends BaseUnitTest {
     }
 
     @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor2 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor2])
-        assertTrue (false)
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
     def testInvalidActor3 () = {
         UnitTestModule.injector.getInstance(classOf[InvalidTestActor3])
         assertTrue (false)
@@ -175,15 +169,6 @@ class ActAnnotationTestActor extends HiPriorityActor {
 class InvalidTestActor1 extends HiPriorityActor {
     @Act
     def onMessage : Unit = {
-    }
-}
-
-/**
- * Invalid actor.
- */
-class InvalidTestActor2 extends HiPriorityActor {
-    @Act
-    private def onMessage : Unit = {
     }
 }
 

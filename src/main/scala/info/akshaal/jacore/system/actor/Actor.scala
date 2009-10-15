@@ -9,7 +9,7 @@ import java.lang.reflect.Modifier
 
 import Predefs._
 import logger.Logging
-import annotation.Act
+import annotation.{Act, ExtractBy}
 
 /**
  * Implementation of actors.
@@ -129,6 +129,9 @@ abstract class Actor (actorEnv : ActorEnv)
         // Check methods and collect information
         var methods : List[ActMethodDesc] = Nil
 
+        // For each annotated method (including inherited) of this class
+        val allMethodNames = getClass.getMethods.map (_.getName)
+
         for (method <- getClass.getMethods if method.isAnnotationPresent (classOf[Act])) {
             val methodName = method.getName
 
@@ -136,7 +139,7 @@ abstract class Actor (actorEnv : ActorEnv)
                 throw new UnrecoverableError ("Action method " + methodName + " " + str)
             }
 
-            // Checks
+            // Checks modifiers
             val modifiers = method.getModifiers
 
             if (Modifier.isPrivate (modifiers)) {
@@ -147,24 +150,61 @@ abstract class Actor (actorEnv : ActorEnv)
                 unrecover ("must not be static")
             }
 
+            // Check return type
             val returnType = method.getReturnType
             if (returnType != Void.TYPE) {
                 unrecover ("must return nothing, but returns " + returnType.getName)
             }
 
+            // Check uniqueness of method name
+            if (allMethodNames.filter(_ == methodName).length > 1) {
+                unrecover ("must not be overloaded")
+            }
+
+            // Check params
             val paramTypes = method.getParameterTypes
             if (paramTypes.length == 0) {
                 unrecover ("must have at least one argument")
+            }
+
+            val paramExtractors =
+                method.getParameterAnnotations.map (
+                        _.find (_.isInstanceOf [ExtractBy])
+                         .map (_.asInstanceOf [ExtractBy].value())
+                    )
+
+            val paramDescs =
+                for ((paramClazz, paramExtractor) <- paramTypes.zip (paramExtractors))
+                    yield ActMethodParamDesc (clazz = paramClazz,
+                                              extractor = paramExtractor)
+
+            if (paramDescs.filter (_.extractor.isEmpty).length > 1) {
+                unrecover ("must have no more than one argument without extractor")
+            }
+
+            if (Set(paramDescs : _*).size != paramDescs.length) {
+                unrecover ("must not have duplicated arguments")
             }
 
             // Gather information
             val actAnnotation = method.getAnnotation (classOf[Act])
 
             methods ::= ActMethodDesc (name = methodName,
-                                       subscribe = actAnnotation.subscribe)
+                                       subscribe = actAnnotation.subscribe,
+                                       params = paramDescs)
         }
 
-        // TODO: groupBy to find duplicates
+        // Sanity checks on class level
+        val methodMatchingSets =
+                methods.map (methodDesc => (methodDesc.name, Set (methodDesc.params : _*)))
+
+        for ((_, methodGroup) <- methodMatchingSets.groupBy (_._2)) {
+            if (methodGroup.length > 1) {
+                throw new UnrecoverableError ("More than one mathod match the same messages: "
+                                              + methodGroup.map(_._1).mkString(" "))
+            }
+        }
+
         // TODO: sortWith to order
 
         null
@@ -184,10 +224,11 @@ abstract class Actor (actorEnv : ActorEnv)
  * Describes a method annotated with @Act annotation.
  */
 private[actor] sealed case class ActMethodDesc (name : String,
-                                                subscribe : Boolean)
+                                                subscribe : Boolean,
+                                                params : Seq[ActMethodParamDesc])
 
-private[actor] sealed case class ActMethodParamDesc (clazz : Class[Any],
-                                                     extractor : Option[Class[Any]])
+private[actor] sealed case class ActMethodParamDesc (clazz : Class[_ <: Any],
+                                                     extractor : Option[Class[_ <: Any]])
 
 /**
  * Executor of queued actors.
