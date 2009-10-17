@@ -122,11 +122,10 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     private def createDispatcherAndSubscribe : MethodDispatcher = {
         val actMethods = ActorClassScanner.scan (this)
 
-        new MethodDispatcher () {
-            override def dispatch (msg : Any) : Boolean = {
-                false
-            }
-        }
+        // TODO: Subscribe
+
+        new ActorMethodDispatcherGenerator (this, actMethods)
+                       .create ().asInstanceOf[MethodDispatcher]
     }
 
     /**

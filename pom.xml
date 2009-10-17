@@ -23,6 +23,8 @@
         <log4j.version>1.2.15</log4j.version>
         <guice.version>2.0</guice.version>
         <aopalliance.version>1.0</aopalliance.version>
+        <cglib.version>2.2</cglib.version>
+        <asm.version>3.2</asm.version>
 
         <!-- Plugin versions -->
         <maven-scala-plugin.version>2.12</maven-scala-plugin.version>
@@ -54,6 +56,18 @@
             <groupId>aopalliance</groupId>
             <artifactId>aopalliance</artifactId>
             <version>${aopalliance.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
         </dependency>
 
         <dependency>
@@ -160,7 +174,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>
-                        -Djava.library.path=${basedir}/src/main/native/${host.native.id}
+                        -Djava.library.path=${basedir}/src/main/native/${host.native.id} -Dcglib.debugLocation=${basedir}/target/cglib
                     </argLine>
 
                     <suiteXmlFiles>
