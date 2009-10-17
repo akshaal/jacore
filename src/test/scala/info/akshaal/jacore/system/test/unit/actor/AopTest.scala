@@ -11,6 +11,7 @@ package system.test.unit.actor
 import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 import org.testng.annotations.Test
 import info.akshaal.jacore.system.actor.MessageExtractor
+import java.math.BigInteger
 import org.testng.Assert._
 import system.annotation.{CallByMessage, Act, ExtractBy}
 import com.google.inject.ProvisionException
@@ -123,6 +124,31 @@ class AopTest extends BaseUnitTest {
         UnitTestModule.injector.getInstance(classOf[InvalidTestActor9])
         assertTrue (false)
     }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor10 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor10])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor11 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor11])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor12 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor12])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor13 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor13])
+        assertTrue (false)
+    }
+
 
     def sleep : Unit = Thread.sleep (1000)
 }
@@ -244,6 +270,61 @@ class InvalidTestActor9 extends HiPriorityActor {
     }
 }
 
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor10 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : String,
+                   @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+    {
+    }
+
+    @Act
+    def onMessage2 (msg : String,
+                    @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor11 extends HiPriorityActor {
+    @Act
+    def onMessage2 (msg : String,
+                    @ExtractBy(classOf[BadExtractor]) y : String) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor12 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : BigInteger,
+                   @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor13 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : String,
+                   @ExtractBy(classOf[StringIdentityExtractor]) y : BigInteger) : Unit =
+    {
+    }
+}
+
 class StringIdentityExtractor extends MessageExtractor[String, String] {
     override def extractFrom (msg : String) = msg
+}
+
+class BadExtractor extends MessageExtractor[String, String] {
+    override def extractFrom (msg : String) = msg
+    def extractFrom (msg : java.lang.Integer) = msg
 }

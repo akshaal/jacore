@@ -142,10 +142,6 @@ abstract class Actor (actorEnv : ActorEnv)
             // Checks modifiers
             val modifiers = method.getModifiers
 
-            if (Modifier.isPrivate (modifiers)) {
-                unrecover ("must not be private")
-            }
-
             if (Modifier.isStatic (modifiers)) {
                 unrecover ("must not be static")
             }
@@ -157,7 +153,7 @@ abstract class Actor (actorEnv : ActorEnv)
             }
 
             // Check uniqueness of method name
-            if (allMethodNames.filter(_ == methodName).length > 1) {
+            if (allMethodNames.count(_ == methodName) > 1) {
                 unrecover ("must not be overloaded")
             }
 
@@ -178,11 +174,66 @@ abstract class Actor (actorEnv : ActorEnv)
                     yield ActMethodParamDesc (clazz = paramClazz,
                                               extractor = paramExtractor)
 
-            if (paramDescs.filter (_.extractor.isEmpty).length > 1) {
+            if (!paramDescs.head.extractor.isEmpty) {
+                unrecover ("can't have extraction as a first argument."
+                           + " First argument must be a message method receives.")
+            }
+
+            if (paramDescs.count (_.extractor.isEmpty) > 1) {
                 unrecover ("must have no more than one argument without extractor")
             }
 
-            if (Set(paramDescs : _*).size != paramDescs.length) {
+            // Create matcher
+            val acceptMessageClass = paramDescs.head.clazz
+            val messageExtractions =
+                    for (paramDesc <- paramDescs.tail)
+                            yield MessageExtraction (acceptExtractionClass = paramDesc.clazz,
+                                                     messageExtractor = paramDesc.extractor.get)
+
+            for (messageExtraction <- messageExtractions) {
+                val extractor = messageExtraction.messageExtractor
+                val acceptExtractionClass = messageExtraction.acceptExtractionClass
+
+                if (acceptExtractionClass.isPrimitive) {
+                    unrecover ("can't use primitive types for extractions")
+                }
+
+                if (!classOf[MessageExtractor[Any, Any]].isAssignableFrom(extractor)) {
+                    unrecover ("has an extractor not implementing MessageExtractor interface: "
+                               + extractor)
+                }
+
+                val extractingMethods =
+                        extractor.getMethods
+                                 .filter (m => m.getName == "extractFrom" && !m.isSynthetic)
+                if (extractingMethods.length > 1) {
+                    unrecover ("uses an extractor with overloaded extractFrom method: "
+                               + extractor)
+                }
+
+                val extractorMethod = extractingMethods.head
+                val extractorMethodArg = extractorMethod.getParameterTypes()(0)
+                val extractorMethodReturn = extractorMethod.getReturnType
+
+                if (!extractorMethodArg.isAssignableFrom(acceptMessageClass)) {
+                    unrecover ("uses extractor " + extractor
+                               + " which can't handle messages of class " + acceptMessageClass)
+                }
+
+                if (!extractorMethodReturn.isAssignableFrom(acceptExtractionClass)
+                    && !acceptExtractionClass.isAssignableFrom(extractorMethodReturn))
+                {
+                    unrecover ("uses extractor " + extractor
+                               + " which produces values of class incompatible"
+                               + " to the class of extraction (argument)")
+                }
+            }
+
+            val messageMatcher =
+                    MessageMatcher (acceptMessageClass = acceptMessageClass,
+                                    messageExtractions = Set(messageExtractions : _*))
+
+            if (messageMatcher.messageExtractions.size != paramDescs.length - 1) {
                 unrecover ("must not have duplicated arguments")
             }
 
@@ -191,17 +242,18 @@ abstract class Actor (actorEnv : ActorEnv)
 
             methods ::= ActMethodDesc (name = methodName,
                                        subscribe = actAnnotation.subscribe,
-                                       params = paramDescs)
+                                       params = paramDescs,
+                                       matcher = messageMatcher)
+
         }
 
-        // Sanity checks on class level
-        val methodMatchingSets =
-                methods.map (methodDesc => (methodDesc.name, Set (methodDesc.params : _*)))
+        debugLazy ("Found action methods " + methods)
 
-        for ((_, methodGroup) <- methodMatchingSets.groupBy (_._2)) {
+        // Sanity checks on class level
+        for ((_, methodGroup) <- methods.groupBy (_.matcher)) {
             if (methodGroup.length > 1) {
                 throw new UnrecoverableError ("More than one mathod match the same messages: "
-                                              + methodGroup.map(_._1).mkString(" "))
+                                              + methodGroup.map(_.name).mkString(" "))
             }
         }
 
@@ -225,7 +277,8 @@ abstract class Actor (actorEnv : ActorEnv)
  */
 private[actor] sealed case class ActMethodDesc (name : String,
                                                 subscribe : Boolean,
-                                                params : Seq[ActMethodParamDesc])
+                                                params : Seq[ActMethodParamDesc],
+                                                matcher : MessageMatcher)
 
 private[actor] sealed case class ActMethodParamDesc (clazz : Class[_ <: Any],
                                                      extractor : Option[Class[_ <: Any]])
