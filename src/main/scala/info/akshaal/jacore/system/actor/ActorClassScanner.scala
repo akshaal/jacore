@@ -135,8 +135,10 @@ private[actor] object ActorClassScanner extends Logging {
                     MessageMatcher (acceptMessageClass = acceptMessageClass,
                                     messageExtractions = Set(messageExtractions : _*))
 
-            if (messageMatcher.messageExtractions.size != paramDescs.length - 1) {
-                badMethod ("must not have duplicated arguments")
+            if (messageMatcher.messageExtractions.map(_.messageExtractor).size
+                                        != paramDescs.length - 1)
+            {
+                badMethod ("must not use same extractor multiple times")
             }
 
             // Gather information

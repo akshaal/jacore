@@ -208,7 +208,54 @@ private[actor] object ActorMethodDispatcherGenerator {
         private def compareExtractions (extractions1 : Set[MessageExtraction],
                                         extractions2 : Set[MessageExtraction]) : Int =
         {
-            -1 // TODO
+            // Map extractor to extraction class
+            def mapFromExtraction (extractions : Set[MessageExtraction])
+                                                            : Map[Class[_], Class[_]] =
+            {
+                Map (extractions.toSeq
+                                .map (ex => (ex.messageExtractor, ex.acceptExtractionClass)) : _*)
+            }
+
+            val map1 = mapFromExtraction (extractions1)
+            val map2 = mapFromExtraction (extractions2)
+            val extractors1 = map1.keySet
+            val extractors2 = map2.keySet
+            
+            // Compare by common extractors
+            val commonExtractors = extractors1.intersect (extractors2)
+            var commonSupers1 = 0
+            var commonSupers2 = 0
+            for (commonExtractor <- commonExtractors) {
+                val extraction1 = map1 (commonExtractor)
+                val extraction2 = map2 (commonExtractor)
+                val extraction1IsSuper = extraction1.isAssignableFrom (extraction2)
+                val extraction2IsSuper = extraction2.isAssignableFrom (extraction1)
+
+                if (!extraction1IsSuper && extraction2IsSuper) {
+                    commonSupers2 += 1
+                } else if (extraction1IsSuper && !extraction2IsSuper) {
+                    commonSupers1 += 1
+                }
+            }
+
+            if (commonSupers2 > commonSupers1) {
+                return -1
+            } else if (commonSupers2 < commonSupers1) {
+                return 1
+            }
+
+            // Compare by number of uniq extractors
+            val uniq1 = extractors1.size - commonExtractors.size
+            val uniq2 = extractors2.size - commonExtractors.size
+
+            if (uniq2 > uniq1) {
+                return 1
+            } else if (uniq2 < uniq1) {
+                return -1
+            }
+
+            // There is no other option, but to use hashcode... TODO
+            return -1
         }
     }
 }
