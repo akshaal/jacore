@@ -255,7 +255,7 @@ private[actor] object ActorMethodDispatcherGenerator {
             }
 
             // There is no other option, but to use hashcode... TODO
-            return -1
+            return extractions1.hashCode.compare (extractions2.hashCode)
         }
     }
 }
