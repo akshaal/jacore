@@ -12,6 +12,7 @@ import logger.Logging
 
 import java.lang.reflect.Modifier
 import annotation.{Act, ExtractBy}
+import utils.ClassUtils
 
 /**
  * The sole role of this class is to scan Actor classes for methods annotated with @Act
@@ -88,19 +89,16 @@ private[actor] object ActorClassScanner extends Logging {
             }
 
             // Create matcher
-            val acceptMessageClass = paramDescs.head.clazz
+            val acceptMessageClass = ClassUtils.box (paramDescs.head.clazz)
             val messageExtractions =
                     for (paramDesc <- paramDescs.tail)
-                            yield MessageExtraction (acceptExtractionClass = paramDesc.clazz,
-                                                     messageExtractor = paramDesc.extractor.get)
+                            yield MessageExtraction (
+                                        acceptExtractionClass = ClassUtils.box (paramDesc.clazz),
+                                        messageExtractor = paramDesc.extractor.get)
 
             for (messageExtraction <- messageExtractions) {
                 val extractor = messageExtraction.messageExtractor
                 val acceptExtractionClass = messageExtraction.acceptExtractionClass
-
-                if (acceptExtractionClass.isPrimitive) {
-                    badMethod ("can't use primitive types for extractions")
-                }
 
                 if (!classOf[MessageExtractor[Any, Any]].isAssignableFrom(extractor)) {
                     badMethod ("has an extractor not implementing MessageExtractor interface: "

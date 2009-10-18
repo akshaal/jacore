@@ -54,6 +54,7 @@ class AopTest extends BaseUnitTest {
         assertNull (actor.obj)
         assertNull (actor.str)
         assertEquals (actor.int, -1)
+        assertFalse (actor.emptyString)
 
         // Test sending int
         actor ! 2
@@ -61,18 +62,34 @@ class AopTest extends BaseUnitTest {
         assertNull (actor.obj)
         assertNull (actor.str)
         assertEquals (actor.int, 2)
+        assertFalse (actor.emptyString)
 
         // Test sending string
         actor ! "Hullo"
+        sleep
+        assertTrue (actor.never1)
         assertNull (actor.obj)
         assertEquals (actor.str, "Hullo")
         assertEquals (actor.int, 2)
+        assertFalse (actor.emptyString)
 
         // Test sending object
         actor ! 'ArbObject
+        sleep
+        assertTrue (actor.never1)
         assertEquals (actor.obj, 'ArbObject)
         assertEquals (actor.str, "Hullo")
         assertEquals (actor.int, 2)
+        assertFalse (actor.emptyString)
+
+        // Test sending empty string
+        actor ! ""
+        sleep
+        assertTrue (actor.never1)
+        assertEquals (actor.obj, 'ArbObject)
+        assertEquals (actor.str, "Hullo")
+        assertEquals (actor.int, 2)
+        assertTrue (actor.emptyString)
         
         UnitTestModule.actorManager.stopActor (actor)
     }
@@ -172,6 +189,8 @@ class ActAnnotationTestActor extends HiPriorityActor {
     var obj : Object = null
     var int : Int = -1
     var str : String = null
+    var emptyString = false
+    var never1 = true
 
     @Act
     def onObjectMessage (msg : Object) : Unit = {
@@ -186,6 +205,20 @@ class ActAnnotationTestActor extends HiPriorityActor {
     @Act
     def onStringMessage (msg : String) : Unit = {
         this.str = msg
+    }
+
+    @Act
+    def onEmptyStringMessageWider (msg : String,
+                              @ExtractBy(classOf[EmptyStringExtractor]) s : Object) : Unit =
+    {
+        this.never1 = false
+    }
+
+    @Act
+    def onEmptyStringMessage (msg : String,
+                              @ExtractBy(classOf[EmptyStringExtractor]) s : String) : Unit =
+    {
+        this.emptyString = true
     }
 }
 
@@ -322,6 +355,10 @@ class InvalidTestActor13 extends HiPriorityActor {
 
 class StringIdentityExtractor extends MessageExtractor[String, String] {
     override def extractFrom (msg : String) = msg
+}
+
+class EmptyStringExtractor extends MessageExtractor[String, String] {
+    override def extractFrom (msg : String) = if (msg.isEmpty) "" else null
 }
 
 class BadExtractor extends MessageExtractor[String, String] {

@@ -122,14 +122,18 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     private def createDispatcherAndSubscribe : MethodDispatcher = {
         val actMethods = ActorClassScanner.scan (this)
 
-        // TODO: Subscribe
+        if (actMethods.isEmpty) {
+            EmptyMethodDispatcher
+        } else {
+            // TODO: Subscribe
 
-        new ActorMethodDispatcherGenerator (this, actMethods)
-                       .create ().asInstanceOf[MethodDispatcher]
+            new ActorMethodDispatcherGenerator (this, actMethods)
+                           .create ().asInstanceOf[MethodDispatcher]
+        }
     }
 
     /**
-     * Concrete implementation of this class is supposed to forward
+     * Implementation of this class is supposed to forward
      * a message processing request to an annotated method of the
      * enclosed class.
      */
@@ -141,6 +145,17 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
          * @return true if message has been forwarded
          */
         def dispatch (msg : Any) : Boolean
+    }
+
+    /**
+     * Implementations that is to be used for Actor classes with no methods annotated with @Act
+     * annotations.
+     */
+    private object EmptyMethodDispatcher extends MethodDispatcher {
+        /**
+         * {@Inherited}
+         */
+        override def dispatch (msg : Any) : Boolean = false
     }
 }
 
