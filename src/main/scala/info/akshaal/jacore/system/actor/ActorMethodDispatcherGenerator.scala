@@ -10,9 +10,11 @@ package actor
 import Predefs._
 import logger.Logging
 
-import org.objectweb.asm.{ClassVisitor, Opcodes, Type}
-import net.sf.cglib.core.{ReflectUtils, DefaultNamingPolicy}
+import org.objectweb.asm.{ClassVisitor, MethodVisitor, Opcodes, Type, Label, ClassWriter}
+import net.sf.cglib.core.{ReflectUtils, DefaultNamingPolicy, DefaultGeneratorStrategy,
+                          DebuggingClassWriter}
 import java.util.{Arrays, Comparator}
+import scala.collection.mutable.HashMap
 
 /**
  * Generates instances of MethodDispatcher classes for Actors.
@@ -35,6 +37,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
     def create () : Object = {
         setNamePrefix (actorClassName)
         setNamingPolicy (NamingPolicy)
+        setStrategy (GeneratorStrategy)
         super.create (actorClassName)
     }
 
@@ -50,7 +53,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         debugLazy ("Generating " + getClassName)
 
         // Class header
-        cv.visit (Opcodes.V1_6,
+        cv.visit (Opcodes.V1_5,
                   Opcodes.ACC_PUBLIC + Opcodes.ACC_FINAL,
                   implClassIN,
                   null, /* signature */
@@ -73,6 +76,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
                             null /* excs */)
 
         iv.visitCode ()
+        iv.visitMaxs (2, 2)
         iv.visitVarInsn (Opcodes.ALOAD, 0)
         iv.visitVarInsn (Opcodes.ALOAD, 1)
         iv.visitFieldInsn (Opcodes.PUTFIELD,
@@ -86,7 +90,6 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
                             "<init>",
                             "(L" + superClassIN + ";)V")
         iv.visitInsn (Opcodes.RETURN)
-        iv.visitMaxs (0, 0)
         iv.visitEnd ()
 
         // Emit 'dispatch' method
@@ -125,15 +128,117 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
                                  null /* excs */)
 
         mv.visitCode ()
-        /* doItVisitor.visitVarInsn (Opcodes.ALOAD, 0); // this
-        doItVisitor.visitFieldInsn (Opcodes.GETFIELD, "Victim$DispatcherGeneratedImpl", "this$0", "LVictim;");
-        doItVisitor.visitMethodInsn (Opcodes.INVOKEVIRTUAL, "Victim", "act", "()V");*/
+
+        // Maxs
+        val maxExtractionsPerMethod = 1 // TODO
+        val stackSize = maxExtractionsPerMethod + 2 /* 2 means 'this, msg' */
+        val argsNum = 2 /* 2 means 'this, msg' */
+        val localsSize = maxExtractionsPerMethod + argsNum
+        mv.visitMaxs (stackSize, localsSize)
+
+        // Gen code
+        for (method <- sortedMethods) {
+            emitDispatchCodeForMethod (mv, actorClassIN, implClassIN, method)
+        }
 
         mv.visitInsn (Opcodes.ICONST_0)
         mv.visitInsn (Opcodes.IRETURN)
-        mv.visitMaxs (0, 0)
 
+        // End
         mv.visitEnd ();
+    }
+
+    /**
+     * Emit 'dispatch' method.
+     * @param cv class visitor
+     * @param actorClassIN class internal name of actor
+     * @param implClassIN class internal name of implementation class of dispatcher
+     */
+    private def emitDispatchCodeForMethod (mv : MethodVisitor,
+                                           actorClassIN : String,
+                                           implClassIN : String,
+                                           method : ActMethodDesc) : Unit =
+    {
+        val matcher = method.matcher
+        val skipInvocation = new Label
+
+        // Check message with instanceof
+        emitLoadMsg (mv)
+        emitInstanceOfCheck (mv, matcher.acceptMessageClass, skipInvocation)
+
+        // Check extractions
+        var freeSlot = 2
+        var usedSlots = new HashMap[Class[_], Int]
+        for (extraction <- matcher.messageExtractions) {
+            val extractorIN = internalNameOf (extraction.messageExtractor)
+
+            // Store result
+            mv.visitTypeInsn (Opcodes.NEW, extractorIN)
+            mv.visitInsn (Opcodes.DUP)
+            mv.visitMethodInsn (Opcodes.INVOKESPECIAL,
+                                extractorIN,
+                                "<init>",
+                                "()V")
+            mv.visitInsn (Opcodes.DUP)
+            mv.visitVarInsn (Opcodes.ASTORE, freeSlot)
+
+            // Check result
+            emitInstanceOfCheck (mv, extraction.acceptExtractionClass, skipInvocation)
+
+            // Remember
+            usedSlots (extraction.messageExtractor) = freeSlot
+            freeSlot += 1
+        }
+
+        // Invoke
+
+        // return true
+        mv.visitInsn (Opcodes.ICONST_1)
+        mv.visitInsn (Opcodes.IRETURN)
+
+        // End
+        mv.visitLabel (skipInvocation)
+    }
+
+    /**
+     * Emit instruction to check value on stack with instanceof instruction. If check fails
+     * instruction counter will be set to instruction pointed by label.
+     */
+    private def emitInstanceOfCheck (mv : MethodVisitor, clazz : Class[_], ifNot : Label) : Unit =
+    {
+        mv.visitTypeInsn (Opcodes.INSTANCEOF, internalNameOf (clazz))
+        mv.visitJumpInsn (Opcodes.IFEQ, ifNot)
+    }
+
+    /**
+     * Put "this" object on stack.
+     * @param mv method visitor
+     */
+    private def emitLoadThis (mv : MethodVisitor) : Unit = {
+        mv.visitVarInsn (Opcodes.ALOAD, 0)
+    }
+
+    /**
+     * Put "msg" object on stack.
+     * @param mv method visitor
+     */
+    private def emitLoadMsg (mv : MethodVisitor) : Unit = {
+        mv.visitVarInsn (Opcodes.ALOAD, 1)
+    }
+
+    /**
+     * Get internal name of classes including objects.
+     * @param clazz class
+     * @return internal name
+     */
+    private def internalNameOf (clazz : Class[_]) : String = {
+        val ty = Type.getType (clazz)
+
+        if (clazz.isArray) {
+            ty.getDescriptor
+        } else {
+            ty.getInternalName
+        }
     }
 
     /**
@@ -165,6 +270,15 @@ private[actor] object ActorMethodDispatcherGenerator {
      */
     object NamingPolicy extends DefaultNamingPolicy {
         override protected def getTag : String = "ByJacore"
+    }
+
+    /**
+     * Custom generator strategy.
+     */
+    object GeneratorStrategy extends DefaultGeneratorStrategy {
+        protected override def getClassWriter() : ClassWriter = {
+            new DebuggingClassWriter (0)
+        }
     }
 
     /**
