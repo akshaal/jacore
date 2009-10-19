@@ -382,7 +382,7 @@ private[actor] object ActorMethodDispatcherGenerator {
          * Compare two sets of extractions.
          * @param extractions1 set of extractions 1
          * @param extractions2 set of extractions 2
-         * @return TODO
+         * @return 1 if extraction1 is wider than extractions2
          */
         private def compareExtractions (extractions1 : Set[MessageExtraction],
                                         extractions2 : Set[MessageExtraction]) : Int =
@@ -433,7 +433,7 @@ private[actor] object ActorMethodDispatcherGenerator {
                 return -1
             }
 
-            // There is no other option, but to use hashcode... TODO
+            // There is no other option, but to use hashcode...
             return extractions1.hashCode.compare (extractions2.hashCode)
         }
     }
