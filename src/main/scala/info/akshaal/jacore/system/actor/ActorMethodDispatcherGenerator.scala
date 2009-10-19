@@ -9,6 +9,7 @@ package actor
 
 import Predefs._
 import logger.Logging
+import utils.ClassUtils
 
 import org.objectweb.asm.{ClassVisitor, MethodVisitor, Opcodes, Type, Label, ClassWriter}
 import net.sf.cglib.core.{ReflectUtils, DefaultNamingPolicy, DefaultGeneratorStrategy,
@@ -172,13 +173,20 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         for (extraction <- matcher.messageExtractions) {
             val extractorIN = internalNameOf (extraction.messageExtractor)
 
-            // Store result
+            // Construct extractor
             mv.visitTypeInsn (Opcodes.NEW, extractorIN)
             mv.visitInsn (Opcodes.DUP)
             mv.visitMethodInsn (Opcodes.INVOKESPECIAL,
                                 extractorIN,
                                 "<init>",
                                 "()V")
+
+            // Run extractFrom
+            emitLoadMsg (mv)
+            mv.visitMethodInsn (Opcodes.INVOKEVIRTUAL,
+                                extractorIN,
+                                "extractFrom",
+                                "(Ljava/lang/Object;)Ljava/lang/Object;")
             mv.visitInsn (Opcodes.DUP)
             mv.visitVarInsn (Opcodes.ASTORE, freeSlot)
 
@@ -191,6 +199,35 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         }
 
         // Invoke
+        emitLoadThis (mv)
+        mv.visitFieldInsn (Opcodes.GETFIELD,
+                           implClassIN,
+                           "this$0",
+                           "L" + actorClassIN + ";")
+
+        for (param <- method.params) {
+            param.extractor match {
+                case None => {
+                    emitLoadMsg (mv)
+                }
+
+                case Some (extractorClass) => {
+                    mv.visitVarInsn (Opcodes.ALOAD, usedSlots (extractorClass))
+                }
+            }
+
+            if (param.clazz != classOf[Object]) {
+                mv.visitTypeInsn(Opcodes.CHECKCAST,
+                                 internalNameOf (ClassUtils.box (param.clazz)))
+            }
+            
+            emitUnboxObjectTo (mv, param.clazz)
+        }
+        
+        mv.visitMethodInsn (Opcodes.INVOKEVIRTUAL,
+                            actorClassIN,
+                            method.name,
+                            method.typeDescriptor)
 
         // return true
         mv.visitInsn (Opcodes.ICONST_1)
@@ -200,12 +237,38 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         mv.visitLabel (skipInvocation)
     }
 
+    /* Unbox object value from stack if specified class is primitive.
+     * @param mv method visitor
+     * @param clazz class
+     */
+    private def emitUnboxObjectTo (mv : MethodVisitor, clazz : Class[_]) : Unit = {
+        def emit (clazz : String, name : String, desc : String) : Unit =
+                mv.visitMethodInsn (Opcodes.INVOKEVIRTUAL,
+                                    clazz,
+                                    name + "Value",
+                                    "()" + desc)
+
+        clazz match {
+            case java.lang.Boolean.TYPE      => emit ("java/lang/Boolean",   "boolean", "Z")
+            case java.lang.Byte.TYPE         => emit ("java/lang/Byte",      "byte", "B")
+            case java.lang.Character.TYPE    => emit ("java/lang/Character", "char", "C")
+            case java.lang.Double.TYPE       => emit ("java/lang/Double",    "double", "D")
+            case java.lang.Float.TYPE        => emit ("java/lang/Float",     "float", "F")
+            case java.lang.Integer.TYPE      => emit ("java/lang/Integer",   "int", "I")
+            case java.lang.Long.TYPE         => emit ("java/lang/Long",      "long", "J")
+            case java.lang.Short.TYPE        => emit ("java/lang/Short",     "short", "S")
+            case _ => ()
+        }
+    }
+
     /**
      * Emit instruction to check value on stack with instanceof instruction. If check fails
      * instruction counter will be set to instruction pointed by label.
      */
     private def emitInstanceOfCheck (mv : MethodVisitor, clazz : Class[_], ifNot : Label) : Unit =
     {
+        // NOTE: We check even for Object because it guards us against nulls
+
         mv.visitTypeInsn (Opcodes.INSTANCEOF, internalNameOf (clazz))
         mv.visitJumpInsn (Opcodes.IFEQ, ifNot)
     }

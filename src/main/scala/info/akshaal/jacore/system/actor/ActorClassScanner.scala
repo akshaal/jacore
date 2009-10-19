@@ -11,6 +11,7 @@ import Predefs._
 import logger.Logging
 
 import java.lang.reflect.Modifier
+import org.objectweb.asm.Type
 import annotation.{Act, ExtractBy}
 import utils.ClassUtils
 
@@ -152,8 +153,8 @@ private[actor] object ActorClassScanner extends Logging {
             methods ::= ActMethodDesc (name = methodName,
                                        subscribe = actAnnotation.subscribe,
                                        params = paramDescs,
-                                       matcher = messageMatcher)
-
+                                       matcher = messageMatcher,
+                                       typeDescriptor = Type.getMethodDescriptor (method))
         }
 
         debugLazy ("Found action methods " + methods)
@@ -176,7 +177,8 @@ private[actor] object ActorClassScanner extends Logging {
 private[actor] sealed case class ActMethodDesc (name : String,
                                                 subscribe : Boolean,
                                                 params : Seq[ActMethodParamDesc],
-                                                matcher : MessageMatcher)
+                                                matcher : MessageMatcher,
+                                                typeDescriptor : String)
 
 /**
  * Describes an argument of method annotated with @Act annotation.
