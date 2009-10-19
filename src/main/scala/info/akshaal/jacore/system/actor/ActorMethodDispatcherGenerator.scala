@@ -131,7 +131,9 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         mv.visitCode ()
 
         // Maxs
-        val maxExtractionsPerMethod = 1 // TODO
+        val maxExtractionsPerMethod =
+                 methods.map (method => method.matcher.messageExtractions.size).max
+
         val stackSize = maxExtractionsPerMethod + 2 /* 2 means 'this, msg' */
         val argsNum = 2 /* 2 means 'this, msg' */
         val localsSize = maxExtractionsPerMethod + argsNum
