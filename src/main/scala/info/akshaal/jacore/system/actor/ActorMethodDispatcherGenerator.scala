@@ -173,7 +173,8 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         var freeSlot = 2
         var usedSlots = new HashMap[Class[_], Int]
         for (extraction <- matcher.messageExtractions) {
-            val extractorIN = internalNameOf (extraction.messageExtractor)
+            val extractor = extraction.messageExtractor
+            val extractorIN = internalNameOf (extractor)
 
             // Construct extractor
             mv.visitTypeInsn (Opcodes.NEW, extractorIN)
@@ -196,7 +197,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
             emitInstanceOfCheck (mv, extraction.acceptExtractionClass, skipInvocation)
 
             // Remember
-            usedSlots (extraction.messageExtractor) = freeSlot
+            usedSlots (extractor) = freeSlot
             freeSlot += 1
         }
 
@@ -269,10 +270,12 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
      */
     private def emitInstanceOfCheck (mv : MethodVisitor, clazz : Class[_], ifNot : Label) : Unit =
     {
-        // NOTE: We check even for Object because it guards us against nulls
-
-        mv.visitTypeInsn (Opcodes.INSTANCEOF, internalNameOf (clazz))
-        mv.visitJumpInsn (Opcodes.IFEQ, ifNot)
+        if (clazz == classOf[Object]) {
+            mv.visitJumpInsn (Opcodes.IFNULL, ifNot)
+        } else {
+            mv.visitTypeInsn (Opcodes.INSTANCEOF, internalNameOf (clazz))
+            mv.visitJumpInsn (Opcodes.IFEQ, ifNot)
+        }
     }
 
     /**
