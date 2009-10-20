@@ -8,13 +8,15 @@
 package info.akshaal.jacore
 package system.test.unit.actor
 
-import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
+import java.io.IOException
 import org.testng.annotations.Test
-import info.akshaal.jacore.system.actor.MessageExtractor
 import java.math.BigInteger
 import org.testng.Assert._
-import system.annotation.{CallByMessage, Act, ExtractBy}
 import com.google.inject.ProvisionException
+
+import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
+import system.actor.MessageExtractor
+import system.annotation.{CallByMessage, Act, ExtractBy}
 
 /**
  * Test for aspected things of actors.
@@ -97,6 +99,12 @@ class AopTest extends BaseUnitTest {
     @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
     def testInvalidActor1 () = {
         UnitTestModule.injector.getInstance(classOf[InvalidTestActor1])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor2 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor2])
         assertTrue (false)
     }
 
@@ -234,6 +242,17 @@ class InvalidTestActor1 extends HiPriorityActor {
 /**
  * Invalid actor.
  */
+class InvalidTestActor2 extends HiPriorityActor {
+    @Act
+    def onMessage2 (msg : String,
+                    @ExtractBy(classOf[BadExtractor2]) y : String) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
 class InvalidTestActor3 extends HiPriorityActor {
     @Act
     def onMessage (x : Int) : Int = x
@@ -364,4 +383,8 @@ class EmptyStringExtractor extends MessageExtractor[String, String] {
 class BadExtractor extends MessageExtractor[String, String] {
     override def extractFrom (msg : String) = msg
     def extractFrom (msg : java.lang.Integer) = msg
+}
+
+class BadExtractor2 (s : String) extends MessageExtractor[String, String] {
+    override def extractFrom (msg : String) = msg
 }

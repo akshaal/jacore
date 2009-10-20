@@ -106,8 +106,16 @@ private[actor] object ActorClassScanner extends Logging {
                                + extractor)
                 }
 
+                try {
+                    extractor.getConstructor ()
+                } catch {
+                    case ex : NoSuchMethodException =>
+                            badMethod ("uses an extractor without or inaccesible"
+                                       + " default constructor: "
+                                       + extractor)
+                }
+
                 // TODO: Check in scanner that extractors have default constructor
-                // that doesn't throw exceptions
 
                 val extractingMethods =
                         extractor.getMethods
@@ -120,8 +128,6 @@ private[actor] object ActorClassScanner extends Logging {
                 val extractorMethod = extractingMethods.head
                 val extractorMethodArg = extractorMethod.getParameterTypes()(0)
                 val extractorMethodReturn = extractorMethod.getReturnType
-
-                // TODO: Method must not throw any exceptions
 
                 if (!extractorMethodArg.isAssignableFrom(acceptMessageClass)) {
                     badMethod ("uses extractor " + extractor
