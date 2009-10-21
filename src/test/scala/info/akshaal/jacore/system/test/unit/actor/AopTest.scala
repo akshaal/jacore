@@ -53,46 +53,69 @@ class AopTest extends BaseUnitTest {
         UnitTestModule.actorManager.startActor (actor)
 
         // Initial values
+        assertTrue (actor.never1)
+        assertTrue (actor.never2)
         assertNull (actor.obj)
         assertNull (actor.str)
         assertEquals (actor.int, -1)
         assertFalse (actor.emptyString)
+        assertFalse (actor.orderMsgReceived)
 
         // Test sending int
         actor ! 2
         sleep
+        assertTrue (actor.never1)
+        assertTrue (actor.never2)
         assertNull (actor.obj)
         assertNull (actor.str)
         assertEquals (actor.int, 2)
         assertFalse (actor.emptyString)
+        assertFalse (actor.orderMsgReceived)
 
         // Test sending string
         actor ! "Hullo"
         sleep
         assertTrue (actor.never1)
+        assertTrue (actor.never2)
         assertNull (actor.obj)
         assertEquals (actor.str, "Hullo")
         assertEquals (actor.int, 2)
         assertFalse (actor.emptyString)
+        assertFalse (actor.orderMsgReceived)
 
         // Test sending object
         actor ! 'ArbObject
         sleep
         assertTrue (actor.never1)
+        assertTrue (actor.never2)
         assertEquals (actor.obj, 'ArbObject)
         assertEquals (actor.str, "Hullo")
         assertEquals (actor.int, 2)
         assertFalse (actor.emptyString)
+        assertFalse (actor.orderMsgReceived)
 
         // Test sending empty string
         actor ! ""
         sleep
         assertTrue (actor.never1)
+        assertTrue (actor.never2)
         assertEquals (actor.obj, 'ArbObject)
         assertEquals (actor.str, "Hullo")
         assertEquals (actor.int, 2)
         assertTrue (actor.emptyString)
-        
+        assertFalse (actor.orderMsgReceived)
+
+        // Test sending empty string
+        actor ! (new OrderTestObj(5))
+        sleep
+        assertTrue (actor.never1)
+        assertTrue (actor.never2)
+        assertEquals (actor.obj, 'ArbObject)
+        assertEquals (actor.str, "Hullo")
+        assertEquals (actor.int, 2)
+        assertTrue (actor.emptyString)
+        assertTrue (actor.orderMsgReceived)
+
         UnitTestModule.actorManager.stopActor (actor)
     }
 
@@ -199,6 +222,9 @@ class ActAnnotationTestActor extends HiPriorityActor {
     var str : String = null
     var emptyString = false
     var never1 = true
+    var never2 = true
+    var orderNotZero = false
+    var orderMsgReceived = false
 
     @Act
     def onObjectMessage (msg : Object) : Unit = {
@@ -228,7 +254,22 @@ class ActAnnotationTestActor extends HiPriorityActor {
     {
         this.emptyString = true
     }
+
+    @Act (suborder = 0)
+    def onOrderObjMessage (msg : OrderTestObj) : Unit =
+    {
+        this.orderMsgReceived = true
+    }
+
+    @Act (suborder = 1)
+    def onOrderObjMessage2 (msg : OrderTestObj,
+                            @ExtractBy(classOf[OrderExtractor]) s : Int) : Unit =
+    {
+        this.never2 = false
+    }
 }
+
+case class OrderTestObj (integer : Int)
 
 /**
  * Invalid actor.
@@ -378,6 +419,10 @@ class StringIdentityExtractor extends MessageExtractor[String, String] {
 
 class EmptyStringExtractor extends MessageExtractor[String, String] {
     override def extractFrom (msg : String) = if (msg.isEmpty) "" else null
+}
+
+class OrderExtractor extends MessageExtractor[OrderTestObj, Int] {
+    override def extractFrom (msg : OrderTestObj) = msg.integer
 }
 
 class BadExtractor extends MessageExtractor[String, String] {

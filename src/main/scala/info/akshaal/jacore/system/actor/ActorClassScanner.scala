@@ -115,8 +115,6 @@ private[actor] object ActorClassScanner extends Logging {
                                        + extractor)
                 }
 
-                // TODO: Check in scanner that extractors have default constructor
-
                 val extractingMethods =
                         extractor.getMethods
                                  .filter (m => m.getName == "extractFrom" && !m.isSynthetic)
@@ -126,8 +124,8 @@ private[actor] object ActorClassScanner extends Logging {
                 }
 
                 val extractorMethod = extractingMethods.head
-                val extractorMethodArg = extractorMethod.getParameterTypes()(0)
-                val extractorMethodReturn = extractorMethod.getReturnType
+                val extractorMethodArg = ClassUtils.box (extractorMethod.getParameterTypes()(0))
+                val extractorMethodReturn = ClassUtils.box (extractorMethod.getReturnType)
 
                 if (!extractorMethodArg.isAssignableFrom(acceptMessageClass)) {
                     badMethod ("uses extractor " + extractor
@@ -158,6 +156,7 @@ private[actor] object ActorClassScanner extends Logging {
 
             methods ::= ActMethodDesc (name = methodName,
                                        subscribe = actAnnotation.subscribe,
+                                       suborder = actAnnotation.suborder,
                                        params = paramDescs,
                                        matcher = messageMatcher,
                                        typeDescriptor = Type.getMethodDescriptor (method))
@@ -182,6 +181,7 @@ private[actor] object ActorClassScanner extends Logging {
  */
 private[actor] sealed case class ActMethodDesc (name : String,
                                                 subscribe : Boolean,
+                                                suborder : Int,
                                                 params : Seq[ActMethodParamDesc],
                                                 matcher : MessageMatcher,
                                                 typeDescriptor : String)

@@ -369,7 +369,16 @@ private[actor] object ActorMethodDispatcherGenerator {
                             acceptMessageClass2.isAssignableFrom (acceptMessageClass1)
 
             if (acceptMessageClass1IsSuperOrSame && acceptMessageClass2IsSuperOrSame) {
-                // That means that message classes are the same
+                // That means that message classes are the same.
+
+                // At first we will try to compare by suborder
+                if (method1.suborder < method2.suborder) {
+                    return -1
+                } else if (method1.suborder > method2.suborder) {
+                    return 1
+                }
+
+                // Value of suborder is the same, lets compare by extractions
                 compareExtractions (matcher1.messageExtractions, matcher2.messageExtractions)
             } else if (!acceptMessageClass1IsSuperOrSame && !acceptMessageClass2IsSuperOrSame) {
                 // That means that message classes are incompatible at all.

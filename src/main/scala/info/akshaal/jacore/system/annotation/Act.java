@@ -16,4 +16,5 @@ import java.lang.annotation.Inherited;
 @Inherited
 public @interface Act {
     boolean subscribe () default false;
+    int suborder () default Integer.MAX_VALUE;
 }
