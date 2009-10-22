@@ -10,6 +10,7 @@ package actor
 import Predefs._
 import logger.Logging
 
+import java.lang.annotation.Annotation
 import java.lang.reflect.Modifier
 import org.objectweb.asm.Type
 import annotation.{Act, ExtractBy}
@@ -28,7 +29,7 @@ private[actor] object ActorClassScanner extends Logging {
     def scan (actor : Actor) : Seq[ActMethodDesc] = {
         val actorClass = actor.getClass
 
-        def badClass (str : String) {
+        def badClass (str : String) : Nothing = {
             throw new UnrecoverableError ("Actor class " + actorClass.getName + ": " + str)
         }
 
@@ -41,18 +42,18 @@ private[actor] object ActorClassScanner extends Logging {
         for (method <- actorClass.getMethods if method.isAnnotationPresent (classOf[Act])) {
             val methodName = method.getName
 
-            def badMethod (str : String) {
+            def badMethod (str : String) : Nothing = {
                 badClass ("Action method " + methodName + " " + str)
             }
 
-            // Checks modifiers
+            // Checks modifiers: must not be static
             val modifiers = method.getModifiers
 
             if (Modifier.isStatic (modifiers)) {
                 badMethod ("must not be static")
             }
 
-            // Check return type
+            // Check return type: must be void
             val returnType = method.getReturnType
             if (returnType != Void.TYPE) {
                 badMethod ("must return nothing, but returns " + returnType.getName)
@@ -63,28 +64,53 @@ private[actor] object ActorClassScanner extends Logging {
                 badMethod ("must not be overloaded")
             }
 
-            // Check params
+            // Check params: must be at least one parameter
             val paramTypes = method.getParameterTypes
             if (paramTypes.length == 0) {
                 badMethod ("must have at least one argument")
             }
 
-            val paramExtractors =
-                method.getParameterAnnotations.map (
-                        _.find (_.isInstanceOf [ExtractBy])
-                         .map (_.asInstanceOf [ExtractBy].value())
-                    )
+            // Find extractor annotations for arguments
+            def findArgExtractor (annotations : Array[Annotation]) : Option[Class[_]] =
+            {
+                def visitAnnotation (annotation : Annotation) : Option[Class[_]] = {
+                    if (annotation.isInstanceOf[ExtractBy]) {
+                        Some (annotation.asInstanceOf[ExtractBy].value)
+                    } else {
+                        annotation.annotationType.getAnnotation (classOf[ExtractBy]) match {
+                            case null => None
+                            case thisAnnotation => {
+                                    visitAnnotation (thisAnnotation)
+                            }
+                        }
+                    }
+                }
 
+                val argExtractors = annotations.map (visitAnnotation).filter (_.isDefined)
+
+                argExtractors.size match {
+                    case 0 => None
+                    case 1 => Some (argExtractors(0).get)
+                    case _ => badMethod ("has argument with more than one extractor annotation")
+                }
+            }
+
+            val paramExtractors =
+                        method.getParameterAnnotations.map (findArgExtractor)
+
+            // Create parameter descriptions
             val paramDescs =
                 for ((paramClazz, paramExtractor) <- paramTypes.zip (paramExtractors))
                     yield ActMethodParamDesc (clazz = paramClazz,
                                               extractor = paramExtractor)
 
+            // First argument must not be extraction
             if (!paramDescs.head.extractor.isEmpty) {
                 badMethod ("can't have extraction as a first argument."
                            + " First argument must be a message method receives.")
             }
 
+            // Only first argument is message, others are values prduced by extractors
             if (paramDescs.count (_.extractor.isEmpty) > 1) {
                 badMethod ("must have no more than one argument without extractor")
             }
@@ -97,15 +123,18 @@ private[actor] object ActorClassScanner extends Logging {
                                         acceptExtractionClass = ClassUtils.box (paramDesc.clazz),
                                         messageExtractor = paramDesc.extractor.get)
 
+            // Check each extraction
             for (messageExtraction <- messageExtractions) {
                 val extractor = messageExtraction.messageExtractor
                 val acceptExtractionClass = messageExtraction.acceptExtractionClass
 
+                // Extractor must implement MessageExtractor interface
                 if (!classOf[MessageExtractor[Any, Any]].isAssignableFrom(extractor)) {
                     badMethod ("has an extractor not implementing MessageExtractor interface: "
                                + extractor)
                 }
 
+                // Extractor must have default constructor
                 try {
                     extractor.getConstructor ()
                 } catch {
@@ -115,6 +144,7 @@ private[actor] object ActorClassScanner extends Logging {
                                        + extractor)
                 }
 
+                // Extract must not have overloaded method extractFrom
                 val extractingMethods =
                         extractor.getMethods
                                  .filter (m => m.getName == "extractFrom" && !m.isSynthetic)
@@ -123,6 +153,7 @@ private[actor] object ActorClassScanner extends Logging {
                                + extractor)
                 }
 
+                // Check that extractor can handle messages that this method receives
                 val extractorMethod = extractingMethods.head
                 val extractorMethodArg = ClassUtils.box (extractorMethod.getParameterTypes()(0))
                 val extractorMethodReturn = ClassUtils.box (extractorMethod.getReturnType)
@@ -132,6 +163,8 @@ private[actor] object ActorClassScanner extends Logging {
                                + " which can't handle messages of class " + acceptMessageClass)
                 }
 
+                // Check that extractor produces values that are compatible with the method
+                // argument
                 if (!extractorMethodReturn.isAssignableFrom(acceptExtractionClass)
                     && !acceptExtractionClass.isAssignableFrom(extractorMethodReturn))
                 {
@@ -141,6 +174,7 @@ private[actor] object ActorClassScanner extends Logging {
                 }
             }
 
+            // Construct message matcher
             val messageMatcher =
                     MessageMatcher (acceptMessageClass = acceptMessageClass,
                                     messageExtractions = Set(messageExtractions : _*))

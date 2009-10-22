@@ -18,7 +18,7 @@ import java.lang.annotation.ElementType;
  * @author akshaal
  */
 @Retention (RetentionPolicy.RUNTIME)
-@Target (ElementType.PARAMETER)
+@Target ({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface ExtractBy {
     Class<? extends MessageExtractor<?, ?>> value ();
 }

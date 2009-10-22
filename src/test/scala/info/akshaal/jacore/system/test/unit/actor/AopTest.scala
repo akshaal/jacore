@@ -60,6 +60,8 @@ class AopTest extends BaseUnitTest {
         assertEquals (actor.int, -1)
         assertFalse (actor.emptyString)
         assertFalse (actor.orderMsgReceived)
+        assertFalse (actor.justException)
+        assertFalse (actor.npeException)
 
         // Test sending int
         actor ! 2
@@ -71,6 +73,8 @@ class AopTest extends BaseUnitTest {
         assertEquals (actor.int, 2)
         assertFalse (actor.emptyString)
         assertFalse (actor.orderMsgReceived)
+        assertFalse (actor.justException)
+        assertFalse (actor.npeException)
 
         // Test sending string
         actor ! "Hullo"
@@ -82,6 +86,8 @@ class AopTest extends BaseUnitTest {
         assertEquals (actor.int, 2)
         assertFalse (actor.emptyString)
         assertFalse (actor.orderMsgReceived)
+        assertFalse (actor.justException)
+        assertFalse (actor.npeException)
 
         // Test sending object
         actor ! 'ArbObject
@@ -93,6 +99,8 @@ class AopTest extends BaseUnitTest {
         assertEquals (actor.int, 2)
         assertFalse (actor.emptyString)
         assertFalse (actor.orderMsgReceived)
+        assertFalse (actor.justException)
+        assertFalse (actor.npeException)
 
         // Test sending empty string
         actor ! ""
@@ -104,8 +112,10 @@ class AopTest extends BaseUnitTest {
         assertEquals (actor.int, 2)
         assertTrue (actor.emptyString)
         assertFalse (actor.orderMsgReceived)
+        assertFalse (actor.justException)
+        assertFalse (actor.npeException)
 
-        // Test sending empty string
+        // Test sending some object
         actor ! (new OrderTestObj(5))
         sleep
         assertTrue (actor.never1)
@@ -115,6 +125,34 @@ class AopTest extends BaseUnitTest {
         assertEquals (actor.int, 2)
         assertTrue (actor.emptyString)
         assertTrue (actor.orderMsgReceived)
+        assertFalse (actor.justException)
+        assertFalse (actor.npeException)
+
+        // Test sending runtime exception see if custom annotation works
+        actor ! (new RuntimeException ("123", new NullPointerException ()))
+        sleep
+        assertTrue (actor.never1)
+        assertTrue (actor.never2)
+        assertEquals (actor.obj, 'ArbObject)
+        assertEquals (actor.str, "Hullo")
+        assertEquals (actor.int, 2)
+        assertTrue (actor.emptyString)
+        assertTrue (actor.orderMsgReceived)
+        assertFalse (actor.justException)
+        assertTrue (actor.npeException)
+
+        // Test sending runtime exception see if custom annotation is skipped
+        actor ! (new RuntimeException ("123", new IllegalArgumentException ()))
+        sleep
+        assertTrue (actor.never1)
+        assertTrue (actor.never2)
+        assertEquals (actor.obj, 'ArbObject)
+        assertEquals (actor.str, "Hullo")
+        assertEquals (actor.int, 2)
+        assertTrue (actor.emptyString)
+        assertTrue (actor.orderMsgReceived)
+        assertTrue (actor.justException)
+        assertTrue (actor.npeException)
 
         UnitTestModule.actorManager.stopActor (actor)
     }
@@ -197,6 +235,17 @@ class AopTest extends BaseUnitTest {
         assertTrue (false)
     }
 
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor14 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor14])
+        assertTrue (false)
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor15 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor15])
+        assertTrue (false)
+    }
 
     def sleep : Unit = Thread.sleep (1000)
 }
@@ -225,6 +274,8 @@ class ActAnnotationTestActor extends HiPriorityActor {
     var never2 = true
     var orderNotZero = false
     var orderMsgReceived = false
+    var justException = false;
+    var npeException = false;
 
     @Act
     def onObjectMessage (msg : Object) : Unit = {
@@ -266,6 +317,19 @@ class ActAnnotationTestActor extends HiPriorityActor {
                             @ExtractBy(classOf[OrderExtractor]) s : Int) : Unit =
     {
         this.never2 = false
+    }
+
+    @Act
+    def onNpeException (msg : Exception,
+                     @CauseExtractTestAnnotation cause : NullPointerException) : Unit =
+    {
+        this.npeException = true
+    }
+
+    @Act
+    def onException (msg : Exception) : Unit =
+    {
+        this.justException = true
     }
 }
 
@@ -409,6 +473,30 @@ class InvalidTestActor13 extends HiPriorityActor {
     @Act
     def onMessage (msg : String,
                    @ExtractBy(classOf[StringIdentityExtractor]) y : BigInteger) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor14 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : Exception,
+                   @ExtractBy(classOf[CauseExtractorExample])
+                   @CauseExtractTestAnnotation y : Exception) : Unit =
+    {
+    }
+}
+
+/**
+ * Invalid actor.
+ */
+class InvalidTestActor15 extends HiPriorityActor {
+    @Act
+    def onMessage (msg : Exception,
+                   @ExtractBy(classOf[CauseExtractorExample]) y : Exception,
+                   @CauseExtractTestAnnotation z : Exception) : Unit =
     {
     }
 }

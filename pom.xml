@@ -141,9 +141,6 @@
     <!-- = = = = = = = = = = = = = = Build = = = = = = = = = = = = = = = -->
 
     <build>
-        <sourceDirectory>src/main/scala</sourceDirectory>
-        <testSourceDirectory>src/test/scala</testSourceDirectory> 
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
