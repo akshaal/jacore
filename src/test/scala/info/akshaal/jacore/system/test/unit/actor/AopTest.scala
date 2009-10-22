@@ -321,7 +321,7 @@ class ActAnnotationTestActor extends HiPriorityActor {
 
     @Act
     def onNpeException (msg : Exception,
-                     @CauseExtractTestAnnotation cause : NullPointerException) : Unit =
+                        @CauseExtractTestAnnotation cause : NullPointerException) : Unit =
     {
         this.npeException = true
     }
