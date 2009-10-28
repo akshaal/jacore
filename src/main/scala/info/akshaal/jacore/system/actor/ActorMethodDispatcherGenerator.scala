@@ -39,7 +39,11 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         setNamePrefix (actorClassName)
         setNamingPolicy (NamingPolicy)
         setStrategy (GeneratorStrategy)
-        super.create (actorClassName)
+
+        // We must use Class object, because CGLIB uses WeakHashMap to hold generated
+        // classes. So if we want generated class live as long as actor class is loaded
+        // we must pass Class object as a key.
+        super.create (actorClass)
     }
 
     /**
@@ -132,7 +136,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
 
         // Maxs
         val maxExtractionsPerMethod =
-                 methods.map (method => method.matcher.messageExtractions.size).max
+                 methods.map (method => method.matcher.messageExtractionMatchers.size).max
 
         val stackSize = maxExtractionsPerMethod + 2 /* 2 means 'this, msg' */
         val argsNum = 2 /* 2 means 'this, msg' */
@@ -172,7 +176,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         // Check extractions
         var freeSlot = 2
         var usedSlots = new HashMap[Class[_], Int]
-        for (extraction <- matcher.messageExtractions) {
+        for (extraction <- matcher.messageExtractionMatchers) {
             val extractor = extraction.messageExtractor
             val extractorIN = internalNameOf (extractor)
 
@@ -379,7 +383,10 @@ private[actor] object ActorMethodDispatcherGenerator {
                 }
 
                 // Value of suborder is the same, lets compare by extractions
-                compareExtractions (matcher1.messageExtractions, matcher2.messageExtractions)
+                compareExtractions (matcher1.messageExtractionMatchers
+                                        .asInstanceOf[Set[MessageExtractionMatcher[_]]],
+                                    matcher2.messageExtractionMatchers
+                                        .asInstanceOf[Set[MessageExtractionMatcher[_]]])
             } else if (!acceptMessageClass1IsSuperOrSame && !acceptMessageClass2IsSuperOrSame) {
                 // That means that message classes are incompatible at all.
                 // In order to have constitant result we will return comparison
@@ -396,11 +403,11 @@ private[actor] object ActorMethodDispatcherGenerator {
          * @param extractions2 set of extractions 2
          * @return 1 if extraction1 is wider than extractions2
          */
-        private def compareExtractions (extractions1 : Set[MessageExtraction],
-                                        extractions2 : Set[MessageExtraction]) : Int =
+        private def compareExtractions (extractions1 : Set[MessageExtractionMatcher[_]],
+                                        extractions2 : Set[MessageExtractionMatcher[_]]) : Int =
         {
             // Map extractor to extraction class
-            def mapFromExtraction (extractions : Set[MessageExtraction])
+            def mapFromExtraction (extractions : Set[MessageExtractionMatcher[_]])
                                                             : Map[Class[_], Class[_]] =
             {
                 Map (extractions.toSeq

@@ -7,12 +7,12 @@ package info.akshaal.jacore
 package system
 package actor
 
-import Predefs._
-import logger.Logging
-
 import java.lang.annotation.Annotation
 import java.lang.reflect.Modifier
 import org.objectweb.asm.Type
+
+import Predefs._
+import logger.Logging
 import annotation.{Act, ExtractBy}
 import utils.ClassUtils
 
@@ -21,6 +21,8 @@ import utils.ClassUtils
  * annotation and do some sanity checks.
  */
 private[actor] object ActorClassScanner extends Logging {
+    private type OptionalMessageExtractorClass = Option[Class[MessageExtractor[_, _]]]
+
     /**
      * Scan actor for messages annotated with @Act annotation and validate these methods.
      * @param actor actor to scan
@@ -71,7 +73,7 @@ private[actor] object ActorClassScanner extends Logging {
             }
 
             // Find extractor annotations for arguments
-            def findArgExtractor (annotations : Array[Annotation]) : Option[Class[_]] =
+            def findArgExtractor (annotations : Array[Annotation]) : OptionalMessageExtractorClass =
             {
                 def visitAnnotation (annotation : Annotation) : Option[Class[_]] = {
                     if (annotation.isInstanceOf[ExtractBy]) {
@@ -90,13 +92,22 @@ private[actor] object ActorClassScanner extends Logging {
 
                 argExtractors.size match {
                     case 0 => None
-                    case 1 => Some (argExtractors(0).get)
+
+                    case 1 => {
+                        val extractor = argExtractors(0).get
+                        if (!classOf[MessageExtractor[_, _]].isAssignableFrom(extractor)) {
+                            badMethod ("has an extractor not implementing MessageExtractor interface: "
+                                       + extractor)
+                        }
+
+                        Some (extractor).asInstanceOf[OptionalMessageExtractorClass]
+                    }
+
                     case _ => badMethod ("has argument with more than one extractor annotation")
                 }
             }
 
-            val paramExtractors =
-                        method.getParameterAnnotations.map (findArgExtractor)
+            val paramExtractors = method.getParameterAnnotations.map (findArgExtractor)
 
             // Create parameter descriptions
             val paramDescs =
@@ -117,22 +128,18 @@ private[actor] object ActorClassScanner extends Logging {
 
             // Create matcher
             val acceptMessageClass = ClassUtils.box (paramDescs.head.clazz)
-            val messageExtractions =
+            val messageExtractionMatchers =
                     for (paramDesc <- paramDescs.tail)
-                            yield MessageExtraction (
-                                        acceptExtractionClass = ClassUtils.box (paramDesc.clazz),
-                                        messageExtractor = paramDesc.extractor.get)
+                            yield MessageExtractionMatcher[Any] (
+                                    acceptExtractionClass = ClassUtils.box (paramDesc.clazz),
+                                    messageExtractor =
+                                        paramDesc.extractor
+                                                 .get.asInstanceOf[Class[MessageExtractor[Any,_]]])
 
             // Check each extraction
-            for (messageExtraction <- messageExtractions) {
-                val extractor = messageExtraction.messageExtractor
-                val acceptExtractionClass = messageExtraction.acceptExtractionClass
-
-                // Extractor must implement MessageExtractor interface
-                if (!classOf[MessageExtractor[Any, Any]].isAssignableFrom(extractor)) {
-                    badMethod ("has an extractor not implementing MessageExtractor interface: "
-                               + extractor)
-                }
+            for (messageExtractionMatcher <- messageExtractionMatchers) {
+                val extractor = messageExtractionMatcher.messageExtractor
+                val acceptExtractionClass = messageExtractionMatcher.acceptExtractionClass
 
                 // Extractor must have default constructor
                 try {
@@ -176,10 +183,12 @@ private[actor] object ActorClassScanner extends Logging {
 
             // Construct message matcher
             val messageMatcher =
-                    MessageMatcher (acceptMessageClass = acceptMessageClass,
-                                    messageExtractions = Set(messageExtractions : _*))
+                    MessageMatcher (acceptMessageClass =
+                                        acceptMessageClass.asInstanceOf[Class[Any]],
+                                    messageExtractionMatchers =
+                                        Set(messageExtractionMatchers : _*))
 
-            if (messageMatcher.messageExtractions.map(_.messageExtractor).size
+            if (messageMatcher.messageExtractionMatchers.map(_.messageExtractor).size
                                         != paramDescs.length - 1)
             {
                 badMethod ("must not use same extractor multiple times")
@@ -213,15 +222,16 @@ private[actor] object ActorClassScanner extends Logging {
 /**
  * Describes a method annotated with @Act annotation.
  */
-private[actor] sealed case class ActMethodDesc (name : String,
-                                                subscribe : Boolean,
-                                                suborder : Int,
-                                                params : Seq[ActMethodParamDesc],
-                                                matcher : MessageMatcher,
-                                                typeDescriptor : String)
-
+private[actor] sealed case class ActMethodDesc (
+                                name : String,
+                                subscribe : Boolean,
+                                suborder : Int,
+                                params : Seq[ActMethodParamDesc],
+                                matcher : MessageMatcher[_],
+                                typeDescriptor : String)
 /**
  * Describes an argument of method annotated with @Act annotation.
  */
-private[actor] sealed case class ActMethodParamDesc (clazz : Class[_ <: Any],
-                                                     extractor : Option[Class[_ <: Any]])
+private[actor] sealed case class ActMethodParamDesc (
+                                clazz : Class[_],
+                                extractor : Option[Class[MessageExtractor[_ ,_]]])
