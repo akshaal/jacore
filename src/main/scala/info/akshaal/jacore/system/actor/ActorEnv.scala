@@ -22,6 +22,7 @@ import scheduler.Scheduler
 sealed abstract class ActorEnv {
     private[actor] val pool : Pool
     private[actor] val scheduler : Scheduler
+    private[actor] val broadcaster : Broadcaster
 }
 
 /**
@@ -30,7 +31,8 @@ sealed abstract class ActorEnv {
 @Singleton
 final class LowPriorityActorEnv @Inject() (
                 private[actor] val pool : LowPriorityPool,
-                private[actor] val scheduler : Scheduler)
+                private[actor] val scheduler : Scheduler,
+                private[actor] val broadcaster : Broadcaster)
              extends ActorEnv
 
 /**
@@ -39,7 +41,8 @@ final class LowPriorityActorEnv @Inject() (
 @Singleton
 final class NormalPriorityActorEnv @Inject() (
                 private[actor] val pool : NormalPriorityPool,
-                private[actor] val scheduler : Scheduler)
+                private[actor] val scheduler : Scheduler,
+                private[actor] val broadcaster : Broadcaster)
              extends ActorEnv
 
 /**
@@ -48,5 +51,6 @@ final class NormalPriorityActorEnv @Inject() (
 @Singleton
 final class HiPriorityActorEnv @Inject() (
                 private[actor] val pool : HiPriorityPool,
-                private[actor] val scheduler : Scheduler)
+                private[actor] val scheduler : Scheduler,
+                private[actor] val broadcaster : Broadcaster)
              extends ActorEnv

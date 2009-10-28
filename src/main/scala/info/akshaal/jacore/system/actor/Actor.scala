@@ -16,10 +16,16 @@ import logger.Logging
 abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
 {
     /**
+     * A set of descriptions for methods annotated with @Act annotation.
+     * This is used to create a dispatcher and subscribe/unsubscribe actor to messages.
+     */
+    private[this] final val actMethodDescs = ActorClassScanner.scan (this)
+
+    /**
      * Method dispatcher. Forwards message processing request to
      * an appropriate method of this class.
      */
-    private[this] final val dispatcher = createDispatcherAndSubscribe
+    private[this] final val dispatcher = createDispatcher
 
     /**
      * Schedule to be used by this actor.
@@ -81,6 +87,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     /**
      * Invokes this actor's act() method.
      */
+    @inline
     private def invokeAct (msg : Any, sentFrom : Option[Actor]) =
     {
         sender = sentFrom
@@ -101,16 +108,34 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     /**
      * Start actor.
      */
-    private[actor] final def start () = {
+    def start () = {
         debug ("About to start")
+
+        // Subscribe
+        for (actMethodDesc <- actMethodDescs) {
+            if (actMethodDesc.subscribe) {
+                actorEnv.broadcaster.subscribe (this, actMethodDesc.matcher)
+            }
+        }
+
+        // Start transport
         fiber.start
     }
 
     /**
      * Stop the actor.
      */
-    private[actor] final def stop() = {
+    def stop() = {
         debug ("About to stop")
+        
+        // Unsubscribe
+        for (actMethodDesc <- actMethodDescs) {
+            if (actMethodDesc.subscribe) {
+                actorEnv.broadcaster.unsubscribe (this, actMethodDesc.matcher)
+            }
+        }
+
+        // Stop transport
         fiber.dispose
     }
 
@@ -119,15 +144,11 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * suitable to forward request for message processing to an appropriate
      * annotated method of this object. It also subscribes.
      */
-    private def createDispatcherAndSubscribe : MethodDispatcher = {
-        val actMethods = ActorClassScanner.scan (this)
-
-        if (actMethods.isEmpty) {
+    private def createDispatcher : MethodDispatcher = {
+        if (actMethodDescs.isEmpty) {
             EmptyMethodDispatcher
         } else {
-            // TODO: Subscribe
-
-            new ActorMethodDispatcherGenerator (this, actMethods)
+            new ActorMethodDispatcherGenerator (this, actMethodDescs)
                            .create ().asInstanceOf[MethodDispatcher]
         }
     }
@@ -173,9 +194,7 @@ private[actor] class ActorExecutor (actor : Actor)
         ThreadLocalState.current.set(Some(actor))
 
         // Execute
-        for (command <- commands) {
-            command.run
-        }
+        commands.foreach (_.run)
 
         // Reset curren actor
         ThreadLocalState.current.set(None)

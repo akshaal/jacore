@@ -21,7 +21,7 @@ trait Broadcaster {
      * @param actor actor that will receive message accepted by matcher.
      * @param matcher matcher that will accept or reject message for the actor.
      */
-    def subscribe (actor : Actor, matcher : MessageMatcher[_]) : Unit
+    def subscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit
 
     /**
      * Unsubscribe the given actor from messages accepted by the given matcher.
@@ -29,7 +29,7 @@ trait Broadcaster {
      * @param actor actor that is currently subscribed to the messages accepted by matcher.
      * @param matcher matcher that is currently used by actor to filter broadcasted messages.
      */
-    def unsubscribe (actor : Actor, matcher : MessageMatcher[_]) : Unit
+    def unsubscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit
 
     /**
      * Broadcast message to all actors subscribed to this type of msg.
@@ -48,13 +48,13 @@ private[system] class BroadcasterImpl @Inject() (hiPriorityActorEnv : HiPriority
 {
     /** {@Inherited} */
     @CallByMessage
-    override def subscribe (actor : Actor, matcher : MessageMatcher[_]) : Unit = {
+    override def subscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit = {
         // TODO
     }
 
     /** {@Inherited} */
     @CallByMessage
-    override def unsubscribe (actor : Actor, matcher : MessageMatcher[_]) : Unit = {
+    override def unsubscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit = {
         // TODO
     }
 
@@ -80,6 +80,7 @@ private[actor] sealed case class MessageMatcher[A] (
  * Describes a matcher for message extraction.
  * @param A a class of objects that is accepted by extractor
  * @param acceptExtractionClass a class of extraction that is accepted by matcher
+ * @param messageExtractor extractor class to be used to get extraction out of message
  */
 private[actor] sealed case class MessageExtractionMatcher[A] (
                     acceptExtractionClass : Class[_],
