@@ -42,7 +42,7 @@ trait Broadcaster {
  * Implementation of broadcaster service.
  */
 @Singleton
-private[system] class BroadcasterImpl @Inject() (hiPriorityActorEnv : HiPriorityActorEnv)
+private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorityActorEnv)
                 extends Actor (actorEnv = hiPriorityActorEnv)
                    with Broadcaster
 {
@@ -72,7 +72,7 @@ private[system] class BroadcasterImpl @Inject() (hiPriorityActorEnv : HiPriority
  *                              accepted by this matcher.
  * @param messageExtractions a set of message extractions that must be tested against message
  */
-private[actor] sealed case class MessageMatcher[A] (
+sealed case class MessageMatcher[A] (
                     acceptMessageClass : Class[A],
                     messageExtractionMatchers : Set[MessageExtractionMatcher[_ >: A]])
 
@@ -82,6 +82,6 @@ private[actor] sealed case class MessageMatcher[A] (
  * @param acceptExtractionClass a class of extraction that is accepted by matcher
  * @param messageExtractor extractor class to be used to get extraction out of message
  */
-private[actor] sealed case class MessageExtractionMatcher[A] (
+sealed case class MessageExtractionMatcher[A] (
                     acceptExtractionClass : Class[_],
                     messageExtractor : Class[MessageExtractor[A, _]])

@@ -9,20 +9,26 @@ package info.akshaal.jacore
 package system
 
 import com.google.inject.{Singleton, Inject}
+import java.lang.{Iterable => JavaIterable}
+
+import collection.JavaConversions._
 
 import fs.FileActor
 import daemon.{DaemonStatusActor, DaemonStatus}
-import actor.{ActorManager, MonitoringActors, Actor}
+import actor.{MonitoringActors, BroadcasterActor, Actor}
 import scheduler.Scheduler
 import logger.Logging
 
+/**
+ * Manager for an instance of jacore framework.
+ */
 @Singleton
 final class JacoreManager @Inject() (
                     fileActor : FileActor,
                     daemonStatusActor : DaemonStatusActor,
                     daemonStatus : DaemonStatus,
                     monitoringActors : MonitoringActors,
-                    actorManager : ActorManager,
+                    broadcasterActor : BroadcasterActor,
                     scheduler : Scheduler
                 ) extends Logging
 {
@@ -32,34 +38,69 @@ final class JacoreManager @Inject() (
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Useful addons
 
-    def startActor (actor : Actor) = {
-        actorManager.startActor (actor)
+    /**
+     * Convenient method to help start actors.
+     * @param actors variable argument parameters
+     */
+    def startActors (actors : Actor*) : Unit = {
+        startActors (actors)
     }
 
-    def startActors (it : Iterable[Actor]) = {
-        it.foreach (startActor (_))
+    /**
+     * Convenient method to help start actors.
+     * @param it iterable object
+     */
+    def startActors (it : Iterable[Actor]) : Unit = {
+        it.foreach (_.start)
     }
 
-    def stopActor (actor : Actor) = {
-        actorManager.stopActor (actor)
+    /**
+     * Convenient method to help start actors.
+     * @param it iterable object
+     */
+    def startActors (it : JavaIterable[Actor]) : Unit = {
+        startActors (it : Iterable[Actor])
     }
 
+    /**
+     * Convenient method to help stop actors.
+     * @param actors variable argument parameters
+     */
+    def stopActors (actors : Actor*) : Unit = {
+        stopActors (actors)
+    }
 
-    def stopActors (it : Iterable[Actor]) = {
-        it.foreach (stopActor (_))
+    /**
+     * Convenient method to help stop actors.
+     * @param it iterable object
+     */
+    def stopActors (it : Iterable[Actor]) : Unit = {
+        it.foreach (_.stop)
+    }
+
+    /**
+     * Convenient method to help stop actors.
+     * @param it iterable object
+     */
+    def stopActors (it : JavaIterable[Actor]) : Unit = {
+        stopActors (it : Iterable[Actor])
     }
 
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Init code
 
     // Actors
-    private[this] val actors =
+    private[this] val actors : List[Actor] =
         (fileActor
          :: daemonStatusActor
          :: monitoringActors.monitoringActor1
          :: monitoringActors.monitoringActor2
+         :: broadcasterActor
          :: Nil)
 
+    /**
+     * Start instance of jacore.
+     */
     lazy val start : Unit = {
         require (!stopped,
             "Unable to start JacoreManager. JacoreManager has been stopped")
@@ -78,6 +119,9 @@ final class JacoreManager @Inject() (
         debug ("Jacore started")
     }
 
+    /**
+     * Stop instance of jacore.
+     */
     lazy val stop : Unit = {
         require (started,
                  "Unable to stop JacoreManager. JacoreManager is not started")

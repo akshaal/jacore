@@ -15,7 +15,7 @@ import com.google.inject.name.Names
 
 import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
-import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterImpl}
+import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterActor}
 import annotation.CallByMessage
 
 /**
@@ -64,7 +64,7 @@ class Module extends GuiceModule {
         binder.bind (classOf[ThreadPriorityChanger]).to (threadPriorityChangerImplClass)
 
         // Internal implemntation bindings
-        binder.bind (classOf[Broadcaster]).to (classOf[BroadcasterImpl])
+        binder.bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
 
         // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
         

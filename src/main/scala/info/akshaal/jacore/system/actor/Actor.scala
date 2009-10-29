@@ -22,6 +22,13 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     private[this] final val actMethodDescs = ActorClassScanner.scan (this)
 
     /**
+     * A sequence of matchers to be used for auto-subscribe/unsubscribe of this actor
+     * when it is started/stopped.
+     */
+    private[this] final val matchersForSubscribe =
+                                    actMethodDescs.filter(_.subscribe).map (_.matcher)
+
+    /**
      * Method dispatcher. Forwards message processing request to
      * an appropriate method of this class.
      */
@@ -31,6 +38,11 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * Schedule to be used by this actor.
      */
     protected final val schedule = new ActorSchedule (this, actorEnv.scheduler)
+
+    /**
+     * Broadcaster to be used by this actor.
+     */
+    protected final val broadcaster = actorEnv.broadcaster
 
     /**
      * A fiber used by this actor.
@@ -112,14 +124,13 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         debug ("About to start")
 
         // Subscribe
-        for (actMethodDesc <- actMethodDescs) {
-            if (actMethodDesc.subscribe) {
-                actorEnv.broadcaster.subscribe (this, actMethodDesc.matcher)
-            }
-        }
+        broadcaster.subscribe (this, matchersForSubscribe : _*)
 
         // Start transport
         fiber.start
+
+        // Publish event
+        broadcaster.broadcast (ActorStartedEvent (this))
     }
 
     /**
@@ -129,14 +140,13 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         debug ("About to stop")
         
         // Unsubscribe
-        for (actMethodDesc <- actMethodDescs) {
-            if (actMethodDesc.subscribe) {
-                actorEnv.broadcaster.unsubscribe (this, actMethodDesc.matcher)
-            }
-        }
+        broadcaster.unsubscribe (this, matchersForSubscribe : _*)
 
         // Stop transport
         fiber.dispose
+
+        // Publish event
+        broadcaster.broadcast (ActorStoppedEvent (this))
     }
 
     /**
@@ -221,3 +231,6 @@ private[actor] object Actor {
             def apply (msg : Any) = ()
         }    
 }
+
+sealed case class ActorStartedEvent (actor : Actor)
+sealed case class ActorStoppedEvent (actor : Actor)

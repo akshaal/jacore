@@ -9,41 +9,23 @@ import com.google.inject.name.Named
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.Set
 
+import annotation.Act
 import daemon.DaemonStatus
 import scheduler.{UnfixedScheduling, TimeOut}
 import utils.TimeUnit
-
-@Singleton
-private[system] final class Monitoring @Inject()
-                    (monitoringActors : MonitoringActors)
-{
-    private[actor] final def add (actor : Actor) = {
-        val cmd = Add (actor)
-
-        monitoringActors.monitoringActor1 ! cmd
-        monitoringActors.monitoringActor2 ! cmd
-    }
-
-    private[actor] final def remove (actor : Actor) = {
-        val cmd = Remove (actor)
-
-        monitoringActors.monitoringActor1 ! cmd
-        monitoringActors.monitoringActor2 ! cmd
-    }
-}
 
 @Singleton
 private[system] final class MonitoringActors @Inject() (
                         val monitoringActor1 : MonitoringActor,
                         val monitoringActor2 : MonitoringActor)
 
-private[actor] abstract sealed class MonitoringCommand extends NotNull
-private[actor] final case class Add (actor : Actor) extends MonitoringCommand
-private[actor] final case class Remove (actor : Actor) extends MonitoringCommand
-private[actor] case object Ping extends MonitoringCommand
-private[actor] case object Pong extends MonitoringCommand
-private[actor] case object Monitor extends MonitoringCommand
+private[actor] case object Ping extends NotNull
+private[actor] case object Pong extends NotNull
+private[actor] case object Monitor extends NotNull
 
+/**
+ * Implementation of monitoring actor.
+ */
 private[system] final class MonitoringActor @Inject() (
                      normalPriorityActorEnv : NormalPriorityActorEnv,
                      @Named("jacore.monitoring.interval") interval : TimeUnit,
@@ -56,15 +38,36 @@ private[system] final class MonitoringActor @Inject() (
     private val currentActors : Set[Actor] = new HashSet[Actor]
     private var monitoringActors : Set[Actor] = new HashSet[Actor]
 
-    final override def act () = {
-        case Add (actor)    => currentActors += actor
-        case Remove (actor) => currentActors -= actor
+    /**
+     * This method is called when an actor has been started. Used to start monitoring
+     * for the given actor.
+     */
+    @Act (subscribe = true)
+    def handleStartedActor (event : ActorStartedEvent) : Unit = {
+        currentActors += event.actor
+    }
 
-        case TimeOut(Monitor) => monitor
+    /**
+     * This method is called when an actor has been started. Used to start monitoring
+     * for the given actor.
+     */
+    @Act (subscribe = true)
+    def handleStoppedActor (event : ActorStoppedEvent) : Unit = {
+        currentActors -= event.actor
+    }
+
+    /**
+     * Process messages.
+     */
+    override def act () = {
+        case TimeOut (Monitor) => monitor
 
         case Pong => sender.foreach (actor => monitoringActors -= actor)
     }
 
+    /**
+     * Do monitoring.
+     */
     private[this] def monitor () = {
         // Check currently monitoring actors
         val notResponding =
