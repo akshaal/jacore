@@ -14,7 +14,7 @@ import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 class SchedulerTest extends BaseUnitTest {
     @Test (groups=Array("unit"))
     def testRecurrentScheduling () = {
-        UnitTestModule.actorManager.startActor (RecurrentTestActor)
+        RecurrentTestActor.start
 
         RecurrentTestActor.invocations = 0
         Thread.sleep (400)
@@ -31,13 +31,13 @@ class SchedulerTest extends BaseUnitTest {
         assertTrue (RecurrentTestActor.invocations <= 18,
                     "After 800ms, RecurrentTestActor should be executed 18 at the most")
 
-        UnitTestModule.actorManager.stopActor (RecurrentTestActor)
+        RecurrentTestActor.stop
     }
 
     @Test (groups=Array("unit"))
     def testOneTimeScheduling () = {
-        UnitTestModule.actorManager.startActor (OneTimeTestActor)
-        UnitTestModule.actorManager.startActor (OneTimeTestActor2)
+        OneTimeTestActor.start
+        OneTimeTestActor2.start
 
         UnitTestModule.scheduler.in (OneTimeTestActor, 123, 130.milliseconds)
         UnitTestModule.scheduler.in (OneTimeTestActor2, 234, 50.milliseconds)
@@ -66,8 +66,8 @@ class SchedulerTest extends BaseUnitTest {
         assertTrue (OneTimeTestActor2.executed,
                     "Actor must be executed at this point")
 
-        UnitTestModule.actorManager.stopActor (OneTimeTestActor)
-        UnitTestModule.actorManager.stopActor (OneTimeTestActor2)
+        OneTimeTestActor.stop
+        OneTimeTestActor2.stop
     }    
 }
 

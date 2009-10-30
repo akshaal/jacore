@@ -20,7 +20,7 @@ import system.fs.{WriteFile, WriteFileDone, WriteFileFailed}
 class FileActorTest extends BaseUnitTest {
     @Test (groups=Array("unit"))
     def testWrite () = {
-        UnitTestModule.actorManager.startActor (WriteTestActor)
+        WriteTestActor.start
 
         val file = File.createTempFile ("jacore", "test")
         file.deleteOnExit
@@ -47,7 +47,7 @@ class FileActorTest extends BaseUnitTest {
         assertEquals (WriteTestActor.payload, "3x")
         assertEquals (WriteTestActor.excs, 1)
 
-        UnitTestModule.actorManager.stopActor (WriteTestActor)
+        WriteTestActor.stop
     }
 
     // TODO: Write reading test

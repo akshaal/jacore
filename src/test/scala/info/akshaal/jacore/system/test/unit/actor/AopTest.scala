@@ -31,7 +31,7 @@ class AopTest extends BaseUnitTest {
         aopTestActor.inc ()
         assertEquals (aopTestActor.sum, 0)
 
-        UnitTestModule.actorManager.startActor (aopTestActor)
+        aopTestActor.start
         
         sleep
         assertEquals (aopTestActor.sum, 1)
@@ -41,7 +41,7 @@ class AopTest extends BaseUnitTest {
         sleep
         assertEquals (aopTestActor.sum, 2)
 
-        UnitTestModule.actorManager.stopActor (aopTestActor)
+        aopTestActor.stop
     }
 
     @Test (groups=Array("unit"))
@@ -50,7 +50,7 @@ class AopTest extends BaseUnitTest {
 
         val actor = injector.getInstance (classOf[ActAnnotationTestActor])
 
-        UnitTestModule.actorManager.startActor (actor)
+        actor.start
 
         // Initial values
         assertTrue (actor.never1)
@@ -154,7 +154,7 @@ class AopTest extends BaseUnitTest {
         assertTrue (actor.justException)
         assertTrue (actor.npeException)
 
-        UnitTestModule.actorManager.stopActor (actor)
+        actor.stop
     }
 
     @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))

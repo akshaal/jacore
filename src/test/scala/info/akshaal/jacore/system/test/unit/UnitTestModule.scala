@@ -12,7 +12,7 @@ import com.google.inject.{Guice, Injector}
 
 import Predefs._
 import system.JacoreManager
-import system.actor.{Actor, ActorManager, HiPriorityActorEnv}
+import system.actor.{Actor, HiPriorityActorEnv}
 import system.module.Module
 import system.daemon.DaemonStatus
 import system.scheduler.Scheduler
@@ -30,7 +30,6 @@ object UnitTestModule extends Module {
 
     val daemonStatus = injector.getInstance (classOf[DaemonStatus])
     val scheduler = injector.getInstance (classOf[Scheduler])
-    val actorManager = injector.getInstance (classOf[ActorManager])
     val fileActor = injector.getInstance (classOf[FileActor])
     val hiPriorityPool = injector.getInstance (classOf[HiPriorityPool])
     val normalPriorityPool = injector.getInstance (classOf[NormalPriorityPool])

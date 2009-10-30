@@ -9,8 +9,7 @@ import system.JacoreManager
 import system.scheduler.Scheduler
 import system.test.unit.BaseUnitTest
 import system.utils.HiPriorityPool
-import system.actor.{Monitoring, MonitoringActor, ActorManager,
-                     Actor, HiPriorityActorEnv}
+import system.actor.{MonitoringActor, Actor, HiPriorityActorEnv}
 import system.daemon.DaemonStatus
 
 import org.testng.annotations.Test
@@ -30,7 +29,6 @@ object MonitoringTestModule extends Module {
 
     jacoreManager.start
 
-    val actorManager = injector.getInstance (classOf[ActorManager])
     val daemonStatus = injector.getInstance (classOf[DaemonStatus])
     val scheduler = injector.getInstance (classOf[Scheduler])
     val hiPriorityPool = injector.getInstance (classOf[HiPriorityPool])
@@ -48,7 +46,7 @@ class MonitoringTest extends BaseUnitTest {
         val srv = ManagementFactory.getPlatformMBeanServer()
         val statusObj = new ObjectName (MonitoringTestModule.daemonStatusJmxName)
 
-        MonitoringTestModule.actorManager.startActor (BadActor)
+        BadActor.start
         BadActor ! "Hi"
         
         assertFalse (MonitoringTestModule.daemonStatus.isDying,
@@ -67,7 +65,7 @@ class MonitoringTest extends BaseUnitTest {
         assertEquals (srv.getAttribute (statusObj, "dying"), true)
         assertEquals (srv.getAttribute (statusObj, "shuttingDown"), true)
 
-        MonitoringTestModule.actorManager.stopActor (BadActor)
+        BadActor.stop
     }
 }
 
