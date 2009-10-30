@@ -19,17 +19,17 @@ trait Broadcaster {
      * Subscribe the given actor on messages accepted by the given matcher.
      * Request is ignored if actor is already subscribed to this kind of messages.
      * @param actor actor that will receive message accepted by matcher.
-     * @param matcher matcher that will accept or reject message for the actor.
+     * @param matchers matchers that will accept or reject message for the actor.
      */
-    def subscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit
+    def subscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit
 
     /**
      * Unsubscribe the given actor from messages accepted by the given matcher.
      * If actor is not subscribed then request is ingored.
      * @param actor actor that is currently subscribed to the messages accepted by matcher.
-     * @param matcher matcher that is currently used by actor to filter broadcasted messages.
+     * @param matchers matchers that are currently used by actor to filter broadcasted messages.
      */
-    def unsubscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit
+    def unsubscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit
 
     /**
      * Broadcast message to all actors subscribed to this type of msg.
@@ -48,14 +48,18 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
 {
     /** {@Inherited} */
     @CallByMessage
-    override def subscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit = {
+    override def subscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit = {
         // TODO
+
+        matchers.foreach (matcher => info ("!!! subscribe " + actor + " actor to " + matcher))
     }
 
     /** {@Inherited} */
     @CallByMessage
-    override def unsubscribe (actor : Actor, matcher : MessageMatcher[_]*) : Unit = {
+    override def unsubscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit = {
         // TODO
+
+        matchers.foreach (matcher => info ("!!! unsubscribe " + actor + " actor to " + matcher))
     }
 
     /** {@Inherited} */
