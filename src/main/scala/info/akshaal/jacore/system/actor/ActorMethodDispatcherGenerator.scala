@@ -136,7 +136,8 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
 
         // Maxs
         val maxExtractionsPerMethod =
-                 methods.map (method => method.matcher.messageExtractionMatchers.size).max
+                 methods.map (method => method.matcherDefinition
+                                              .messageExtractionDefinitions.size).max
 
         val stackSize = maxExtractionsPerMethod + 2 /* 2 means 'this, msg' */
         val argsNum = 2 /* 2 means 'this, msg' */
@@ -166,7 +167,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
                                            implClassIN : String,
                                            method : ActMethodDesc) : Unit =
     {
-        val matcher = method.matcher
+        val matcher = method.matcherDefinition
         val skipInvocation = new Label
 
         // Check message with instanceof
@@ -176,8 +177,8 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         // Check extractions
         var freeSlot = 2
         var usedSlots = new HashMap[Class[_], Int]
-        for (extraction <- matcher.messageExtractionMatchers) {
-            val extractor = extraction.messageExtractor
+        for (extractionDefinition <- matcher.messageExtractionDefinitions) {
+            val extractor = extractionDefinition.messageExtractor
             val extractorIN = internalNameOf (extractor)
 
             // Construct extractor
@@ -198,7 +199,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
             mv.visitVarInsn (Opcodes.ASTORE, freeSlot)
 
             // Check result
-            emitInstanceOfCheck (mv, extraction.acceptExtractionClass, skipInvocation)
+            emitInstanceOfCheck (mv, extractionDefinition.acceptExtractionClass, skipInvocation)
 
             // Remember
             usedSlots (extractor) = freeSlot
@@ -361,8 +362,8 @@ private[actor] object ActorMethodDispatcherGenerator {
          * {@Inherited}
          */
         override def compare (method1 : ActMethodDesc, method2 : ActMethodDesc) : Int = {
-            val matcher1 = method1.matcher
-            val matcher2 = method2.matcher
+            val matcher1 = method1.matcherDefinition
+            val matcher2 = method2.matcherDefinition
 
             // First, compare acceptMessage classes
             val acceptMessageClass1 = matcher1.acceptMessageClass
@@ -383,10 +384,10 @@ private[actor] object ActorMethodDispatcherGenerator {
                 }
 
                 // Value of suborder is the same, lets compare by extractions
-                compareExtractions (matcher1.messageExtractionMatchers
-                                        .asInstanceOf[Set[MessageExtractionMatcher[_]]],
-                                    matcher2.messageExtractionMatchers
-                                        .asInstanceOf[Set[MessageExtractionMatcher[_]]])
+                compareExtractions (matcher1.messageExtractionDefinitions
+                                        .asInstanceOf[Set[MessageExtractionDefinition[_]]],
+                                    matcher2.messageExtractionDefinitions
+                                        .asInstanceOf[Set[MessageExtractionDefinition[_]]])
             } else if (!acceptMessageClass1IsSuperOrSame && !acceptMessageClass2IsSuperOrSame) {
                 // That means that message classes are incompatible at all.
                 // In order to have constitant result we will return comparison
@@ -403,11 +404,11 @@ private[actor] object ActorMethodDispatcherGenerator {
          * @param extractions2 set of extractions 2
          * @return 1 if extraction1 is wider than extractions2
          */
-        private def compareExtractions (extractions1 : Set[MessageExtractionMatcher[_]],
-                                        extractions2 : Set[MessageExtractionMatcher[_]]) : Int =
+        private def compareExtractions (extractions1 : Set[MessageExtractionDefinition[_]],
+                                        extractions2 : Set[MessageExtractionDefinition[_]]) : Int =
         {
             // Map extractor to extraction class
-            def mapFromExtraction (extractions : Set[MessageExtractionMatcher[_]])
+            def mapFromExtraction (extractions : Set[MessageExtractionDefinition[_]])
                                                             : Map[Class[_], Class[_]] =
             {
                 Map (extractions.toSeq

@@ -128,18 +128,18 @@ private[actor] object ActorClassScanner extends Logging {
 
             // Create matcher
             val acceptMessageClass = ClassUtils.box (paramDescs.head.clazz)
-            val messageExtractionMatchers =
+            val messageExtractionDefinitions =
                     for (paramDesc <- paramDescs.tail)
-                            yield MessageExtractionMatcher[Any] (
+                            yield MessageExtractionDefinition[Any] (
                                     acceptExtractionClass = ClassUtils.box (paramDesc.clazz),
                                     messageExtractor =
                                         paramDesc.extractor
                                                  .get.asInstanceOf[Class[MessageExtractor[Any,_]]])
 
             // Check each extraction
-            for (messageExtractionMatcher <- messageExtractionMatchers) {
-                val extractor = messageExtractionMatcher.messageExtractor
-                val acceptExtractionClass = messageExtractionMatcher.acceptExtractionClass
+            for (messageExtractionDefinition <- messageExtractionDefinitions) {
+                val extractor = messageExtractionDefinition.messageExtractor
+                val acceptExtractionClass = messageExtractionDefinition.acceptExtractionClass
 
                 // Extractor must have default constructor
                 try {
@@ -182,14 +182,15 @@ private[actor] object ActorClassScanner extends Logging {
             }
 
             // Construct message matcher
-            val messageMatcher =
-                    MessageMatcher (acceptMessageClass =
-                                        acceptMessageClass.asInstanceOf[Class[Any]],
-                                    messageExtractionMatchers =
-                                        Set(messageExtractionMatchers : _*))
+            val messageMatcherDefinition =
+                    MessageMatcherDefinition (
+                           acceptMessageClass = acceptMessageClass.asInstanceOf[Class[Any]],
+                           messageExtractionDefinitions = Set(messageExtractionDefinitions : _*))
 
-            if (messageMatcher.messageExtractionMatchers.map(_.messageExtractor).size
-                                        != paramDescs.length - 1)
+            if (messageMatcherDefinition.messageExtractionDefinitions
+                                        .map(_.messageExtractor)
+                                        .size
+                                    != paramDescs.length - 1)
             {
                 badMethod ("must not use same extractor multiple times")
             }
@@ -201,14 +202,14 @@ private[actor] object ActorClassScanner extends Logging {
                                        subscribe = actAnnotation.subscribe,
                                        suborder = actAnnotation.suborder,
                                        params = paramDescs,
-                                       matcher = messageMatcher,
+                                       matcherDefinition = messageMatcherDefinition,
                                        typeDescriptor = Type.getMethodDescriptor (method))
         }
 
         debugLazy ("Found action methods " + methods)
 
         // Sanity checks on class level
-        for ((_, methodGroup) <- methods.groupBy (_.matcher)) {
+        for ((_, methodGroup) <- methods.groupBy (_.matcherDefinition)) {
             if (methodGroup.length > 1) {
                 badClass ("More than one mathod match the same messages: "
                           + methodGroup.map(_.name).mkString(" "))
@@ -227,7 +228,7 @@ private[actor] sealed case class ActMethodDesc (
                                 subscribe : Boolean,
                                 suborder : Int,
                                 params : Seq[ActMethodParamDesc],
-                                matcher : MessageMatcher[_],
+                                matcherDefinition : MessageMatcherDefinition[_],
                                 typeDescriptor : String)
 /**
  * Describes an argument of method annotated with @Act annotation.

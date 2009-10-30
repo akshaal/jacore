@@ -21,7 +21,7 @@ trait Broadcaster {
      * @param actor actor that will receive message accepted by matcher.
      * @param matchers matchers that will accept or reject message for the actor.
      */
-    def subscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit
+    def subscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit
 
     /**
      * Unsubscribe the given actor from messages accepted by the given matcher.
@@ -29,7 +29,7 @@ trait Broadcaster {
      * @param actor actor that is currently subscribed to the messages accepted by matcher.
      * @param matchers matchers that are currently used by actor to filter broadcasted messages.
      */
-    def unsubscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit
+    def unsubscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit
 
     /**
      * Broadcast message to all actors subscribed to this type of msg.
@@ -46,25 +46,45 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
                 extends Actor (actorEnv = hiPriorityActorEnv)
                    with Broadcaster
 {
+    // - - - - - - - - - - - -
+    // Message handlers
+
     /** {@Inherited} */
     @CallByMessage
-    override def subscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit = {
-        // TODO
-
-        matchers.foreach (matcher => info ("!!! subscribe " + actor + " actor to " + matcher))
+    override def subscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit = {
+        matchers.foreach (subscribeOneMatcher (actor, _))
     }
 
     /** {@Inherited} */
     @CallByMessage
-    override def unsubscribe (actor : Actor, matchers : MessageMatcher[_]*) : Unit = {
-        // TODO
-
-        matchers.foreach (matcher => info ("!!! unsubscribe " + actor + " actor to " + matcher))
+    override def unsubscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit = {
+        matchers.foreach (unsubscribeOneMatcher (actor, _))
     }
 
     /** {@Inherited} */
     @CallByMessage
     override def broadcast (msg : Any) : Unit = {
+        // TODO
+    }
+
+    // - - - - - - - - - - - - -
+    // Private methods
+
+    /**
+     * Subscribe actor to one matcher.
+     * @param actor actor to subscribe
+     * @param matcher matcher to subscribe actor to
+     */
+    def subscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit = {
+        // TODO
+    }
+
+    /**
+     * Unsubscribe actor from one matcher.
+     * @param actor actor to unsubscribe
+     * @param matcher matcher to unsubscribe actor from
+     */
+    def unsubscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit = {
         // TODO
     }
 }
@@ -76,9 +96,9 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
  *                              accepted by this matcher.
  * @param messageExtractions a set of message extractions that must be tested against message
  */
-sealed case class MessageMatcher[A] (
+sealed case class MessageMatcherDefinition[A] (
                     acceptMessageClass : Class[A],
-                    messageExtractionMatchers : Set[MessageExtractionMatcher[_ >: A]])
+                    messageExtractionDefinitions : Set[MessageExtractionDefinition[_ >: A]])
 
 /**
  * Describes a matcher for message extraction.
@@ -86,6 +106,6 @@ sealed case class MessageMatcher[A] (
  * @param acceptExtractionClass a class of extraction that is accepted by matcher
  * @param messageExtractor extractor class to be used to get extraction out of message
  */
-sealed case class MessageExtractionMatcher[A] (
+sealed case class MessageExtractionDefinition[A] (
                     acceptExtractionClass : Class[_],
                     messageExtractor : Class[MessageExtractor[A, _]])

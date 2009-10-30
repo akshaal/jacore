@@ -37,6 +37,8 @@ sealed abstract class Logger extends NotNull {
  * Logger instantiation helper.
  */
 final object Logger {
+    private[this] val EnhancedClass = """^(.*)\$\$EnhancerByGuice\$\$[0-9a-fA-F]+?$""".r
+
     def get (name : String): Logger =
          new DefaultLogger (LoggerFactory.getLogger (name))
 
@@ -45,11 +47,18 @@ final object Logger {
     def get: Logger =
          get (loggerNameForClass(new Throwable().getStackTrace()(1).getClassName))
 
-    private def loggerNameForClass (className : String) =
-    	if (className.endsWith("$"))
-    	    className.substring(0, className.length - 1)
+    private def loggerNameForClass (className : String) = {
+        val strippedClassName =
+                className match {
+                    case EnhancedClass (clazz) => clazz
+                    case _ => className
+                }
+
+        if (strippedClassName.endsWith("$"))
+            strippedClassName.substring(0, strippedClassName.length - 1)
         else
-            className
+            strippedClassName
+    }
 }
 
 /**

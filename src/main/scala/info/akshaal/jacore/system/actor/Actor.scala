@@ -25,8 +25,8 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * A sequence of matchers to be used for auto-subscribe/unsubscribe of this actor
      * when it is started/stopped.
      */
-    private[this] final val matchersForSubscribe =
-                                    actMethodDescs.filter(_.subscribe).map (_.matcher)
+    private[this] final val matcherDefinitionsForSubscribe =
+                                    actMethodDescs.filter(_.subscribe).map (_.matcherDefinition)
 
     /**
      * Method dispatcher. Forwards message processing request to
@@ -124,7 +124,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         debug ("About to start")
 
         // Subscribe
-        broadcaster.subscribe (this, matchersForSubscribe : _*)
+        broadcaster.subscribe (this, matcherDefinitionsForSubscribe : _*)
 
         // Start transport
         fiber.start
@@ -140,7 +140,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         debug ("About to stop")
         
         // Unsubscribe
-        broadcaster.unsubscribe (this, matchersForSubscribe : _*)
+        broadcaster.unsubscribe (this, matcherDefinitionsForSubscribe : _*)
 
         // Stop transport
         fiber.dispose
