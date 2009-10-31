@@ -48,6 +48,8 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
                 extends Actor (actorEnv = hiPriorityActorEnv)
                    with Broadcaster
 {
+    object PlaceHolder
+
     /**
      * Subscriptions of actors. We use IdentityHashMap and IdentityHashSet to speedup
      * work. Implementation classes are used as type parameters in order to emphasize
@@ -66,7 +68,7 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
      * for the given message. This is not a local variable inside method, but a property
      * in order to increase performance and memory garbage collection overheads.
      */
-    private[this] final val executed = new IdentityHashMap[Actor, Boolean]
+    private[this] final val executed = new IdentityHashMap[Actor, Object]
 
     // - - - - - - - - - - - -
     // Message handlers
@@ -99,7 +101,7 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
                         actorEntry => {
                             val actor = actorEntry.getKey
 
-                            if (executed.put (actor, true) == null) {
+                            if (executed.put (actor, PlaceHolder) == null) {
                                 actor ! msg
                             }
                         }

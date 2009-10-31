@@ -208,6 +208,7 @@
                         <arg>-target:jvm-1.5</arg>
                         <!-- <arg>-optimise</arg> -->
                         <!-- <arg>-Ydebug</arg> -->
+                        <arg>-Ytailrecommend</arg>
                         <arg>-deprecation</arg>
                         <arg>-unchecked</arg>
                         <!-- <arg>-Xcheck-null</arg> -->
