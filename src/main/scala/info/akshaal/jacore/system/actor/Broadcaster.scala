@@ -66,7 +66,7 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
      * for the given message. This is not a local variable inside method, but a property
      * in order to increase performance and memory garbage collection overheads.
      */
-    private[this] final val executed = new IdentityHashMap[Actor, Void]
+    private[this] final val executed = new IdentityHashMap[Actor, Boolean]
 
     // - - - - - - - - - - - -
     // Message handlers
@@ -99,7 +99,7 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
                         actorEntry => {
                             val actor = actorEntry.getKey
 
-                            if (executed.put (actor, null) == null) {
+                            if (executed.put (actor, true) == null) {
                                 actor ! msg
                             }
                         }
