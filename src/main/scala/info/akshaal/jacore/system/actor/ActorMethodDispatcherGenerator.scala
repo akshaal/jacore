@@ -24,7 +24,7 @@ import scala.collection.mutable.HashMap
  */
 private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
                                                      methods : Seq[ActMethodDesc])
-                  extends ActorMethodDispatcherGeneratorWorkaround
+                  extends ActorGeneratorWorkaround
                   with Logging
 {
     import ActorMethodDispatcherGenerator._

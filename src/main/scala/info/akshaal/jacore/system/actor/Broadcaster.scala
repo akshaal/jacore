@@ -8,7 +8,7 @@ package system
 package actor
 
 import com.google.inject.{Inject, Singleton}
-import java.util.IdentityHashMap
+import java.util.{IdentityHashMap, WeakHashMap}
 
 import Predefs._
 import annotation.CallByMessage
@@ -21,9 +21,9 @@ trait Broadcaster {
      * Subscribe the given actor on messages accepted by the given matcher.
      * Request is ignored if actor is already subscribed to this kind of messages.
      * @param actor actor that will receive message accepted by matcher.
-     * @param matchers matchers that will accept or reject message for the actor.
+     * @param matcherDefinitions matchers that will accept or reject message for the actor.
      */
-    def subscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit
+    def subscribe (actor : Actor, matcherDefinitions : MessageMatcherDefinition[_]*) : Unit
 
     /**
      * Unsubscribe the given actor from messages accepted by the given matcher.
@@ -31,7 +31,7 @@ trait Broadcaster {
      * @param actor actor that is currently subscribed to the messages accepted by matcher.
      * @param matchers matchers that are currently used by actor to filter broadcasted messages.
      */
-    def unsubscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit
+    def unsubscribe (actor : Actor, matcherDefinitions : MessageMatcherDefinition[_]*) : Unit
 
     /**
      * Broadcast message to all actors subscribed to this type of msg.
@@ -73,16 +73,18 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
 
     /** {@Inherited} */
     @CallByMessage
-    override final def subscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit =
+    override final def subscribe (actor : Actor,
+                                  matcherDefinitions : MessageMatcherDefinition[_]*) : Unit =
     {
-        matchers.foreach (subscribeOneMatcher (actor, _))
+        matcherDefinitions.foreach (subscribeOneMatcher (actor, _))
     }
 
     /** {@Inherited} */
     @CallByMessage
-    override final def unsubscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit =
+    override final def unsubscribe (actor : Actor,
+                                    matcherDefinitions : MessageMatcherDefinition[_]*) : Unit =
     {
-        matchers.foreach (unsubscribeOneMatcher (actor, _))
+        matcherDefinitions.foreach (unsubscribeOneMatcher (actor, _))
     }
 
     /** {@Inherited} */
@@ -112,21 +114,51 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
     /**
      * Subscribe actor to one matcher.
      * @param actor actor to subscribe
-     * @param matcher matcher to subscribe actor to
+     * @param matcherDefinition matcher to subscribe actor to
      */
-    private def subscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit =
+    private def subscribeOneMatcher (actor : Actor,
+                                     matcherDefinition : MessageMatcherDefinition[_]) : Unit =
     {
-        // TODO
+        val matcher = getCachedMatcher (matcherDefinition)
+
+        var actorsMap = subscriptions.get (matcher)
+        if (actorsMap == null) {
+            actorsMap = new IdentityHashMap
+            subscriptions.put (matcher, actorsMap)
+        }
+
+        actorsMap.put (actor, null)
     }
 
     /**
      * Unsubscribe actor from one matcher.
      * @param actor actor to unsubscribe
-     * @param matcher matcher to unsubscribe actor from
+     * @param matcherDefinition matcher to unsubscribe actor from
      */
-    private def unsubscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit =
+    private def unsubscribeOneMatcher (actor : Actor,
+                                       matcherDefinition : MessageMatcherDefinition[_]) : Unit =
     {
-        // TODO
+        val matcher = getCachedMatcher (matcherDefinition)
+
+        var actorsMap = subscriptions.get (matcher)
+        
+        if (actorsMap != null) {
+            actorsMap.remove (actor)
+            
+            if (actorsMap.isEmpty) {
+                subscriptions.remove (matcher)
+            }
+        }
+    }
+
+    /**
+     * Get matcher from cache. If cache has no matcher in cache,
+     * then a new matcher will be created out of matcher definition.
+     */
+    private def getCachedMatcher (matcherDefinition : MessageMatcherDefinition[_]) : MessageMatcher =
+    {
+        new ActorMessageMatcherGenerator (matcherDefinition)
+                    .create.asInstanceOf [MessageMatcher]
     }
 }
 
@@ -140,6 +172,7 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
 sealed case class MessageMatcherDefinition[A] (
                     acceptMessageClass : Class[A],
                     messageExtractionDefinitions : Set[MessageExtractionDefinition[_ >: A]])
+                        extends NotNull
 
 /**
  * Describes a matcher for message extraction.
@@ -150,11 +183,12 @@ sealed case class MessageMatcherDefinition[A] (
 sealed case class MessageExtractionDefinition[A] (
                     acceptExtractionClass : Class[_],
                     messageExtractor : Class[MessageExtractor[A, _]])
+                        extends NotNull
 
 /**
  * Trait for an implementations of matcher definition.
  */
-private[actor] trait MessageMatcher {
+private[actor] trait MessageMatcher extends NotNull {
     /**
      * Returns true if the given message is acceptable.
      */

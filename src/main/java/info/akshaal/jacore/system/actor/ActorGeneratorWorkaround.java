@@ -13,10 +13,10 @@ import net.sf.cglib.core.AbstractClassGenerator;
  *
  * @author akshaal
  */
-public abstract class ActorMethodDispatcherGeneratorWorkaround extends AbstractClassGenerator {
-    private static final Source SOURCE = new Source ("ActorMethodDispatcherImpl");
+public abstract class ActorGeneratorWorkaround extends AbstractClassGenerator {
+    private static final Source SOURCE = new Source ("ActorGeneratorImpl");
 
-    protected ActorMethodDispatcherGeneratorWorkaround () {
+    protected ActorGeneratorWorkaround () {
         super (SOURCE);
     }
 }
