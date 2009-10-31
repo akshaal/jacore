@@ -8,6 +8,7 @@ package system
 package actor
 
 import com.google.inject.{Inject, Singleton}
+import java.util.IdentityHashMap
 
 import annotation.CallByMessage
 
@@ -46,25 +47,58 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
                 extends Actor (actorEnv = hiPriorityActorEnv)
                    with Broadcaster
 {
+    /**
+     * Subscriptions of actors. We use IdentityHashMap and IdentityHashSet to speedup
+     * work. Implementation classes are used as type parameters in order to emphasize
+     * that values must be identity hash maps!
+     */
+    private[this] final val subscriptions =
+                new IdentityHashMap[MessageMatcher, IdentityHashMap[Actor, Void]]
+
+    /**
+     * Used for perfomance optimization.
+     */
+    private[this] final val subscriptionEntries = subscriptions.entrySet
+
+    /**
+     * Used in broadcast method to track actors that have already been executed
+     * for the given message. This is not a local variable inside method, but a property
+     * in order to increase performance and memory garbage collection overheads.
+     */
+    private[this] final val executed = new IdentityHashMap[Actor, Void]
+
     // - - - - - - - - - - - -
     // Message handlers
 
     /** {@Inherited} */
     @CallByMessage
-    override def subscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit = {
+    override final def subscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit =
+    {
         matchers.foreach (subscribeOneMatcher (actor, _))
     }
 
     /** {@Inherited} */
     @CallByMessage
-    override def unsubscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit = {
+    override final def unsubscribe (actor : Actor, matchers : MessageMatcherDefinition[_]*) : Unit =
+    {
         matchers.foreach (unsubscribeOneMatcher (actor, _))
     }
 
     /** {@Inherited} */
     @CallByMessage
-    override def broadcast (msg : Any) : Unit = {
-        // TODO
+    override final def broadcast (msg : Any) : Unit = {
+        executed.clear
+        
+/*        for (entry <- subscriptionEntries) {
+            if (entry.getKey ().check (msg)) {
+                for (final Code code : entry.getValue ()) {
+                    final Object prev = executed.put (code, null);
+                    if (prev == null) {
+                        code.run ();
+                    }
+                }
+            }
+        }*/
     }
 
     // - - - - - - - - - - - - -
@@ -75,7 +109,8 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
      * @param actor actor to subscribe
      * @param matcher matcher to subscribe actor to
      */
-    def subscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit = {
+    private def subscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit =
+    {
         // TODO
     }
 
@@ -84,7 +119,8 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
      * @param actor actor to unsubscribe
      * @param matcher matcher to unsubscribe actor from
      */
-    def unsubscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit = {
+    private def unsubscribeOneMatcher (actor : Actor, matcher : MessageMatcherDefinition[_]) : Unit =
+    {
         // TODO
     }
 }
@@ -109,3 +145,13 @@ sealed case class MessageMatcherDefinition[A] (
 sealed case class MessageExtractionDefinition[A] (
                     acceptExtractionClass : Class[_],
                     messageExtractor : Class[MessageExtractor[A, _]])
+
+/**
+ * Trait for an implementations of matcher definition.
+ */
+private[actor] trait MessageMatcher {
+    /**
+     * Returns true if the given message is acceptable.
+     */
+    def isAcceptable (msg : Any) : Boolean
+}

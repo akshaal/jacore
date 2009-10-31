@@ -90,7 +90,7 @@ final class JacoreManager @Inject() (
     // Init code
 
     // Actors
-    private[this] val actors : List[Actor] =
+    private[this] val jacoreActors : List[Actor] =
         (fileActor
          :: daemonStatusActor
          :: monitoringActors.monitoringActor1
@@ -114,7 +114,7 @@ final class JacoreManager @Inject() (
         scheduler.start ()
 
         // Start actors
-        startActors (actors)
+        startActors (jacoreActors)
 
         debug ("Jacore started")
     }
@@ -135,7 +135,7 @@ final class JacoreManager @Inject() (
         scheduler.shutdown ()
 
         // Stop actors
-        stopActors (actors)
+        stopActors (jacoreActors)
 
         // Unregister daemon status jmx bean
         daemonStatus.unregisterJmxBean

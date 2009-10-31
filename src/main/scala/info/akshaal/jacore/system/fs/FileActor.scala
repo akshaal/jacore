@@ -180,7 +180,7 @@ private[system] final class FileActor @Inject() (
         /**
          * Called when write operation is canceled. This must not happen.
          */
-        override def cancelled (ignored : Object) : Unit = {
+        override def cancelled (ignored : Object) : Nothing = {
             throw new RuntimeException ("Impossible")
         }
 
@@ -244,7 +244,7 @@ private[system] final class FileActor @Inject() (
         /**
          * Called when read operation is canceled. This must not happen.
          */
-        override def cancelled (ignored : Object) : Unit = {
+        override def cancelled (ignored : Object) : Nothing = {
             throw new RuntimeException ("Impossible")
         }
 

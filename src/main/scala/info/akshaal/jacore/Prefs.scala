@@ -16,19 +16,16 @@ final class Prefs (file : String) {
     private[this] val properties = new Properties ()
 
     withCloseableIO {
-        convertNull (this.getClass.getResourceAsStream (file)) {
-            throw new IllegalArgumentException ("Failed to find preferences: "
-                                                + file)
+        throwIfNull (this.getClass.getResourceAsStream (file)) {
+            new IllegalArgumentException ("Failed to find preferences: " + file)
         }
     } {
         properties.load (_)
     }
 
     final def getString (name : String) : String =
-        convertNull (properties.getProperty (name)) {
-            throw new IllegalArgumentException ("Property "
-                                                + name
-                                                + " is required")
+        throwIfNull (properties.getProperty (name)) {
+            new IllegalArgumentException ("Property " + name + " is required")
         }
 
     final def getTimeUnit (name : String) : TimeUnit =

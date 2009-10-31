@@ -99,7 +99,7 @@ private[jacore] object TimeUnit {
                    throw new IllegalArgumentException (
                               "Failed to parse time: " + str + ": " + m)
 
-               case Error (m, _)   => throw new IllegalArgumentException (m)
+               case Error (m, _)   =>
                    throw new IllegalArgumentException (
                               "Error while parsing time: " + str + ": " + m)
             }

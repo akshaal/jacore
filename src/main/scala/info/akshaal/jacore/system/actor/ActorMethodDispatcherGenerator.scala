@@ -250,9 +250,9 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
      * @param clazz class
      */
     private def emitUnboxObjectTo (mv : MethodVisitor, clazz : Class[_]) : Unit = {
-        def emit (clazz : String, name : String, desc : String) : Unit =
+        def emit (clazzIN : String, name : String, desc : String) : Unit =
                 mv.visitMethodInsn (Opcodes.INVOKEVIRTUAL,
-                                    clazz,
+                                    clazzIN,
                                     name + "Value",
                                     "()" + desc)
 
@@ -330,8 +330,9 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
     /**
      * {InheritedDoc}
      */
-    override protected def nextInstance (instance : Object) : Object =
+    override protected def nextInstance (instance : Object) : Nothing = {
                 throw new UnrecoverableError ("Not implemented")
+    }
 }
 
 /**

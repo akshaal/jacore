@@ -55,6 +55,20 @@ object Predefs {
     }
 
     /**
+     * Throws exception if value is null, otherwise returns value
+     * @param ref possibly null value
+     * @param thr exception to throw
+     */
+    @inline
+    def throwIfNull[T] (ref : T) (thr : => Throwable) : T = {
+        if (ref == null) {
+            throw thr
+        } else {
+            ref
+        }
+    }
+
+    /**
      * Execute code with closeable IO.
      * TODO: Code must be executed with NotNull argument
      */
