@@ -8,6 +8,7 @@
 package info.akshaal.jacore
 
 import java.io.{FileInputStream, IOException, Closeable}
+import java.lang.{Iterable => JavaIterable}
 
 import system.logger.Logger
 import system.utils.TimeUnit
@@ -110,6 +111,17 @@ object Predefs {
         } catch {
             case ex: Exception =>
                 logger.error (message, ex)
+        }
+    }
+
+    /**
+     * Iterate over java iterable. It is compiled to very efficient code.
+     */
+    @inline
+    def iterateOverJavaIterable[T] (c : JavaIterable[T]) (f : T => Unit) {
+        val it = c.iterator
+        while (it.hasNext) {
+            f (it.next)
         }
     }
 

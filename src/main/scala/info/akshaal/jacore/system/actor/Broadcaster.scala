@@ -10,6 +10,7 @@ package actor
 import com.google.inject.{Inject, Singleton}
 import java.util.IdentityHashMap
 
+import Predefs._
 import annotation.CallByMessage
 
 /**
@@ -89,16 +90,20 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
     override final def broadcast (msg : Any) : Unit = {
         executed.clear
         
-/*        for (entry <- subscriptionEntries) {
-            if (entry.getKey ().check (msg)) {
-                for (final Code code : entry.getValue ()) {
-                    final Object prev = executed.put (code, null);
-                    if (prev == null) {
-                        code.run ();
-                    }
+        iterateOverJavaIterable (subscriptionEntries) (
+            subscriptionEntry =>
+                if (subscriptionEntry.getKey.isAcceptable (msg)) {
+                    iterateOverJavaIterable (subscriptionEntry.getValue.entrySet) (
+                        actorEntry => {
+                            val actor = actorEntry.getKey
+
+                            if (executed.put (actor, null) == null) {
+                                actor ! msg
+                            }
+                        }
+                    )
                 }
-            }
-        }*/
+        )
     }
 
     // - - - - - - - - - - - - -
