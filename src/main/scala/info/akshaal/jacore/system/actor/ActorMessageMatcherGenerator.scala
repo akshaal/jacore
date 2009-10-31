@@ -33,7 +33,7 @@ private[actor] class ActorMessageMatcherGenerator (matcherDefinition : MessageMa
                                  .map (_.acceptExtractionClass) +
                               matcherDefinition.acceptMessageClass
         val matcherDefinitionAsShortString =
-                matcherDefinitionClassesUsed.map (clazz => clazz.getName.split(",").last)
+                matcherDefinitionClassesUsed.map (clazz => clazz.getName.split('.').last)
                                             .mkString ("$")
         val namePrefix = classOf[MessageMatcher].getName + "$" + matcherDefinitionAsShortString
 
