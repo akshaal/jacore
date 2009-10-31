@@ -91,11 +91,11 @@ final class JacoreManager @Inject() (
 
     // Actors
     private[this] val jacoreActors : List[Actor] =
-        (fileActor
-         :: daemonStatusActor
-         :: monitoringActors.monitoringActor1
+        (   monitoringActors.monitoringActor1
          :: monitoringActors.monitoringActor2
          :: broadcasterActor
+         :: fileActor
+         :: daemonStatusActor
          :: Nil)
 
     /**

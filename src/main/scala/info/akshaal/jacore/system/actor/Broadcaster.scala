@@ -73,15 +73,15 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
 
     /** {@Inherited} */
     @CallByMessage
-    override final def subscribe (actor : Actor,
-                                  matcherDefinitions : MessageMatcherDefinition[_]*) : Unit =
+    override def subscribe (actor : Actor,
+                            matcherDefinitions : MessageMatcherDefinition[_]*) : Unit =
     {
         matcherDefinitions.foreach (subscribeOneMatcher (actor, _))
     }
 
     /** {@Inherited} */
     @CallByMessage
-    override final def unsubscribe (actor : Actor,
+    override def unsubscribe (actor : Actor,
                                     matcherDefinitions : MessageMatcherDefinition[_]*) : Unit =
     {
         matcherDefinitions.foreach (unsubscribeOneMatcher (actor, _))
@@ -89,7 +89,7 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
 
     /** {@Inherited} */
     @CallByMessage
-    override final def broadcast (msg : Any) : Unit = {
+    override def broadcast (msg : Any) : Unit = {
         executed.clear
         
         iterateOverJavaIterable (subscriptionEntries) (
@@ -157,6 +157,8 @@ private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
      */
     private def getCachedMatcher (matcherDefinition : MessageMatcherDefinition[_]) : MessageMatcher =
     {
+        // TODO: Implement cache
+
         new ActorMessageMatcherGenerator (matcherDefinition)
                     .create.asInstanceOf [MessageMatcher]
     }

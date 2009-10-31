@@ -9,4 +9,6 @@ package info.akshaal.jacore.system.actor
 
 import org.aopalliance.intercept.MethodInvocation
 
-private[actor] final case class Call (invocation : MethodInvocation)
+private[actor] final case class Call (invocation : MethodInvocation) {
+    override def toString = "Call(" + invocation.getMethod.getName + ")"
+}

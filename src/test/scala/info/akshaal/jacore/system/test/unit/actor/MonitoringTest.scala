@@ -34,8 +34,7 @@ object MonitoringTestModule extends Module {
     val hiPriorityPool = injector.getInstance (classOf[HiPriorityPool])
     val hiPriorityActorEnv = injector.getInstance (classOf[HiPriorityActorEnv])
 
-    abstract class HiPriorityActor extends Actor (
-                                        actorEnv = hiPriorityActorEnv)
+    abstract class HiPriorityActor extends Actor (actorEnv = hiPriorityActorEnv)
 }
 
 class MonitoringTest extends BaseUnitTest {

@@ -123,8 +123,10 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     def start () = {
         debug ("About to start")
 
-        // Subscribe
-        broadcaster.subscribe (this, matcherDefinitionsForSubscribe : _*)
+        // Subscribe first. This is very first thing to do before publish any event.
+        if (!matcherDefinitionsForSubscribe.isEmpty) {
+            broadcaster.subscribe (this, matcherDefinitionsForSubscribe : _*)
+        }
 
         // Start transport
         fiber.start
@@ -140,7 +142,9 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         debug ("About to stop")
         
         // Unsubscribe
-        broadcaster.unsubscribe (this, matcherDefinitionsForSubscribe : _*)
+        if (!matcherDefinitionsForSubscribe.isEmpty) {
+            broadcaster.unsubscribe (this, matcherDefinitionsForSubscribe : _*)
+        }
 
         // Stop transport
         fiber.dispose
