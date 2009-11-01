@@ -51,8 +51,12 @@ private[actor] object ActorClassScanner extends Logging {
 
         debugLazy ("Discovered the following classes tree " + classesTree + " for " + actor)
 
-        // List of all declared methods (uniq across the classes)
-        val allDeclaredMethods = classesTree.map (_.getDeclaredMethods.toList).flatten.toSet.toList
+        // List of all declared methods (unique (by name and parameter types) across the classes)
+        val allDeclaredMethods =
+                classesTree.map (_.getDeclaredMethods.toList)
+                           .flatten
+                           .groupBy (method => (method.getName, method.getParameterTypes.toList))
+                           .map (_._2 (0)) // extract one declared method from group
 
         val allMethodNames = allDeclaredMethods.map (_.getName)
 

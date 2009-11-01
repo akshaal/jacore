@@ -87,6 +87,32 @@ class AopTest extends BaseUnitTest {
         actor.stop
     }
 
+    @Test (groups=Array("unit"))
+    def testInheritance2 () = {
+        val injector = UnitTestModule.injector
+
+        val actor = injector.getInstance (classOf[InheritanceTestActor2])
+
+        actor.start
+        assertFalse (actor.intReceived2)
+        assertFalse (actor.intReceived)
+        assertFalse (actor.strReceived)
+
+        actor ! "Hi"
+        sleep
+        assertFalse (actor.intReceived2)
+        assertFalse (actor.intReceived)
+        assertTrue (actor.strReceived)
+
+        actor ! 123
+        sleep
+        assertTrue (actor.intReceived2)
+        assertFalse (actor.intReceived)
+        assertTrue (actor.strReceived)
+
+        actor.stop
+    }
+
 
     @Test (groups=Array("unit"))
     def testActAnnotation () = {
@@ -318,6 +344,21 @@ class InheritanceTestActor extends ProtectedTestActor (UnitTestModule.hiPriority
     @Act
     def stringHandler (str : String) : Unit = {
         strReceived = true
+    }
+}
+
+class InheritanceTestActor2 extends ProtectedTestActor (UnitTestModule.hiPriorityActorEnv) {
+    var strReceived = false
+    var intReceived2 = false
+
+    @Act
+    def stringHandler (str : String) : Unit = {
+        strReceived = true
+    }
+
+    @Act
+    override def test (msg : Int) : Unit = {
+        intReceived2 = true
     }
 }
 
