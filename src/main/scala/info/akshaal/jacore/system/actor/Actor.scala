@@ -100,8 +100,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * Invokes this actor's act() method.
      */
     @inline
-    private def invokeAct (msg : Any, sentFrom : Option[Actor]) =
-    {
+    private[this] def invokeAct (msg : Any, sentFrom : Option[Actor]) = {
         sender = sentFrom
 
         try {
@@ -158,7 +157,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * suitable to forward request for message processing to an appropriate
      * annotated method of this object. It also subscribes.
      */
-    private def createDispatcher : MethodDispatcher = {
+    private[this] def createDispatcher : MethodDispatcher = {
         if (actMethodDescs.isEmpty) {
             EmptyMethodDispatcher
         } else {
@@ -186,7 +185,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * Implementations that is to be used for Actor classes with no methods annotated with @Act
      * annotations.
      */
-    private object EmptyMethodDispatcher extends MethodDispatcher {
+    private[this] object EmptyMethodDispatcher extends MethodDispatcher {
         /**
          * {@Inherited}
          */

@@ -44,10 +44,21 @@ private[actor] object ActorClassScanner extends Logging {
         // Check methods and collect information
         var methods : List[ActMethodDesc] = Nil
 
-        // For each annotated method (including inherited) of this class
-        val allMethodNames = actorClass.getMethods.map (_.getName)
+        // For each annotated method of this class
+        val classesTree =
+                Iterator.iterate[Class[_]] (actorClass) (_.getSuperclass)
+                                  .takeWhile (_ != classOf[Object]).toList
 
-        for (method <- actorClass.getMethods if method.isAnnotationPresent (classOf[Act])) {
+        debugLazy ("Discovered the following classes tree " + classesTree + " for " + actor)
+
+        // List of all declared methods (uniq across the classes)
+        val allDeclaredMethods = classesTree.map (_.getDeclaredMethods.toList).flatten.toSet.toList
+
+        val allMethodNames = allDeclaredMethods.map (_.getName)
+
+        debugLazy ("There are (all) visible methods " + allMethodNames + " of " + actor)
+
+        for (method <- allDeclaredMethods if method.isAnnotationPresent (classOf[Act])) {
             val methodName = method.getName
 
             def badMethod (str : String) : Nothing = {
@@ -59,6 +70,10 @@ private[actor] object ActorClassScanner extends Logging {
 
             if (Modifier.isStatic (modifiers)) {
                 badMethod ("must not be static")
+            }
+
+            if (Modifier.isPrivate (modifiers)) {
+                badMethod ("must not be private")
             }
 
             // Check return type: must be void
@@ -212,7 +227,7 @@ private[actor] object ActorClassScanner extends Logging {
                                        typeDescriptor = Type.getMethodDescriptor (method))
         }
 
-        debugLazy ("Found action methods " + methods)
+        debugLazy ("Found action methods " + methods + " for " + actor)
 
         // Sanity checks on class level
         for ((_, methodGroup) <- methods.groupBy (_.matcherDefinition)) {

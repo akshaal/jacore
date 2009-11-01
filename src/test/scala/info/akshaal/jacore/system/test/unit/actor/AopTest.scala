@@ -45,6 +45,50 @@ class AopTest extends BaseUnitTest {
     }
 
     @Test (groups=Array("unit"))
+    def testJavaProtectedMethodAct () = {
+        val injector = UnitTestModule.injector
+
+        val actor = injector.getInstance (classOf[ProtectedTestActor])
+
+        actor.start
+        assertFalse (actor.intReceived)
+
+        actor ! "Hi"
+        sleep
+        assertFalse (actor.intReceived)
+
+        actor ! 123
+        sleep
+        assertTrue (actor.intReceived)
+
+        actor.stop
+    }
+
+    @Test (groups=Array("unit"))
+    def testInheritance () = {
+        val injector = UnitTestModule.injector
+
+        val actor = injector.getInstance (classOf[InheritanceTestActor])
+
+        actor.start
+        assertFalse (actor.intReceived)
+        assertFalse (actor.strReceived)
+
+        actor ! "Hi"
+        sleep
+        assertFalse (actor.intReceived)
+        assertTrue (actor.strReceived)
+
+        actor ! 123
+        sleep
+        assertTrue (actor.intReceived)
+        assertTrue (actor.strReceived)
+
+        actor.stop
+    }
+
+
+    @Test (groups=Array("unit"))
     def testActAnnotation () = {
         val injector = UnitTestModule.injector
 
@@ -247,6 +291,12 @@ class AopTest extends BaseUnitTest {
         assertTrue (false)
     }
 
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testPrivateTestActor () = {
+        UnitTestModule.injector.getInstance(classOf[PrivateTestActor])
+        assertTrue (false)
+    }
+
     def sleep : Unit = Thread.sleep (1000)
 }
 
@@ -259,6 +309,15 @@ class AopTestActor extends HiPriorityActor {
     @CallByMessage
     def inc () = {
         sum = sum + 1
+    }
+}
+
+class InheritanceTestActor extends ProtectedTestActor (UnitTestModule.hiPriorityActorEnv) {
+    var strReceived = false
+
+    @Act
+    def stringHandler (str : String) : Unit = {
+        strReceived = true
     }
 }
 
