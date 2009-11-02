@@ -44,29 +44,56 @@ private[actor] object ActorClassScanner extends Logging {
         // Check methods and collect information
         var methods : List[ActMethodDesc] = Nil
 
-        // For each annotated method of this class
+        // Classes tree of this actor class
         val classesTree =
                 Iterator.iterate[Class[_]] (actorClass) (_.getSuperclass)
-                                  .takeWhile (_ != classOf[Object]).toList
+                        .takeWhile (_ != classOf[Object])
+                        .toList
 
         debugLazy ("Discovered the following classes tree " + classesTree + " for " + actor)
 
-        // List of all declared methods (unique (by name and parameter types) across the classes)
-        val allDeclaredMethods =
+        // List of all declared methods (unique by name, parameter types and annotations)
+
+        val allDeclaredMethodsGroupedBySignature =
                 classesTree.map (_.getDeclaredMethods.toList)
                            .flatten
-                           .groupBy (method => (method.getName, method.getParameterTypes.toList))
-                           .map (_._2 (0)) // extract one declared method from group
+                           .groupBy (method => (method.getName,
+                                                method.getParameterTypes.toList,
+                                                method.getParameterAnnotations.map(_.toList)
+                                                                              .toList))
+                           .map (_._2)
 
-        val allMethodNames = allDeclaredMethods.map (_.getName)
+        val allMethodNames = allDeclaredMethodsGroupedBySignature.map (_(0).getName)
 
         debugLazy ("There are (all) visible methods " + allMethodNames + " of " + actor)
 
-        for (method <- allDeclaredMethods if method.isAnnotationPresent (classOf[Act])) {
+        // For each found method signature
+        for (methodsOfSignature <- allDeclaredMethodsGroupedBySignature;
+             methodsActAnnotations = methodsOfSignature.map (_.getAnnotation(classOf[Act]))
+                                                       .filter (_ != null);
+             if !methodsActAnnotations.isEmpty)
+        {
+            val method = methodsOfSignature(0)
             val methodName = method.getName
+
+            debugLazy ("Processing " + methodsOfSignature)
 
             def badMethod (str : String) : Nothing = {
                 badClass ("Action method " + methodName + " " + str)
+            }
+
+            // Get and check subscribe option consistency
+            val subscribe = methodsActAnnotations.head.subscribe
+            val subscribeOverriden = methodsActAnnotations.tail.map (_.subscribe)
+            if (!subscribeOverriden.isEmpty && subscribeOverriden.count (_ != subscribe) > 0) {
+                badMethod ("is overriden with different subscribe flag values in Act annotation")
+            }
+
+            // Get and check subscribe option consistency
+            val suborder = methodsActAnnotations.head.suborder
+            val suborderOverriden = methodsActAnnotations.tail.map (_.suborder)
+            if (!suborderOverriden.isEmpty && suborderOverriden.count (_ != suborder) > 0) {
+                badMethod ("is overriden with different suborder flag values in Act annotation")
             }
 
             // Checks modifiers: must not be static
@@ -88,7 +115,8 @@ private[actor] object ActorClassScanner extends Logging {
 
             // Check uniqueness of method name
             if (allMethodNames.count(_ == methodName) > 1) {
-                badMethod ("must not be overloaded")
+                badMethod ("must not be overloaded or overriden with"
+                           + " different set of annotations on paramteres")
             }
 
             // Check params: must be at least one parameter
@@ -221,11 +249,9 @@ private[actor] object ActorClassScanner extends Logging {
             }
 
             // Gather information
-            val actAnnotation = method.getAnnotation (classOf[Act])
-
             methods ::= ActMethodDesc (name = methodName,
-                                       subscribe = actAnnotation.subscribe,
-                                       suborder = actAnnotation.suborder,
+                                       subscribe = subscribe,
+                                       suborder = suborder,
                                        params = paramDescs,
                                        matcherDefinition = messageMatcherDefinition,
                                        typeDescriptor = Type.getMethodDescriptor (method))

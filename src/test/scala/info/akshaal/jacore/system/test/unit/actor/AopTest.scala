@@ -45,6 +45,38 @@ class AopTest extends BaseUnitTest {
     }
 
     @Test (groups=Array("unit"))
+    def testInterceptorWithAct () = {
+        val injector = UnitTestModule.injector
+
+        val actor = injector.getInstance (classOf[InterceptWithActTestActor])
+        actor.start
+
+        assertEquals (actor.strCount, 0)
+        assertEquals (actor.intCount, 0)
+        assertEquals (actor.incCount, 0)
+
+        actor.inc
+        sleep
+        assertEquals (actor.strCount, 0)
+        assertEquals (actor.intCount, 0)
+        assertEquals (actor.incCount, 1)
+
+        actor ! "hi"
+        sleep
+        assertEquals (actor.strCount, 1)
+        assertEquals (actor.intCount, 0)
+        assertEquals (actor.incCount, 1)
+
+        actor ! 123
+        sleep
+        assertEquals (actor.strCount, 1)
+        assertEquals (actor.intCount, 1)
+        assertEquals (actor.incCount, 1)
+        
+        actor.stop
+    }
+
+    @Test (groups=Array("unit"))
     def testJavaProtectedMethodAct () = {
         val injector = UnitTestModule.injector
 
@@ -335,6 +367,29 @@ class AopTestActor extends HiPriorityActor {
     @CallByMessage
     def inc () = {
         sum = sum + 1
+    }
+}
+
+/**
+ * Actor to test @CallByMessage annotation.
+ */
+class InterceptWithActTestActor extends HiPriorityActor {
+    var incCount = 0
+    var strCount = 0
+    var intCount = 0
+
+    @CallByMessage
+    def inc () = {
+        incCount += 1
+    }
+
+    @Act
+    def strHandler (str : String) = {
+        strCount += 1
+    }
+
+    override def act = {
+        case x : Int => intCount += 1
     }
 }
 
