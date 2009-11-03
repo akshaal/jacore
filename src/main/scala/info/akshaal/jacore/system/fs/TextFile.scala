@@ -10,7 +10,6 @@ package system
 package fs
 
 import java.nio.channels.AsynchronousFileChannel
-import java.nio.file.{Path, OpenOption}
 import java.io.{File, IOException}
 import java.nio.file.StandardOpenOption.{READ, WRITE, CREATE, TRUNCATE_EXISTING}
 import java.nio.{ByteBuffer, CharBuffer}
@@ -18,22 +17,16 @@ import java.nio.channels.CompletionHandler
 import java.nio.charset.Charset
 
 import com.google.inject.{Inject, Singleton}
-import com.google.inject.name.Named
 
 import Predefs._
 import actor.{Actor, NormalPriorityActorEnv}
 import logger.Logging
+import annotation.CallByMessage
+
+// ///////////////////////////////////////////////////////////////////////
+// Messages
 
 abstract sealed class FileMessage extends NotNull
-
-final case class WriteFile (file : File,
-                            content : String,
-                            payload : Any)
-                           extends FileMessage
-
-final case class ReadFile (file : File,
-                           payload : Any)
-                            extends FileMessage
 
 final case class WriteFileDone (file : File,
                                 payload : Any)
@@ -55,37 +48,52 @@ final case class ReadFileFailed (file : File,
                             extends FileMessage
 
 // ///////////////////////////////////////////////////////////////////////
-// File actor
+// TextFile interface
 
 /**
- * Fast async file reader/writer. Can read only limited number of bytes.
+ * Fast synchronous file reader/writer.
+ */
+trait TextFile {
+    /**
+     * Write a given content into the file. When writing is done a message will be issued
+     * to the caller actor. The possible result messages are <code>WriteFileDone</code>
+     * and <code>WriteFileFailed</code>.
+     *
+     * @param file write content to this file
+     * @param content string content to write into the file
+     * @param payload payload to passed back in messsage when writing is done
+     */
+    def writeFile (file : File, content : String, payload : Any) : Unit
+
+    /**
+     * Open file and initiate reading from the file. When reading is done a message will sended
+     * to the caller actor. The possible result messages are <code>ReadFileDone</code>
+     * and <code>ReadFileFailed</code>.
+     * @param file file to read from
+     * @param payload payload to passed back in messsage when reading is done
+     */
+    def readFile (file : File, payload : Any) : Unit
+}
+
+// ///////////////////////////////////////////////////////////////////////
+// TextFile actor
+
+/**
+ * Fast async file reader/writer.
  */
 @Singleton
-private[system] final class FileActor @Inject() (
+private[system] class TextFileActor @Inject() (
                        normalPriorityActorEnv : NormalPriorityActorEnv,
-                       @Named("jacore.file.buffer.limit") readBytesLimit : Int,
                        prefs : Prefs)
                     extends Actor (actorEnv = normalPriorityActorEnv)
+                       with TextFile
 {
-    private val encoding = prefs.getString("jacore.os.file.encoding")
-    private val encoder = Charset.forName(encoding).newEncoder()
-    private val decoder = Charset.forName(encoding).newDecoder()
+    private val encoding = prefs.getString ("jacore.os.file.encoding")
+    private val encoder = Charset.forName (encoding).newEncoder ()
+    private val decoder = Charset.forName (encoding).newDecoder ()
 
-    /**
-     * Process actor message.
-     */
-    protected override final def act () = {
-        case WriteFile(file, content, payload) => writeFile (file,
-                                                             content,
-                                                             payload)
-
-        case ReadFile(file, payload) => readFile (file, payload)
-    }
-
-    /**
-     * Open file and initiate writing to the file.
-     */
-    private def writeFile (file : File, content : String, payload : Any) =
+    @CallByMessage
+    override def writeFile (file : File, content : String, payload : Any) : Unit =
     {
         val buf = encoder.encode(CharBuffer.wrap (content))
         val handler = new WriteCompletionHandler (buf, file, sender, payload)
@@ -103,17 +111,15 @@ private[system] final class FileActor @Inject() (
         }
     }
 
-    /**
-     * Open file and initiate reading from the file.
-     */
-    private def readFile (file : File, payload : Any) =
+    @CallByMessage
+    override def readFile (file : File, payload : Any) : Unit =
     {
-        val buf = ByteBuffer.allocate (readBytesLimit)
-        val handler = new ReadCompletionHandler (buf, file, sender, payload)
+        var handler = new ReadCompletionHandler (file, sender, payload)
 
         try {
             val ch = AsynchronousFileChannel.open (file.toPath, READ)
-            handler.setChannel (ch)
+            val buf = ByteBuffer.allocate (ch.size.asInstanceOf[Int])
+            handler.setChannelAndBuffer (ch, buf)
 
             ch.read (buf, 0, null, handler)
         } catch {
@@ -150,13 +156,15 @@ private[system] final class FileActor @Inject() (
             if (bufLen != bytes) {
                 failed (new IOException ("Only " + bytes
                                          + " number of bytes out of "
-                                         + bufLen + " has been written for file "
+                                         + bufLen + " has been written to file "
                                          + file + " with payload " + payload),
                         null)
             } else {
-                sender.foreach (_ ! (WriteFileDone (file, payload)))
-
-                closeChannel ()
+                try {
+                    sender.foreach (_ ! (WriteFileDone (file, payload)))
+                } finally {
+                    closeChannel ()
+                }
             }
         }
 
@@ -164,17 +172,19 @@ private[system] final class FileActor @Inject() (
          * Called when write operation failed.
          */
         override def failed (exc : Throwable, ignored : Object) : Unit = {
-            sender match {
-                case None =>
-                    error ("Failed to write to file " + file
-                           + " with payload " + payload,
-                           exc)
+            try {
+                sender match {
+                    case None =>
+                        error ("Failed to write to file " + file
+                               + " with payload " + payload,
+                               exc)
 
-                case Some (actor) =>
-                    actor ! (WriteFileFailed (file, exc, payload))
+                    case Some (actor) =>
+                        actor ! (WriteFileFailed (file, exc, payload))
+                }
+            } finally {
+                closeChannel ()
             }
-
-            closeChannel ()
         }
 
         /**
@@ -200,45 +210,53 @@ private[system] final class FileActor @Inject() (
     /**
      * Write completion handler
      */
-    private [fs] final class ReadCompletionHandler (buf : ByteBuffer,
-                                                    file : File,
+    private [fs] final class ReadCompletionHandler (file : File,
                                                     sender : Option[Actor],
                                                     payload : Any)
                         extends CompletionHandler [java.lang.Integer, Object]
                         with Logging
     {
         private var channel : AsynchronousFileChannel = null
+        private var buf : ByteBuffer = null
 
         /**
          * Associate a channel this handler serves.
          */
-        def setChannel (ch : AsynchronousFileChannel) = channel = ch
+        def setChannelAndBuffer (ch : AsynchronousFileChannel, buffer : ByteBuffer) = {
+            channel = ch
+            this.buf = buffer
+        }
 
         /**
          * Called when write operation is finished.
          */
         override def completed (bytes : java.lang.Integer,
                                 ignored : Object) : Unit = {
-            val content : String = decoder.decode (buf).toString
+            try {
+                val content : String = decoder.decode (buf).toString
 
-            sender.foreach (_ ! (ReadFileDone (file, content, payload)))
-            closeChannel ()
+                sender.foreach (_ ! (ReadFileDone (file, content, payload)))
+            } finally {
+                closeChannel ()
+            }
         }
 
         /**
          * Called when write operation failed.
          */
         override def failed (exc : Throwable, ignored : Object) : Unit = {
-            sender match {
-                case None =>
-                    error ("Failed to read from file: " + file
-                           + " with payliad " + payload, exc)
+            try {
+                sender match {
+                    case None =>
+                        error ("Failed to read from file: " + file
+                               + " with payliad " + payload, exc)
 
-                case Some (actor) =>
-                    actor ! (ReadFileFailed (file, exc, payload))
+                    case Some (actor) =>
+                        actor ! (ReadFileFailed (file, exc, payload))
+                }
+            } finally {
+                closeChannel ()
             }
-
-            closeChannel ()
         }
 
         /**

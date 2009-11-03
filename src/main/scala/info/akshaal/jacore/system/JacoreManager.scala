@@ -13,7 +13,7 @@ import java.lang.{Iterable => JavaIterable}
 
 import collection.JavaConversions._
 
-import fs.FileActor
+import fs.{TextFileActor}
 import daemon.{DaemonStatusActor, DaemonStatus}
 import actor.{MonitoringActors, BroadcasterActor, Actor}
 import scheduler.Scheduler
@@ -24,7 +24,7 @@ import logger.Logging
  */
 @Singleton
 final class JacoreManager @Inject() (
-                    fileActor : FileActor,
+                    textFileActor : TextFileActor,
                     daemonStatusActor : DaemonStatusActor,
                     daemonStatus : DaemonStatus,
                     monitoringActors : MonitoringActors,
@@ -94,7 +94,7 @@ final class JacoreManager @Inject() (
         (   monitoringActors.monitoringActor1
          :: monitoringActors.monitoringActor2
          :: broadcasterActor
-         :: fileActor
+         :: textFileActor
          :: daemonStatusActor
          :: Nil)
 

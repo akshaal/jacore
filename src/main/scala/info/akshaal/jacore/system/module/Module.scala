@@ -16,6 +16,7 @@ import com.google.inject.name.Names
 import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
 import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterActor}
+import fs.{TextFile, TextFileActor}
 import annotation.CallByMessage
 
 /**
@@ -46,8 +47,6 @@ class Module extends GuiceModule {
     lazy val daemonStatusUpdateInterval = prefs.getTimeUnit("jacore.status.update.interval")
     lazy val daemonStatusFile = prefs.getString("jacore.status.file")
 
-    lazy val fileReadBytesLimit = 1024*1024
-
     lazy val threadPriorityChangerImplClass : Class[T] forSome {type T <: ThreadPriorityChanger} =
                     classOf[DummyThreadPriorityChanger]
 
@@ -65,6 +64,7 @@ class Module extends GuiceModule {
 
         // Internal implemntation bindings
         binder.bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
+        binder.bind (classOf[TextFile]).to (classOf[TextFileActor])
 
         // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
         
@@ -78,10 +78,6 @@ class Module extends GuiceModule {
               .toInstance (prefs)
 
         //  - - - - - - - - - - -  Named - - - - - - - - - -  - - - -
-
-        binder.bind (classOf[Int])
-              .annotatedWith (Names.named ("jacore.file.buffer.limit"))
-              .toInstance (fileReadBytesLimit)
 
         binder.bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.scheduler.latency"))
@@ -131,6 +127,7 @@ class Module extends GuiceModule {
 
         
         // Low priority pool parameters
+
         binder.bind (classOf[Int])
               .annotatedWith (Names.named ("jacore.pool.low.threads"))
               .toInstance (lowPriorityPoolThreads)

@@ -15,9 +15,9 @@ import java.io.{File, FileReader, BufferedReader, BufferedWriter, FileWriter}
 
 import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 
-import system.fs.{WriteFile, WriteFileDone, WriteFileFailed}
+import system.fs.{WriteFileDone, WriteFileFailed}
 
-class FileActorTest extends BaseUnitTest {
+class TextFileTest extends BaseUnitTest {
     @Test (groups=Array("unit"))
     def testWrite () = {
         WriteTestActor.start
@@ -81,7 +81,7 @@ object WriteTestActor extends HiPriorityActor {
     override def act () = {
         case msg @ (file : File, content : String, payl) => {
             debug ("Received message: " + msg)
-            UnitTestModule.fileActor ! (WriteFile (file, content, payl))
+            UnitTestModule.textFile.writeFile (file, content, payl)
         }
 
         case msg @ WriteFileDone (file, payl) => {
