@@ -233,8 +233,9 @@ private[system] class TextFileActor @Inject() (
         override def completed (bytes : java.lang.Integer,
                                 ignored : Object) : Unit = {
             try {
-                val content : String = decoder.decode (buf).toString
+                buf.rewind ()
 
+                val content : String = decoder.decode (buf).toString
                 sender.foreach (_ ! (ReadFileDone (file, content, payload)))
             } finally {
                 closeChannel ()

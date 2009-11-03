@@ -15,14 +15,14 @@ import java.io.{File, FileReader, BufferedReader, BufferedWriter, FileWriter}
 
 import system.test.unit.{BaseUnitTest, UnitTestModule, HiPriorityActor}
 
-import system.fs.{WriteFileDone, WriteFileFailed}
+import system.fs.{WriteFileDone, WriteFileFailed, ReadFileDone, ReadFileFailed}
 
 class TextFileTest extends BaseUnitTest {
     @Test (groups=Array("unit"))
     def testWrite () = {
         WriteTestActor.start
 
-        val file = File.createTempFile ("jacore", "test")
+        val file = File.createTempFile ("jacore", "writeTest")
         file.deleteOnExit
 
         assertNull (WriteTestActor.payload)
@@ -50,7 +50,40 @@ class TextFileTest extends BaseUnitTest {
         WriteTestActor.stop
     }
 
-    // TODO: Write reading test
+    @Test (groups=Array("unit"))
+    def testRead () = {
+        ReadTestActor.start
+
+        val file = File.createTempFile ("jacore", "readTest")
+        file.deleteOnExit
+
+        assertNull (ReadTestActor.payload)
+
+        writeLine (file, "Hi")
+        ReadTestActor ! (file, "1x")
+        sleep
+        assertEquals (ReadTestActor.payload, "1x")
+        assertEquals (ReadTestActor.done, 1)
+        assertEquals (ReadTestActor.excs, 0)
+        assertEquals (ReadTestActor.content, "Hi")
+
+        writeLine (file, "Bye")
+        ReadTestActor ! (file, "2x")
+        sleep
+        assertEquals (ReadTestActor.payload, "2x")
+        assertEquals (ReadTestActor.done, 2)
+        assertEquals (ReadTestActor.excs, 0)
+        assertEquals (ReadTestActor.content, "Bye")
+
+        ReadTestActor ! (new File ("/ook/ooook/ooooooook"), "3x")
+        sleep
+        assertEquals (ReadTestActor.payload, "3x")
+        assertEquals (ReadTestActor.done, 2)
+        assertEquals (ReadTestActor.excs, 1)
+        assertEquals (ReadTestActor.content, "Bye")
+
+        ReadTestActor.stop
+    }
 
     private def sleep () = Thread.sleep (1000)
 
@@ -79,7 +112,7 @@ object WriteTestActor extends HiPriorityActor {
     var payload : Any = null
 
     override def act () = {
-        case msg @ (file : File, content : String, payl) => {
+        case msg @ (file : File, content : String, payl : Any) => {
             debug ("Received message: " + msg)
             UnitTestModule.textFile.writeFile (file, content, payl)
         }
@@ -91,6 +124,33 @@ object WriteTestActor extends HiPriorityActor {
         }
 
         case msg @ WriteFileFailed (file, exc, payl) => {
+            this.payload = payl
+            excs = excs + 1
+            debug ("Received message: " + msg)
+        }
+    }
+}
+
+object ReadTestActor extends HiPriorityActor {
+    var done = 0
+    var excs = 0
+    var payload : Any = null
+    var content : String = null
+
+    override def act () = {
+        case msg @ (file : File, payl) => {
+            debug ("Received message: " + msg)
+            UnitTestModule.textFile.readFile (file, payl)
+        }
+
+        case msg @ ReadFileDone (file, cont, payl) => {
+            done = done + 1
+            this.payload = payl
+            this.content = cont
+            debug ("Received message: " + msg)
+        }
+
+        case msg @ ReadFileFailed (file, exc, payl) => {
             this.payload = payl
             excs = excs + 1
             debug ("Received message: " + msg)
