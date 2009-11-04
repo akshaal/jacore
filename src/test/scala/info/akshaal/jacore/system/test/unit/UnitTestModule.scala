@@ -9,6 +9,7 @@ package info.akshaal.jacore
 package system.test.unit
 
 import com.google.inject.{Guice, Injector}
+import java.io.File
 
 import Predefs._
 import system.JacoreManager
@@ -19,9 +20,12 @@ import system.scheduler.Scheduler
 import system.fs.TextFile
 import system.utils.{HiPriorityPool, NormalPriorityPool, ThreadPriorityChanger}
 
-
 object UnitTestModule extends Module {
+    val daemonStatusFileFile = File.createTempFile ("jacore", "unitTest")
+    daemonStatusFileFile.deleteOnExit
+
     override lazy val daemonStatusJmxName = "jacore:name=testStatus"
+    override lazy val daemonStatusFile = daemonStatusFileFile.getAbsolutePath
 
     val injector = Guice.createInjector (this)
     val jacoreManager = injector.getInstance (classOf[JacoreManager])

@@ -72,8 +72,7 @@ final class DaemonStatus @Inject() (
     /**
      * Called by monitoring actor to set
      */
-    final def monitoringAlive () = lastAliveTimestamp =
-                    System.nanoTime.nanoseconds
+    final def monitoringAlive () = lastAliveTimestamp = System.nanoTime.nanoseconds
 
     /**
      * Called when application is no more reliable and must die.
@@ -110,8 +109,7 @@ final class DaemonStatus @Inject() (
             val name = thread.getName
             val stack = stackTraceElements.mkString (",\n    ")
 
-            threadDumpList =
-                (name + ":\n    " + stack + "\n") :: threadDumpList
+            threadDumpList = (name + ":\n    " + stack + "\n") :: threadDumpList
         }
 
         error ("Dumping threads:\n" + threadDumpList.mkString ("\n"))

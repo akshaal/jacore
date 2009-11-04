@@ -18,12 +18,13 @@ import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
 import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterActor}
 import fs.{TextFile, TextFileActor}
 import annotation.CallByMessage
+import logger.Logging
 
 /**
  * This module is supposed to help instantiate all classes needed for jacore
  * to work.
  */
-class Module extends GuiceModule {
+class Module extends GuiceModule with Logging {
     lazy val prefsResource = "/jacore.properties"
     lazy val prefs = new Prefs (prefsResource)
 
@@ -52,9 +53,13 @@ class Module extends GuiceModule {
 
     // -- tests
 
-    require (daemonStatusUpdateInterval > monitoringInterval * 2,
-             "daemonStatusUpdateInterval must at least be greater"
-             + " than 2*monitoringInterval")
+    if (daemonStatusUpdateInterval > 0.nanoseconds) {
+        require (daemonStatusUpdateInterval > monitoringInterval * 2,
+                 "daemonStatusUpdateInterval must at least be greater"
+                 + " than 2*monitoringInterval")
+    } else {
+        debug ("daemon status file is disabled")
+    }
 
     // - - - - - - - - - - - - Bindings - - - - - - - - - -
 

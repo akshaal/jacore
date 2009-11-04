@@ -9,7 +9,7 @@ import system.JacoreManager
 import system.scheduler.Scheduler
 import system.test.unit.BaseUnitTest
 import system.utils.HiPriorityPool
-import system.actor.{MonitoringActor, Actor, HiPriorityActorEnv}
+import system.actor.{Actor, HiPriorityActorEnv}
 import system.daemon.DaemonStatus
 
 import org.testng.annotations.Test
@@ -18,11 +18,17 @@ import org.testng.Assert._
 import java.lang.management.ManagementFactory
 import javax.management.ObjectName
 
+import java.io.File
+
 // NOTE: This test cannot use usual Test module, because it must not set
 // it to dying state!, so we redefine some objects
 
 object MonitoringTestModule extends Module {
+    val daemonStatusFileFile = File.createTempFile ("jacore", "monitoringTest")
+    daemonStatusFileFile.deleteOnExit
+
     override lazy val daemonStatusJmxName = "jacore:name=monitoringTestDaemonStatus"
+    override lazy val daemonStatusFile = daemonStatusFileFile.getAbsolutePath
 
     val injector = Guice.createInjector (this)
     val jacoreManager = injector.getInstance (classOf[JacoreManager])
