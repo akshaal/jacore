@@ -46,7 +46,10 @@ private[system] class DaemonStatusActor @Inject() (
                 val passedSinceAlive = System.nanoTime.nanoseconds - daemonStatus.lastAlive
                 val isReallyAlive = !daemonStatus.isDying && passedSinceAlive < interval
 
-                textFile.writeFile (statusFile, if (isReallyAlive) "alive" else "dying", null)
+                val curTime = System.currentTimeMillis
+                val statusString = if (isReallyAlive) "alive" else "dying"
+                val content = curTime + " " + statusString
+                textFile.writeFile (statusFile, content, null)
         }
 
         case WriteFileDone (_, _) => debug ("Status file has been updated")
