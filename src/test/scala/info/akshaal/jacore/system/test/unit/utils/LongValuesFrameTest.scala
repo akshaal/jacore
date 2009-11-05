@@ -6,50 +6,29 @@ package info.akshaal.jacore
 package system
 package test.unit.utils
 
-import system.utils.LongValueFrame
-import system.test.unit.BaseUnitTest
+import org.specs.SpecificationWithJUnit
 
-import org.testng.annotations.Test
-import org.testng.Assert._
+import system.utils.LongValueFrame
 
 /**
  * Test Long Value Frame.
  */
-class LongValuesFrameTest extends BaseUnitTest {
-    val MAGIC_3 = 3L
-    val MAGIC_4 = 4L
-    val MAGIC_5 = 5L
-    val MAGIC_6 = 6L
+class LongValuesFrameTest extends SpecificationWithJUnit ("LongValueFrame class specification") {
+    "LongValueFrame" should {
+        "fail with zero width" in {
+            new LongValueFrame (0) must throwA[IllegalArgumentException]
+        }
 
-    /**
-     * Test zero count.
-     * @throws Exception if something goes wrong
-     */
-    @Test (expectedExceptions = Array(classOf[IllegalArgumentException]),
-           groups = Array("unit"))
-    def zeroWidth () = {
-        val frame = new LongValueFrame (0)
-        frame.put (1)
-        assertFalse (true)
-    }
-
-    /**
-     * Test negative count.
-     * @throws Exception if something goes wrong
-     */
-    @Test (expectedExceptions = Array(classOf[IllegalArgumentException]),
-           groups = Array("unit"))
-    def negativeWidth () = {
-        val frame = new LongValueFrame (-2)
-        frame.put (1)
-        assertFalse (true)
+        "fail with negative width" in {
+            new LongValueFrame (-1) must throwA[IllegalArgumentException]
+        }
     }
 
     /**
      * Test 1 count.
      * @throws Exception if something goes wrong
      */
-    @Test (groups = Array("unit"))
+    /*@Test (groups = Array("unit"))
     def oneWidth () = {
         val frame = new LongValueFrame (1)
         assertEquals (frame.average (), 0L)
@@ -65,13 +44,13 @@ class LongValuesFrameTest extends BaseUnitTest {
 
         frame.put (MAGIC_3)
         assertEquals (frame.average (), MAGIC_3)
-    }
+    }*/
 
     /**
      * Test 2 count.
      * @throws Exception if something goes wrong
      */
-    @Test (groups = Array("unit"))
+    /*@Test (groups = Array("unit"))
     def twoWidth () = {
         val frame = new LongValueFrame (2)
         assertEquals (frame.average (), 0L)
@@ -87,13 +66,13 @@ class LongValuesFrameTest extends BaseUnitTest {
 
         frame.put (MAGIC_3)
         assertEquals (frame.average (), 2L)
-    }
+    }*/
 
     /**
      * Test 3 count.
      * @throws Exception if something goes wrong
      */
-    @Test (groups = Array("unit"))
+    /*@Test (groups = Array("unit"))
     def threeWidth () = {
         val frame = new LongValueFrame (3)
         assertEquals (frame.average (), 0L)
@@ -109,5 +88,5 @@ class LongValuesFrameTest extends BaseUnitTest {
 
         frame.put (MAGIC_3)
         assertEquals (frame.average (), 2L)
-    }
+    }*/
 }

@@ -6,12 +6,8 @@ package info.akshaal.jacore
 package system.test.unit.utils
 
 import Predefs._
-import system.utils.TimeUnit
-import system.test.unit.BaseUnitTest
 
-import org.testng.annotations.Test
-import org.testng.Assert.{assertEquals, assertTrue, assertFalse}
-
+/*
 class TimeUnitTest extends BaseUnitTest {
     @Test (groups = Array("unit"))
     def testConstruction () = {
@@ -92,4 +88,4 @@ class TimeUnitTest extends BaseUnitTest {
 
         assertFalse (true, "Exception should have been thrown")
     }
-}
+}*/
