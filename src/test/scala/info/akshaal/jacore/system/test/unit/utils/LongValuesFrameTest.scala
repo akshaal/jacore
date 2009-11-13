@@ -22,71 +22,56 @@ class LongValuesFrameTest extends SpecificationWithJUnit ("LongValueFrame class 
         "fail with negative width" in {
             new LongValueFrame (-1) must throwA[IllegalArgumentException]
         }
+
+        "support frames with size 1" in {
+            val frame = new LongValueFrame (1)
+            frame.average must_== 0
+
+            frame.put (1)
+            frame.average must_== 1
+
+            frame.put (1)
+            frame.average must_== 1
+
+            frame.put (2)
+            frame.average must_== 2
+
+            frame.put (3)
+            frame.average must_== 3
+        }
+
+        "support frames with size 2" in {
+            val frame = new LongValueFrame (2)
+            frame.average must_== 0
+
+            frame.put (1)
+            frame.average must_== 1
+
+            frame.put (1)
+            frame.average must_== 1
+
+            frame.put (2)
+            frame.average must_== 1
+
+            frame.put (3)
+            frame.average must_== 2
+        }
+
+        "support frames with size 3" in {
+            val frame = new LongValueFrame (3)
+            frame.average must_== 0
+
+            frame.put (1)
+            frame.average must_== 1
+
+            frame.put (1)
+            frame.average must_== 1
+
+            frame.put (2)
+            frame.average must_== 1
+
+            frame.put (3)
+            frame.average must_== 2
+        }
     }
-
-    /**
-     * Test 1 count.
-     * @throws Exception if something goes wrong
-     */
-    /*@Test (groups = Array("unit"))
-    def oneWidth () = {
-        val frame = new LongValueFrame (1)
-        assertEquals (frame.average (), 0L)
-
-        frame.put (1)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (1)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (2)
-        assertEquals (frame.average (), 2L)
-
-        frame.put (MAGIC_3)
-        assertEquals (frame.average (), MAGIC_3)
-    }*/
-
-    /**
-     * Test 2 count.
-     * @throws Exception if something goes wrong
-     */
-    /*@Test (groups = Array("unit"))
-    def twoWidth () = {
-        val frame = new LongValueFrame (2)
-        assertEquals (frame.average (), 0L)
-
-        frame.put (1)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (1)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (2)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (MAGIC_3)
-        assertEquals (frame.average (), 2L)
-    }*/
-
-    /**
-     * Test 3 count.
-     * @throws Exception if something goes wrong
-     */
-    /*@Test (groups = Array("unit"))
-    def threeWidth () = {
-        val frame = new LongValueFrame (3)
-        assertEquals (frame.average (), 0L)
-
-        frame.put (1)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (1)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (2)
-        assertEquals (frame.average (), 1L)
-
-        frame.put (MAGIC_3)
-        assertEquals (frame.average (), 2L)
-    }*/
 }
