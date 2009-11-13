@@ -16,7 +16,7 @@
         <test.threads>10</test.threads>
 
         <!-- Versions -->
-        <scala.version>2.8.0-r18997</scala.version>
+        <scala.version>2.8.0-SNAP-20091113</scala.version>
         <jetlang.version>0.1.7</jetlang.version>
         <junit.version>4.7</junit.version>
         <slf4j.version>1.5.8</slf4j.version>
@@ -25,7 +25,7 @@
         <aopalliance.version>1.0</aopalliance.version>
         <cglib.version>2.2</cglib.version>
         <asm.version>3.2</asm.version>
-        <scala-specs.version>1.6.1</scala-specs.version>
+        <specs.version>1.6.2-SNAP-20091113</specs.version>
 
         <!-- Plugin versions -->
         <maven-scala-plugin.version>2.12</maven-scala-plugin.version>
@@ -40,18 +40,17 @@
           <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.scala-tools.testing</groupId>
-            <artifactId>specs</artifactId>
-            <version>${scala-specs.version}</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/libs/specs-1.6.0-2.8.0.jar</systemPath>
-        </dependency>
-
     	<dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
+        </dependency>
+
+    	<dependency>
+            <groupId>org.specs</groupId>
+            <artifactId>specs</artifactId>
+            <version>${specs.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
