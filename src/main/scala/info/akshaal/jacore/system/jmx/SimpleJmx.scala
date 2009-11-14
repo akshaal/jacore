@@ -44,7 +44,7 @@ trait SimpleJmx {
     /**
      * Unregisters object.
      */
-    lazy val unregisterJmxBean =
+    lazy val unregisterJmxBean : Unit =
         ManagementFactory.getPlatformMBeanServer()
                          .unregisterMBean (jmxTrueObjectName)
 
