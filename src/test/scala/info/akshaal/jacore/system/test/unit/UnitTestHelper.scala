@@ -26,29 +26,9 @@ object UnitTestHelper {
     val TIMEOUT = 2.seconds
 
     /**
-     * Thrown if time is occured.
-     */
-    class MessageTimeout extends RuntimeException
-
-    /**
-     * Basic ancestor for all actor that are to be used in tests.
-     */
-    class TestActor extends Actor (actorEnv = TestModule.hiPriorityActorEnv) {
-        var messageLatch : CountDownLatch = null
-
-        override def afterActs () : Unit = {
-            super.afterActs ()
-
-            if (messageLatch != null) {
-                messageLatch.countDown ()
-            }
-        }
-    }
-
-    /**
      * Execute function with the actor constructed by using guice injector.
      */
-    def withStartedActor[T <: TestActor] (f : T => Any) (implicit clazz : ClassManifest[T]) : Unit =
+    def withStartedActor[T <: Actor] (f : T => Any) (implicit clazz : ClassManifest[T]) : Unit =
     {
         val actor = TestModule.injector.getInstanceOf[T]
         try {
@@ -63,13 +43,52 @@ object UnitTestHelper {
      * Execute the given code and wait for a message to be processed by actor. If
      * message is not received within some timeout interval, then test will be failed.
      * @param actor actor to wait message on
+     * @param count number of batches to wait
      * @param f code to execute before waiting for a message on actor
      */
-    def waitForMessageAfter[T <: TestActor] (actor : T) (f : => Any) : Unit = {
-        actor.messageLatch = new CountDownLatch (1)
+    def waitForMessageBatchesAfter[T <: Waitable] (actor : T, count : Int) (f : => Any) : Unit = {
+        actor.messageLatch = new CountDownLatch (count)
+
         f
+        
         if (!actor.messageLatch.await (TIMEOUT.asMilliseconds, TimeUnit.MILLISECONDS)) {
             throw new MessageTimeout
+        }
+    }
+
+    /**
+     * Execute the given code and wait for a message to be processed by actor. If
+     * message is not received within some timeout interval, then test will be failed.
+     * @param actor actor to wait message on
+     * @param f code to execute before waiting for a message on actor
+     */
+    def waitForMessageAfter[T <: Waitable] (actor : T) (f : => Any) : Unit = {
+        waitForMessageBatchesAfter (actor, 1) {f}
+    }
+
+    /**
+     * Thrown if time is occured.
+     */
+    class MessageTimeout extends RuntimeException
+
+    /**
+     * Basic ancestor for all actor that are to be used in tests.
+     */
+    class TestActor extends Actor (actorEnv = TestModule.hiPriorityActorEnv) with Waitable {
+    }
+
+    /**
+     * Makes it possible to wait a momment when messages are processed by actor.
+     */
+    trait Waitable extends Actor {
+        var messageLatch : CountDownLatch = null
+
+        override def afterActs () : Unit = {
+            super.afterActs
+
+            if (messageLatch != null) {
+                messageLatch.countDown ()
+            }
         }
     }
 

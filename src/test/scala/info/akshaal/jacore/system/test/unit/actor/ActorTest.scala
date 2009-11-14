@@ -11,6 +11,8 @@ import org.specs.SpecificationWithJUnit
 
 import Predefs._
 import UnitTestHelper._
+import system.annotation.{CallByMessage, Act, ExtractBy}
+import system.actor.MessageExtractor
 
 class ActorTest extends SpecificationWithJUnit ("Actor specification") {
     import ActorTest._
@@ -32,12 +34,326 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") {
             })
         }
 
-        "have afterActs methods" in {
-            withStartedActor [AfterTestActor] (actor =>
-                () // TODO
+        "speak to other actors and get feedback" in {
+            withStartedActor [SpeakingStringTestActor] (stringActor =>
+                withStartedActor [SpeakingTestActor] (speakingActor => {
+                    speakingActor.stringMaker = Some (stringActor)
+
+                    waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 1}
+                    waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 3}
+                    waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 7}
+                    
+                    speakingActor.accuInt      must_==  List (7, 3, 1)
+                    speakingActor.accuString   must_==  List ("x7", "x3", "x1")
+                })
             )
         }
+
+        "be exception resistant" in {
+            withStartedActor [UnstableTestActor] (actor => {
+                for (i <- 1 to 10) {
+                    waitForMessageAfter (actor) {actor ! i}
+                }
+
+                actor.sum  must_==  (1 + 3 + 5 + 7 + 9)
+            })
+        }
+
+        "support methods with call by message style" in {
+            withStartedActor [CallByMessageTestActor] (actor => {
+                actor.sum  must_==  0
+                waitForMessageAfter (actor) {actor.inc ()}
+                actor.sum  must_==  1
+                waitForMessageAfter (actor) {actor.inc ()}
+                actor.sum  must_==  2
+            })
+        }
+
+        "work when both @Act and @CallByMessage annotation present" in {
+            withStartedActor [CallByMessageWithActTestActor] (actor => {
+                actor.strCount  must_==  0
+                actor.intCount  must_==  0
+                actor.incCount  must_==  0
+
+                waitForMessageAfter (actor) {actor.inc}
+
+                actor.strCount  must_==  0
+                actor.intCount  must_==  0
+                actor.incCount  must_==  1
+
+                waitForMessageAfter (actor) {actor ! "hi"}
+
+                actor.strCount  must_==  1
+                actor.intCount  must_==  0
+                actor.incCount  must_==  1
+
+                waitForMessageAfter (actor) {actor ! 123}
+
+                actor.strCount  must_==  1
+                actor.intCount  must_==  1
+                actor.incCount  must_==  1
+            })
+        }
+
+        "work with protected methods annotated with @Act" in {
+            withStartedActor [AdoptedProtectedTestActor] (actor => {
+                actor.intReceived  must beFalse
+
+                waitForMessageAfter (actor) {actor ! 123}
+
+                actor.intReceived  must beTrue
+            })
+        }
+
+        "support inheritance" in {
+            withStartedActor [InheritanceTestActor] (actor => {
+                actor.intReceived  must beFalse
+                actor.strReceived  must beFalse
+
+                waitForMessageAfter (actor) {actor ! "Hi"}
+
+                actor.intReceived  must beFalse
+                actor.strReceived  must beTrue
+
+                waitForMessageAfter (actor) {actor ! 123}
+
+                actor.intReceived  must beTrue
+                actor.strReceived  must beTrue
+            })
+        }
+
+        "support inheritance with override of @Act method" in {
+            withStartedActor [InheritanceWithOverrideTestActor] (actor => {
+                actor.strReceived   must beFalse
+                actor.intReceived   must beFalse
+                actor.intReceived2  must beFalse
+
+                waitForMessageAfter (actor) {actor ! "Hi"}
+
+                actor.strReceived   must beTrue
+                actor.intReceived   must beFalse
+                actor.intReceived2  must beFalse
+
+                waitForMessageAfter (actor) {actor ! 123}
+
+                actor.strReceived   must beTrue
+                actor.intReceived   must beFalse
+                actor.intReceived2  must beTrue
+            })
+        }
+
+        "have @Act annotation support" in {
+            withStartedActor [ActAnnotationTestActor] (actor => {
+                // Initial values
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must beNull
+                actor.str  must beNull
+                actor.int  must_==  -1
+                actor.emptyString  must_==  0
+                actor.orderMsgReceived  must_==  0
+                actor.justException  must_==  0
+                actor.npeException  must_==  0
+
+                // Test sending int
+                waitForMessageAfter (actor) {actor ! 2}
+
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must beNull
+                actor.str  must beNull
+                actor.int  must_==  2
+                actor.emptyString  must_==  0
+                actor.orderMsgReceived  must_==  0
+                actor.justException  must_==  0
+                actor.npeException  must_==  0
+
+                // Test sending string
+                waitForMessageAfter (actor) {actor ! "Hello"}
+
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must beNull
+                actor.str  must_==  "Hello"
+                actor.int  must_==  2
+                actor.emptyString  must_==  0
+                actor.orderMsgReceived  must_==  0
+                actor.justException  must_==  0
+                actor.npeException  must_==  0
+
+                // Test sending object
+                waitForMessageAfter (actor) {actor ! 'ArbObject}
+
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must_==  'ArbObject
+                actor.str  must_==  "Hello"
+                actor.int  must_==  2
+                actor.emptyString  must_==  0
+                actor.orderMsgReceived  must_==  0
+                actor.justException  must_==  0
+                actor.npeException  must_==  0
+
+                // Test sending empty string
+                waitForMessageAfter (actor) {actor ! ""}
+
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must_==  'ArbObject
+                actor.str  must_==  "Hello"
+                actor.int  must_==  2
+                actor.emptyString  must_==  1
+                actor.orderMsgReceived  must_==  0
+                actor.justException  must_==  0
+                actor.npeException  must_==  0
+
+                // Test sending some object
+                waitForMessageAfter (actor) {actor ! (new OrderTestObj(5))}
+
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must_==  'ArbObject
+                actor.str  must_==  "Hello"
+                actor.int  must_==  2
+                actor.emptyString  must_==  1
+                actor.orderMsgReceived  must_==  1
+                actor.justException  must_==  0
+                actor.npeException  must_==  0
+
+                // Test sending runtime exception see if custom annotation works
+                waitForMessageAfter (actor) {
+                    actor ! (new RuntimeException ("123", new NullPointerException ()))
+                }
+
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must_==  'ArbObject
+                actor.str  must_==  "Hello"
+                actor.int  must_==  2
+                actor.emptyString  must_==  1
+                actor.orderMsgReceived  must_==  1
+                actor.justException  must_==  0
+                actor.npeException  must_==  1
+
+                // Test sending runtime exception see if custom annotation is skipped
+                waitForMessageAfter (actor) {
+                    actor ! (new RuntimeException ("123", new IllegalArgumentException ()))
+                }
+
+                actor.never1  must_==  0
+                actor.never2  must_==  0
+                actor.obj  must_==  'ArbObject
+                actor.str  must_==  "Hello"
+                actor.int  must_==  2
+                actor.emptyString  must_==  1
+                actor.orderMsgReceived  must_==  1
+                actor.justException  must_==  1
+                actor.npeException  must_==  1
+            })
+        }
+
+        /*"" in {
+            withStartedActor [] (actor => {
+            })
+        }*/
     }
+
+/*
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor1 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor1])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor2 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor2])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor3 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor3])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor4 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor4])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor5 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor5])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor6 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor6])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor7 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor7])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor8 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor8])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor9 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor9])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor10 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor10])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor11 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor11])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor12 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor12])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor13 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor13])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor14 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor14])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testInvalidActor15 () = {
+        UnitTestModule.injector.getInstance(classOf[InvalidTestActor15])
+        false
+    }
+
+    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
+    def testPrivateTestActor () = {
+        UnitTestModule.injector.getInstance(classOf[PrivateTestActor])
+        false
+    }*/
 }
 
 object ActorTest {
@@ -51,6 +367,359 @@ object ActorTest {
         }
     }
 
-    class AfterTestActor extends TestActor {
+    class SpeakingTestActor extends TestActor {
+        var accuString : List[String] = Nil
+        var accuInt : List[Int] = Nil
+        var stringMaker : Option[TestActor] = None
+
+        override def act () = {
+            case x : Int => {
+                accuInt = x :: accuInt
+                stringMaker.foreach (_ ! x)
+            }
+
+            case x : String => {
+                accuString = x :: accuString
+            }
+        }
+    }
+
+    class SpeakingStringTestActor extends TestActor {
+        override def act () = {
+            case x => sender.foreach (_ ! ("x" + x))
+        }
+    }
+
+    class UnstableTestActor extends TestActor {
+        var sum = 0
+
+        override def act () = {
+            case x : Int => {
+                if (x % 2 == 0) {
+                    throw new IllegalArgumentException ()
+                } else {
+                    sum += x
+                }
+            }
+        }
+    }
+
+    class CallByMessageTestActor extends TestActor {
+        var sum = 0
+
+        @CallByMessage
+        def inc () = {
+            sum = sum + 1
+        }
+    }
+
+    class CallByMessageWithActTestActor extends TestActor {
+        var incCount = 0
+        var strCount = 0
+        var intCount = 0
+
+        @CallByMessage
+        def inc () = {
+            incCount += 1
+        }
+
+        @Act
+        def strHandler (str : String) = {
+            strCount += 1
+        }
+
+        override def act = {
+            case x : Int => intCount += 1
+        }
+    }
+
+    class AdoptedProtectedTestActor extends ProtectedTestActor (TestModule.hiPriorityActorEnv)
+                                    with Waitable
+
+    class InheritanceTestActor extends ProtectedTestActor (TestModule.hiPriorityActorEnv)
+                               with Waitable
+    {
+        var strReceived = false
+
+        @Act
+        def stringHandler (str : String) : Unit = {
+            strReceived = true
+        }
+    }
+
+    class InheritanceWithOverrideTestActor
+                                extends ProtectedTestActor (TestModule.hiPriorityActorEnv)
+                                with Waitable
+    {
+        var strReceived = false
+        var intReceived2 = false
+
+        @Act
+        def stringHandler (str : String) : Unit = {
+            strReceived = true
+        }
+
+        @Act
+        override def test (msg : Int) : Unit = {
+            intReceived2 = true
+        }
+    }
+
+    class ActAnnotationTestActor extends TestActor {
+        var obj : Object = null
+        var int : Int = -1
+        var str : String = null
+        var emptyString = 0
+        var never1 = 0
+        var never2 = 0
+        var orderNotZero = 0
+        var orderMsgReceived = 0
+        var justException = 0
+        var npeException = 0
+
+        @Act
+        def onObjectMessage (msg : Object) : Unit = {
+            this.obj = msg
+        }
+
+        @Act
+        def onIntegerMessage (msg : Int) : Unit = {
+            this.int = msg
+        }
+
+        @Act
+        def onStringMessage (msg : String) : Unit = {
+            this.str = msg
+        }
+
+        @Act
+        def onEmptyStringMessageWider (msg : String,
+                                  @ExtractBy(classOf[EmptyStringExtractor]) s : Object) : Unit =
+        {
+            this.never1 += 1
+        }
+
+        @Act
+        def onEmptyStringMessage (msg : String,
+                                  @ExtractBy(classOf[EmptyStringExtractor]) s : String) : Unit =
+        {
+            this.emptyString += 1
+        }
+
+        @Act (suborder = 0)
+        def onOrderObjMessage (msg : OrderTestObj) : Unit =
+        {
+            this.orderMsgReceived += 1
+        }
+
+        @Act (suborder = 1)
+        def onOrderObjMessage2 (msg : OrderTestObj,
+                                @ExtractBy(classOf[OrderExtractor]) s : Int) : Unit =
+        {
+            this.never2 += 1
+        }
+
+        @Act
+        def onNpeException (msg : Exception,
+                            @CauseExtractTestAnnotation cause : NullPointerException) : Unit =
+        {
+            this.npeException += 1
+        }
+
+        @Act
+        def onException (msg : Exception) : Unit =
+        {
+            this.justException += 1
+        }
+    }
+
+    case class OrderTestObj (integer : Int)
+
+    /*
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor1 extends HiPriorityActor {
+        @Act
+        def onMessage : Unit = {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor2 extends HiPriorityActor {
+        @Act
+        def onMessage2 (msg : String,
+                        @ExtractBy(classOf[BadExtractor2]) y : String) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor3 extends HiPriorityActor {
+        @Act
+        def onMessage (x : Int) : Int = x
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor4 extends HiPriorityActor {
+        @Act
+        def onMessage (x : Int) : Unit = {}
+
+        @Act
+        def onMessage (x : String) : Unit = {}
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor5 extends HiPriorityActor {
+        @Act
+        def onMessage (x : String, y : String) : Unit = {}
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor6 extends HiPriorityActor {
+        @Act
+        def onMessage (x : String) : Unit = {}
+
+        @Act
+        def onMessage2 (x : String) : Unit = {}
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor7 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : Object,
+                       @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor8 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : String,
+                       @ExtractBy(classOf[StringIdentityExtractor]) y : String,
+                       @ExtractBy(classOf[StringIdentityExtractor]) z : String) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor9 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : String,
+                       @ExtractBy(classOf[StringIdentityExtractor]) y : Int) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor10 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : String,
+                       @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+        {
+        }
+
+        @Act
+        def onMessage2 (msg : String,
+                        @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor11 extends HiPriorityActor {
+        @Act
+        def onMessage2 (msg : String,
+                        @ExtractBy(classOf[BadExtractor]) y : String) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor12 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : BigInteger,
+                       @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor13 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : String,
+                       @ExtractBy(classOf[StringIdentityExtractor]) y : BigInteger) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor14 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : Exception,
+                       @ExtractBy(classOf[CauseExtractorExample])
+                       @CauseExtractTestAnnotation y : Exception) : Unit =
+        {
+        }
+    }
+
+    /**
+     * Invalid actor.
+     */
+    class InvalidTestActor15 extends HiPriorityActor {
+        @Act
+        def onMessage (msg : Exception,
+                       @ExtractBy(classOf[CauseExtractorExample]) y : Exception,
+                       @CauseExtractTestAnnotation z : Exception) : Unit =
+        {
+        }
+    }*/
+
+    class StringIdentityExtractor extends MessageExtractor[String, String] {
+        override def extractFrom (msg : String) = msg
+    }
+
+    class EmptyStringExtractor extends MessageExtractor[String, String] {
+        override def extractFrom (msg : String) = if (msg.isEmpty) "" else null
+    }
+
+    class OrderExtractor extends MessageExtractor[OrderTestObj, Int] {
+        override def extractFrom (msg : OrderTestObj) = msg.integer
+    }
+
+    class BadExtractor extends MessageExtractor[String, String] {
+        override def extractFrom (msg : String) = msg
+        def extractFrom (msg : java.lang.Integer) = msg
+    }
+
+    class BadExtractor2 (s : String) extends MessageExtractor[String, String] {
+        override def extractFrom (msg : String) = msg
     }
 }

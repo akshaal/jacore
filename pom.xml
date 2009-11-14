@@ -205,7 +205,7 @@
                         <arg>-deprecation</arg>
                         <arg>-unchecked</arg>
                         <!-- <arg>-Xcheck-null</arg> -->
-                        <arg>-Xwarninit</arg>
+                        <!-- <arg>-Xwarninit</arg> -->
                         <!-- <arg>-Xstrict-warnings</arg> -->
                     </args>
                 </configuration>                
