@@ -25,6 +25,7 @@
         <aopalliance.version>1.0</aopalliance.version>
         <cglib.version>2.2</cglib.version>
         <asm.version>3.2</asm.version>
+        <mockito.version>1.8.1-rc1</mockito.version>
         <specs.version>1.6.2-SNAP-20091113</specs.version>
 
         <!-- Plugin versions -->
@@ -44,6 +45,13 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
 
     	<dependency>
