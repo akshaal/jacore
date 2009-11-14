@@ -8,6 +8,7 @@ package system.test.unit
 package actor
 
 import org.specs.SpecificationWithJUnit
+import com.google.inject.ProvisionException
 
 import Predefs._
 import UnitTestHelper._
@@ -252,10 +253,13 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") {
             })
         }
 
-        /*"" in {
-            withStartedActor [] (actor => {
-            })
-        }*/
+        def badActor[T <: TestActor](implicit clazz : ClassManifest[T]) : Unit = {
+            withStartedActor [T] (actor => ()) (clazz) must throwA[ProvisionException]
+        }
+
+        "not allow @Act annotated method without argument" in {
+            badActor [InvalidTestActorWithoutArg]
+        }
     }
 
 /*
@@ -535,20 +539,17 @@ object ActorTest {
 
     case class OrderTestObj (integer : Int)
 
-    /*
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor1 extends HiPriorityActor {
+    class InvalidTestActorWithoutArg extends TestActor {
         @Act
         def onMessage : Unit = {
         }
     }
 
+    /*
     /**
      * Invalid actor.
      */
-    class InvalidTestActor2 extends HiPriorityActor {
+    class InvalidTestActor2 extends TestActor {
         @Act
         def onMessage2 (msg : String,
                         @ExtractBy(classOf[BadExtractor2]) y : String) : Unit =
@@ -559,7 +560,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor3 extends HiPriorityActor {
+    class InvalidTestActor3 extends TestActor {
         @Act
         def onMessage (x : Int) : Int = x
     }
@@ -567,7 +568,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor4 extends HiPriorityActor {
+    class InvalidTestActor4 extends TestActor {
         @Act
         def onMessage (x : Int) : Unit = {}
 
@@ -578,7 +579,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor5 extends HiPriorityActor {
+    class InvalidTestActor5 extends TestActor {
         @Act
         def onMessage (x : String, y : String) : Unit = {}
     }
@@ -586,7 +587,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor6 extends HiPriorityActor {
+    class InvalidTestActor6 extends TestActor {
         @Act
         def onMessage (x : String) : Unit = {}
 
@@ -597,7 +598,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor7 extends HiPriorityActor {
+    class InvalidTestActor7 extends TestActor {
         @Act
         def onMessage (msg : Object,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
@@ -608,7 +609,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor8 extends HiPriorityActor {
+    class InvalidTestActor8 extends TestActor {
         @Act
         def onMessage (msg : String,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : String,
@@ -620,7 +621,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor9 extends HiPriorityActor {
+    class InvalidTestActor9 extends TestActor {
         @Act
         def onMessage (msg : String,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : Int) : Unit =
@@ -631,7 +632,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor10 extends HiPriorityActor {
+    class InvalidTestActor10 extends TestActor {
         @Act
         def onMessage (msg : String,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
@@ -648,7 +649,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor11 extends HiPriorityActor {
+    class InvalidTestActor11 extends TestActor {
         @Act
         def onMessage2 (msg : String,
                         @ExtractBy(classOf[BadExtractor]) y : String) : Unit =
@@ -659,7 +660,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor12 extends HiPriorityActor {
+    class InvalidTestActor12 extends TestActor {
         @Act
         def onMessage (msg : BigInteger,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
@@ -670,7 +671,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor13 extends HiPriorityActor {
+    class InvalidTestActor13 extends TestActor {
         @Act
         def onMessage (msg : String,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : BigInteger) : Unit =
@@ -681,7 +682,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor14 extends HiPriorityActor {
+    class InvalidTestActor14 extends TestActor {
         @Act
         def onMessage (msg : Exception,
                        @ExtractBy(classOf[CauseExtractorExample])
@@ -693,7 +694,7 @@ object ActorTest {
     /**
      * Invalid actor.
      */
-    class InvalidTestActor15 extends HiPriorityActor {
+    class InvalidTestActor15 extends TestActor {
         @Act
         def onMessage (msg : Exception,
                        @ExtractBy(classOf[CauseExtractorExample]) y : Exception,
