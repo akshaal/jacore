@@ -7,8 +7,9 @@
 
 package info.akshaal.jacore
 
-import java.io.{FileInputStream, IOException, Closeable}
+import java.io.{IOException, Closeable}
 import java.lang.{Iterable => JavaIterable}
+import com.google.inject.Injector
 
 import system.logger.Logger
 import system.utils.TimeUnit
@@ -123,6 +124,28 @@ object Predefs {
         while (it.hasNext) {
             f (it.next)
         }
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Rich stuff for Guice injector
+
+    /**
+     * Richness for Guice Injector.
+     * @param injector guice injector to enrich
+     */
+    final class RichInjector (injector : Injector) {
+        @inline
+        def getInstanceOf[T](implicit clazz : ClassManifest[T]) : T = {
+            injector.getInstance (clazz.erasure).asInstanceOf[T]
+        }
+    }
+
+    /**
+     * Implicit convertion to rich injector.
+     */
+    @inline
+    implicit def injector2richInjector (injector : Injector) : RichInjector = {
+        new RichInjector (injector)
     }
 
     // /////////////////////////////////////////////////////////////////////

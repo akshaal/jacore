@@ -15,6 +15,9 @@ import logger.Logging
  */
 abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
 {
+    // TODO: Split to traits
+    // TODO: Extract transport (fibers) out of this class
+
     /**
      * A set of descriptions for methods annotated with @Act annotation.
      * This is used to create a dispatcher and subscribe/unsubscribe actor to messages.
@@ -54,6 +57,12 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * Current sender. Only valid when act method is called.
      */
     protected var sender : Option[Actor] = None
+
+    /**
+     * Indicates a need to execute afterActs method. Must be set during invocation
+     * of actor's act() like methods with not system messages.
+     */
+    protected var afterActsNeeded = false
 
     /**
      * Method returns a partial function which must process
@@ -103,16 +112,47 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     private[this] def invokeAct (msg : Any, sentFrom : Option[Actor]) = {
         sender = sentFrom
 
+        var userMessage = true
         try {
             msg match {
-                case Ping => sentFrom.foreach (_ ! Pong)
-                case call @ Call (inv) => CallByMessageMethodInterceptor.call (call)
-                case other if dispatcher.dispatch(msg) => ()
-                case other if act.isDefinedAt (msg) => act () (msg)
-                case other => warn ("Ignored message: " + msg)
+                case Ping =>
+                    userMessage = false
+                    sentFrom.foreach (_ ! Pong)
+
+                case call @ Call (inv) =>
+                    CallByMessageMethodInterceptor.call (call)
+
+                case other if dispatcher.dispatch(msg) =>
+
+                case other if act.isDefinedAt (msg) =>
+                    act () (msg)
+
+                case other =>
+                    userMessage = false
+                    warn ("Ignored message: " + msg)
             }
         } finally {
+            afterActsNeeded = afterActsNeeded || userMessage
             sender = None
+        }
+    }
+
+    /**
+     * Called after processing of some amount message is done. Amount of message is undefined.
+     * This method is guaranteed to be called even if an exception is occured during processing
+     * of messages. Internal messages (like Ping) will not trigger this method.
+     */
+    protected def afterActs () = {}
+
+    /**
+     * This method is called by actor executor when the last message of batch is processed
+     * and it is time to execute 'afterActs' method.
+     */
+    private[actor] def executeAfterActs () = {
+        // Only execute after acts method if there were messages that are not system
+        if (afterActsNeeded) {
+            afterActsNeeded = false
+            afterActs () // TODO: Handle possible exceptions
         }
     }
 
@@ -204,13 +244,19 @@ private[actor] class ActorExecutor (actor : Actor)
     final override def execute (commands: Array[Runnable]) = {
         // Remember the current actor in thread local variable.
         // So later it may be referenced from ! method of other actors
-        ThreadLocalState.current.set(Some(actor))
+        ThreadLocalState.current.set (Some(actor))
 
-        // Execute
-        commands.foreach (_.run)
-
-        // Reset curren actor
-        ThreadLocalState.current.set(None)
+        try {
+            // Execute
+            try {
+                commands.foreach (_.run)
+            } finally {
+                actor.executeAfterActs ()
+            }
+        } finally {
+            // Reset curren actor
+            ThreadLocalState.current.set (None)
+        }
     }
 }
 
@@ -232,7 +278,7 @@ private[actor] object Actor {
         new PartialFunction[Any, Unit] {
             def isDefinedAt (msg : Any) = false
             def apply (msg : Any) = ()
-        }    
+        }
 }
 
 sealed case class ActorStartedEvent (actor : Actor)
