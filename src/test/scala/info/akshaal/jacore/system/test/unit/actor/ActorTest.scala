@@ -146,110 +146,110 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") {
         "have @Act annotation support" in {
             withStartedActor [ActAnnotationTestActor] (actor => {
                 // Initial values
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must beNull
-                actor.str  must beNull
-                actor.int  must_==  -1
-                actor.emptyString  must_==  0
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must beNull
+                actor.str               must beNull
+                actor.int               must_==  -1
+                actor.emptyString       must_==  0
                 actor.orderMsgReceived  must_==  0
-                actor.justException  must_==  0
-                actor.npeException  must_==  0
+                actor.justException     must_==  0
+                actor.npeException      must_==  0
 
                 // Test sending int
                 waitForMessageAfter (actor) {actor ! 2}
 
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must beNull
-                actor.str  must beNull
-                actor.int  must_==  2
-                actor.emptyString  must_==  0
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must beNull
+                actor.str               must beNull
+                actor.int               must_==  2
+                actor.emptyString       must_==  0
                 actor.orderMsgReceived  must_==  0
-                actor.justException  must_==  0
-                actor.npeException  must_==  0
+                actor.justException     must_==  0
+                actor.npeException      must_==  0
 
                 // Test sending string
                 waitForMessageAfter (actor) {actor ! "Hello"}
 
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must beNull
-                actor.str  must_==  "Hello"
-                actor.int  must_==  2
-                actor.emptyString  must_==  0
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must beNull
+                actor.str               must_==  "Hello"
+                actor.int               must_==  2
+                actor.emptyString       must_==  0
                 actor.orderMsgReceived  must_==  0
-                actor.justException  must_==  0
-                actor.npeException  must_==  0
+                actor.justException     must_==  0
+                actor.npeException      must_==  0
 
                 // Test sending object
                 waitForMessageAfter (actor) {actor ! 'ArbObject}
 
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must_==  'ArbObject
-                actor.str  must_==  "Hello"
-                actor.int  must_==  2
-                actor.emptyString  must_==  0
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must_==  'ArbObject
+                actor.str               must_==  "Hello"
+                actor.int               must_==  2
+                actor.emptyString       must_==  0
                 actor.orderMsgReceived  must_==  0
-                actor.justException  must_==  0
-                actor.npeException  must_==  0
+                actor.justException     must_==  0
+                actor.npeException      must_==  0
 
                 // Test sending empty string
                 waitForMessageAfter (actor) {actor ! ""}
 
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must_==  'ArbObject
-                actor.str  must_==  "Hello"
-                actor.int  must_==  2
-                actor.emptyString  must_==  1
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must_==  'ArbObject
+                actor.str               must_==  "Hello"
+                actor.int               must_==  2
+                actor.emptyString       must_==  1
                 actor.orderMsgReceived  must_==  0
-                actor.justException  must_==  0
-                actor.npeException  must_==  0
+                actor.justException     must_==  0
+                actor.npeException      must_==  0
 
                 // Test sending some object
                 waitForMessageAfter (actor) {actor ! (new OrderTestObj(5))}
 
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must_==  'ArbObject
-                actor.str  must_==  "Hello"
-                actor.int  must_==  2
-                actor.emptyString  must_==  1
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must_==  'ArbObject
+                actor.str               must_==  "Hello"
+                actor.int               must_==  2
+                actor.emptyString       must_==  1
                 actor.orderMsgReceived  must_==  1
-                actor.justException  must_==  0
-                actor.npeException  must_==  0
+                actor.justException     must_==  0
+                actor.npeException      must_==  0
 
                 // Test sending runtime exception see if custom annotation works
                 waitForMessageAfter (actor) {
                     actor ! (new RuntimeException ("123", new NullPointerException ()))
                 }
 
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must_==  'ArbObject
-                actor.str  must_==  "Hello"
-                actor.int  must_==  2
-                actor.emptyString  must_==  1
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must_==  'ArbObject
+                actor.str               must_==  "Hello"
+                actor.int               must_==  2
+                actor.emptyString       must_==  1
                 actor.orderMsgReceived  must_==  1
-                actor.justException  must_==  0
-                actor.npeException  must_==  1
+                actor.justException     must_==  0
+                actor.npeException      must_==  1
 
                 // Test sending runtime exception see if custom annotation is skipped
                 waitForMessageAfter (actor) {
                     actor ! (new RuntimeException ("123", new IllegalArgumentException ()))
                 }
 
-                actor.never1  must_==  0
-                actor.never2  must_==  0
-                actor.obj  must_==  'ArbObject
-                actor.str  must_==  "Hello"
-                actor.int  must_==  2
-                actor.emptyString  must_==  1
+                actor.never1            must_==  0
+                actor.never2            must_==  0
+                actor.obj               must_==  'ArbObject
+                actor.str               must_==  "Hello"
+                actor.int               must_==  2
+                actor.emptyString       must_==  1
                 actor.orderMsgReceived  must_==  1
-                actor.justException  must_==  1
-                actor.npeException  must_==  1
+                actor.justException     must_==  1
+                actor.npeException      must_==  1
             })
         }
 
