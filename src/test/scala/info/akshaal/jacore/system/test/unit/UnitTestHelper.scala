@@ -16,6 +16,7 @@ import system.JacoreManager
 import system.actor.{Actor, HiPriorityActorEnv}
 import system.module.Module
 import system.scheduler.Scheduler
+import system.fs.TextFile
 
 /**
  * Helper methods for convenient testing of actors and stuff depending on actors.
@@ -110,5 +111,6 @@ object UnitTestHelper {
 
         val hiPriorityActorEnv = injector.getInstanceOf[HiPriorityActorEnv]
         val scheduler = injector.getInstanceOf[Scheduler]
+        val textFile = injector.getInstanceOf[TextFile]
     }
 }
