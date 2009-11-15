@@ -13,7 +13,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
 
 import Predefs._
 import system.JacoreManager
-import system.actor.{Actor, HiPriorityActorEnv}
+import system.actor.{Actor, HiPriorityActorEnv, LowPriorityActorEnv}
 import system.module.Module
 import system.scheduler.Scheduler
 import system.fs.TextFile
@@ -110,6 +110,7 @@ object UnitTestHelper {
         jacoreManager.start
 
         val hiPriorityActorEnv = injector.getInstanceOf[HiPriorityActorEnv]
+        val lowPriorityActorEnv = injector.getInstanceOf[LowPriorityActorEnv]
         val scheduler = injector.getInstanceOf[Scheduler]
         val textFile = injector.getInstanceOf[TextFile]
     }
