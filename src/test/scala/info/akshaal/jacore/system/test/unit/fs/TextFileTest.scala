@@ -50,6 +50,42 @@ class TextFileTest extends SpecificationWithJUnit ("TextFile specification") {
                 actor.excs       must_==  1
             })
         }
+
+        "support read operation" in {
+            withStartedActor [ReadTestActor] (actor => {
+                val file = File.createTempFile ("jacore", "readTest")
+                file.deleteOnExit
+
+                actor.payload  must beNull
+                actor.done     must_==  0
+                actor.excs     must_==  0
+
+                writeLine (file, "Hi")
+                waitForMessageBatchesAfter (actor, 2) {actor ! (file, "1x")}
+
+                actor.payload  must_==  "1x"
+                actor.done     must_==  1
+                actor.excs     must_==  0
+                actor.content  must_==  "Hi"
+
+                writeLine (file, "Bye")
+                waitForMessageBatchesAfter (actor, 2) {actor ! (file, "2x")}
+
+                actor.payload  must_==  "2x"
+                actor.done     must_==  2
+                actor.excs     must_==  0
+                actor.content  must_==  "Bye"
+
+                waitForMessageBatchesAfter (actor, 2) {
+                    actor ! (new File ("/ook/ooook/ooooooook"), "3x")
+                }
+
+                actor.payload  must_==  "3x"
+                actor.done     must_==  2
+                actor.excs     must_==  1
+                actor.content  must_==  "Bye"
+            })
+        }
     }
 
     private def readLine (file : File) : String = {
