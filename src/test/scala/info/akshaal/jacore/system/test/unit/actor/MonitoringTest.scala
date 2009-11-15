@@ -58,6 +58,7 @@ object MonitoringTest {
 
         override lazy val daemonStatusJmxName = "jacore:name=monitoringTestDaemonStatus"
         override lazy val daemonStatusFile = daemonStatusFileFile.getAbsolutePath
+        override lazy val monitoringInterval = 500.milliseconds
 
         val injector = Guice.createInjector (this)
         val jacoreManager = injector.getInstanceOf [JacoreManager]
