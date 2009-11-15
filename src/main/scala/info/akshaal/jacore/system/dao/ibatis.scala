@@ -31,7 +31,7 @@ abstract class IbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
         val session =
             curSession match {
                 case Some (ses) => ses
-                case None => openSession ()
+                case None       => openSession ()
             }
 
         session.insert (insertStatementId, data)
