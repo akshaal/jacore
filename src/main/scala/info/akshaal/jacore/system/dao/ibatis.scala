@@ -22,12 +22,30 @@ abstract class IbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
                                 with DataInserter[T] {
     protected val insertStatementId : String
     protected var curSession : Option [SqlMapSession] = None
+    protected var notifications : List[(Actor, Any)] = Nil
 
     /**
      * (@InheritDoc)
      */
     @CallByMessage
     def insert (data : T) : Unit = {
+        doInsert (data)
+    }
+
+    /**
+     * (@InheritDoc)
+     */
+    @CallByMessage
+    def insert (data : T, payload : Any) : Unit = {
+        doInsert (data)
+
+        sender.foreach (actor => notifications = (actor, payload) :: notifications)
+    }
+
+    /**
+     * Perform insert operation.
+     */
+    protected def doInsert (data : T) : Unit = {
         val session =
             curSession match {
                 case Some (ses) => ses
@@ -50,7 +68,31 @@ abstract class IbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
         session
     }
 
-    // TODO: Implement commit
-    // TODO: Implement optional feedback
-    // TODO: Implement tests
+    /**
+     * (@InheritDoc)
+     *
+     * Used to commit transaction and send notification if any.
+     */
+    protected override def afterActs () : Unit = {
+        curSession match {
+            case None => ()
+            case Some (session) =>
+                curSession = None
+
+                try {
+                    session.executeBatch ()
+                    session.commitTransaction
+
+                    for ((actor, payload) <- notifications) {
+                        actor ! InsertFinished (payload)
+                    }
+                } finally {
+                    try {
+                        session.endTransaction ()
+                    } finally {
+                        session.close ()
+                    }
+                }
+        }
+    }
 }
