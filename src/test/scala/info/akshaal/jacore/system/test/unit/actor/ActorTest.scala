@@ -253,111 +253,58 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") {
             })
         }
 
-        def badActor[T <: TestActor](implicit clazz : ClassManifest[T]) : Unit = {
+        def mustBeInvalidActor[T <: TestActor](implicit clazz : ClassManifest[T]) : Unit = {
             withStartedActor [T] (actor => ()) (clazz) must throwA[ProvisionException]
         }
 
-        "not allow @Act annotated method without argument" in {
-            badActor [InvalidTestActorWithoutArg]
+        "not allow @Act method without argument" in {
+            mustBeInvalidActor [InvalidTestActorWithoutArg]
+        }
+
+        "not allow @Act method have extractor with overloaded extractFrom method" in {
+            mustBeInvalidActor [InvalidTestActorWithExtractorWithOverload]
+        }
+
+        "not allow @Act method have return type" in {
+            mustBeInvalidActor [InvalidTestActorWithReturn]
+        }
+
+        "not allow @Act method be overloaded" in {
+            mustBeInvalidActor [InvalidTestActorWithOverload]
+        }
+
+        "not allow @Act method have more than one argument without extractor" in {
+            mustBeInvalidActor [InvalidTestActorWithoutExtractor]
+        }
+
+        "not allow two or more @Act methods have the same message type" in {
+            mustBeInvalidActor [InvalidTestActorWithSameMessageType]
+        }
+
+        "not allow @Act method use extractor with incompatible argument type" in {
+            mustBeInvalidActor [InvalidTestActorWithIncompatibleExtractor]
+        }
+
+        "not allow @Act method use same extractor more than once" in {
+            mustBeInvalidActor [InvalidTestActorWithDuplicatedExtractor]
+        }
+
+        "not allow @Act method use an extractor with incompatible return type" in {
+            mustBeInvalidActor [InvalidTestActorWithParamTypeIncompatibleExtractor]
+        }
+
+        "not allow two or more @Act methods with the same message matcher set" in {
+            mustBeInvalidActor [InvalidTestActorWithDuplicatedMessageMatcher]
+        }
+
+        "not allow more than one extractor for the same argument on @Act method" in {
+            mustBeInvalidActor [InvalidTestActorWithMoreThanOneExtractorOnOneArg]
+        }
+
+        "not allow @Act method specify same extractor on one method by @ExtractBy and user defined annotation" in {
+            mustBeInvalidActor [InvalidTestActorWithDuplicatedExtracorInDifferentForms]
         }
     }
-
-/*
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor1 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor1])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor2 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor2])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor3 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor3])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor4 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor4])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor5 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor5])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor6 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor6])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor7 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor7])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor8 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor8])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor9 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor9])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor10 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor10])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor11 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor11])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor12 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor12])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor13 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor13])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor14 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor14])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testInvalidActor15 () = {
-        UnitTestModule.injector.getInstance(classOf[InvalidTestActor15])
-        false
-    }
-
-    @Test (groups=Array("unit"), expectedExceptions = Array(classOf[ProvisionException]))
-    def testPrivateTestActor () = {
-        UnitTestModule.injector.getInstance(classOf[PrivateTestActor])
-        false
-    }*/
 }
 
 object ActorTest {
@@ -545,30 +492,20 @@ object ActorTest {
         }
     }
 
-    /*
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor2 extends TestActor {
+    class InvalidTestActorWithExtractorWithOverload extends TestActor {
         @Act
         def onMessage2 (msg : String,
-                        @ExtractBy(classOf[BadExtractor2]) y : String) : Unit =
+                        @ExtractBy(classOf[BadExtractorWithOverload]) y : String) : Unit =
         {
         }
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor3 extends TestActor {
+    class InvalidTestActorWithReturn extends TestActor {
         @Act
         def onMessage (x : Int) : Int = x
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor4 extends TestActor {
+    class InvalidTestActorWithOverload extends TestActor {
         @Act
         def onMessage (x : Int) : Unit = {}
 
@@ -576,18 +513,12 @@ object ActorTest {
         def onMessage (x : String) : Unit = {}
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor5 extends TestActor {
+    class InvalidTestActorWithoutExtractor extends TestActor {
         @Act
         def onMessage (x : String, y : String) : Unit = {}
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor6 extends TestActor {
+    class InvalidTestActorWithSameMessageType extends TestActor {
         @Act
         def onMessage (x : String) : Unit = {}
 
@@ -595,10 +526,7 @@ object ActorTest {
         def onMessage2 (x : String) : Unit = {}
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor7 extends TestActor {
+    class InvalidTestActorWithIncompatibleExtractor extends TestActor {
         @Act
         def onMessage (msg : Object,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
@@ -606,10 +534,7 @@ object ActorTest {
         }
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor8 extends TestActor {
+    class InvalidTestActorWithDuplicatedExtractor extends TestActor {
         @Act
         def onMessage (msg : String,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : String,
@@ -618,10 +543,7 @@ object ActorTest {
         }
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor9 extends TestActor {
+    class InvalidTestActorWithParamTypeIncompatibleExtractor extends TestActor {
         @Act
         def onMessage (msg : String,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : Int) : Unit =
@@ -629,10 +551,7 @@ object ActorTest {
         }
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor10 extends TestActor {
+    class InvalidTestActorWithDuplicatedMessageMatcher extends TestActor {
         @Act
         def onMessage (msg : String,
                        @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
@@ -646,43 +565,7 @@ object ActorTest {
         }
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor11 extends TestActor {
-        @Act
-        def onMessage2 (msg : String,
-                        @ExtractBy(classOf[BadExtractor]) y : String) : Unit =
-        {
-        }
-    }
-
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor12 extends TestActor {
-        @Act
-        def onMessage (msg : BigInteger,
-                       @ExtractBy(classOf[StringIdentityExtractor]) y : String) : Unit =
-        {
-        }
-    }
-
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor13 extends TestActor {
-        @Act
-        def onMessage (msg : String,
-                       @ExtractBy(classOf[StringIdentityExtractor]) y : BigInteger) : Unit =
-        {
-        }
-    }
-
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor14 extends TestActor {
+    class InvalidTestActorWithMoreThanOneExtractorOnOneArg extends TestActor {
         @Act
         def onMessage (msg : Exception,
                        @ExtractBy(classOf[CauseExtractorExample])
@@ -691,17 +574,14 @@ object ActorTest {
         }
     }
 
-    /**
-     * Invalid actor.
-     */
-    class InvalidTestActor15 extends TestActor {
+    class InvalidTestActorWithDuplicatedExtracorInDifferentForms extends TestActor {
         @Act
         def onMessage (msg : Exception,
                        @ExtractBy(classOf[CauseExtractorExample]) y : Exception,
                        @CauseExtractTestAnnotation z : Exception) : Unit =
         {
         }
-    }*/
+    }
 
     class StringIdentityExtractor extends MessageExtractor[String, String] {
         override def extractFrom (msg : String) = msg
@@ -715,7 +595,7 @@ object ActorTest {
         override def extractFrom (msg : OrderTestObj) = msg.integer
     }
 
-    class BadExtractor extends MessageExtractor[String, String] {
+    class BadExtractorWithOverload extends MessageExtractor[String, String] {
         override def extractFrom (msg : String) = msg
         def extractFrom (msg : java.lang.Integer) = msg
     }
