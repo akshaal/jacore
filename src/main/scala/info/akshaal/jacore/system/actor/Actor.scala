@@ -152,7 +152,9 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         // Only execute after acts method if there were messages that are not system
         if (afterActsNeeded) {
             afterActsNeeded = false
-            afterActs () // TODO: Handle possible exceptions
+            logIgnoredException ("Error while invoking afterActs method") {
+                afterActs ()
+            }
         }
     }
 

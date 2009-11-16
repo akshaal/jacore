@@ -81,7 +81,7 @@ abstract class IbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
 
                 try {
                     session.executeBatch ()
-                    session.commitTransaction
+                    session.commitTransaction ()
 
                     for ((actor, payload) <- notifications) {
                         actor ! InsertFinished (payload)

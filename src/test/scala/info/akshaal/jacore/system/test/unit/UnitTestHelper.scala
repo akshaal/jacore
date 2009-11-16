@@ -29,12 +29,30 @@ object UnitTestHelper {
 
     /**
      * Execute function with the actor constructed by using guice injector.
+     * Created actor will be started and passed to function f. When function is completed
+     * its work, actor will be stopped.
+     * @param f function receiving actor
+     * @param [T] actor class
      */
     def withStartedActor[T <: Actor] (f : T => Any) (implicit clazz : ClassManifest[T]) : Unit =
     {
+        withNotStartedActor[T] (actor => {
+            actor.start
+            f (actor)
+        })
+    }
+
+    /**
+     * Execute function with the actor constructed by using guice injector. Extor must be
+     * starter explicitly in f.
+     * @param f function receiving actor, when execution of this function is done, actor
+     *          will be stopped
+     * @param [T] actor class to instantiate
+     */
+    def withNotStartedActor[T <: Actor] (f : T => Any) (implicit clazz : ClassManifest[T]) : Unit =
+    {
         val actor = TestModule.injector.getInstanceOf[T]
         try {
-            actor.start
             f (actor)
         } finally {
             actor.stop
@@ -71,7 +89,7 @@ object UnitTestHelper {
     /**
      * Thrown if time is occured.
      */
-    class MessageTimeout extends RuntimeException
+    class MessageTimeout extends RuntimeException ("Tinmeout while waiting for a message")
 
     /**
      * Basic ancestor for all actor that are to be used in tests.
@@ -86,10 +104,12 @@ object UnitTestHelper {
         var messageLatch : CountDownLatch = null
 
         override def afterActs () : Unit = {
-            super.afterActs
-
-            if (messageLatch != null) {
-                messageLatch.countDown ()
+            try {
+                super.afterActs
+            } finally {
+                if (messageLatch != null) {
+                    messageLatch.countDown ()
+                }
             }
         }
     }
