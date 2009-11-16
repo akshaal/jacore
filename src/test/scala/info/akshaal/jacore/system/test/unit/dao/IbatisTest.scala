@@ -31,9 +31,9 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
 
                 client.openSession() returns session
 
-                actor insert "Hello"
-                actor insert "Actor"
-                actor insert "Bye"
+                actor insert ("Hello")
+                actor insert ("Actor")
+                actor insert ("Bye")
 
                 waitForMessageAfter (actor) {actor.start}
 
