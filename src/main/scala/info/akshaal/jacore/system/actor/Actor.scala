@@ -90,8 +90,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         val runner = mkRunnable {
             runTimingFinisher ("[latency] Actor started for message: " + msg)
 
-            val executeTimingFinisher =
-                        actorEnv.pool.executionTiming.createFinisher
+            val executeTimingFinisher = actorEnv.pool.executionTiming.createFinisher
 
             // Execute
             logIgnoredException ("Error processing message: " + msg) {
@@ -152,9 +151,14 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
         // Only execute after acts method if there were messages that are not system
         if (afterActsNeeded) {
             afterActsNeeded = false
+
+            val executeTimingFinisher = actorEnv.pool.executionTiming.createFinisher
+
             logIgnoredException ("Error while invoking afterActs method") {
                 afterActs ()
             }
+
+            executeTimingFinisher ("[execution] Actor finished execution of afterActs method")
         }
     }
 
