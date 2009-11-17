@@ -128,16 +128,23 @@ final class DefaultLogger (slfLogger : SlfLogger) extends Logger {
         if (slfLogger.isErrorEnabled) this.error (obj.toString, e)
 
     // Logging levels
-    def isDebugEnabled = slfLogger.isDebugEnabled
-    def isInfoEnabled = slfLogger.isInfoEnabled
-    def isWarnEnabled = slfLogger.isWarnEnabled
-    def isErrorEnabled = slfLogger.isErrorEnabled
+    @inline
+    override def isDebugEnabled = slfLogger.isDebugEnabled
+
+    @inline
+    override def isInfoEnabled = slfLogger.isInfoEnabled
+
+    @inline
+    override def isWarnEnabled = slfLogger.isWarnEnabled
+
+    @inline
+    override def isErrorEnabled = slfLogger.isErrorEnabled
 }
 
 /**
- * Dummy logger
+ * Dummy logger. Shows message on console. Debug messages are suppressed.
  */
-object DummyLogger extends Logger {
+class DummyLogger extends Logger {
     @inline
     override def debug (str : String) = ()
     
@@ -157,19 +164,19 @@ object DummyLogger extends Logger {
     
     @inline
     override def info (str : String, e : Throwable)  = {
-        println (str)
+        info (str)
         e.printStackTrace
     }
 
     @inline
     override def warn (str : String, e : Throwable)  = {
-        println ("WARN: " + str)
+        warn (str)
         e.printStackTrace
     }
 
     @inline
     override def error (str : String, e : Throwable) = {
-        println (str)
+        error (str)
         e.printStackTrace
     }
 
@@ -202,8 +209,41 @@ object DummyLogger extends Logger {
     override def errorLazy (obj : AnyRef, e : Throwable) = error (obj.toString, e)
 
     // Logging levels
+    @inline
     def isDebugEnabled = false
+
+    @inline
     def isInfoEnabled = true
+
+    @inline
     def isWarnEnabled = true
+
+    @inline
     def isErrorEnabled = true
 }
+
+/**
+ * Instance of DummyLogger.
+ */
+object DummyLogger extends DummyLogger
+
+/**
+ * QuickDebugLogger. The same as DummyLogger, but debug message are not suppresesd.
+ */
+class QuickDebugLogger extends DummyLogger {
+    override def debug (str : String) = println ("DEBUG: " + str)
+
+    override def debug (str : String, e : Throwable) = {
+        debug (str)
+        e.printStackTrace
+    }
+
+    override def debugLazy (obj : => AnyRef) = debug (obj.toString)
+    override def debugLazy (obj : AnyRef, e : Throwable) = debug (obj.toString, e)
+    override def isDebugEnabled = true
+}
+
+/**
+ * QuickDebugLogger instance.
+ */
+object QuickDebugLogger extends QuickDebugLogger

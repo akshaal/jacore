@@ -51,3 +51,7 @@ trait DummyLogging extends {
     protected[logger] override implicit val logger = DummyLogger
 } with AbstractLogging
 
+trait QuickDubugLogging extends {
+    protected[logger] override implicit val logger = QuickDebugLogger
+} with AbstractLogging
+
