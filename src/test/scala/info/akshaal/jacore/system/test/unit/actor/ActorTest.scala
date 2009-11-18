@@ -8,6 +8,7 @@ package system.test.unit
 package actor
 
 import org.specs.SpecificationWithJUnit
+import org.specs.mock.Mockito
 import com.google.inject.{ProvisionException, Inject}
 
 import Predefs._
@@ -15,7 +16,7 @@ import UnitTestHelper._
 import system.annotation.{CallByMessage, Act, ExtractBy}
 import system.actor.MessageExtractor
 
-class ActorTest extends SpecificationWithJUnit ("Actor specification") {
+class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mockito {
     import ActorTest._
 
     "Actor" should {
@@ -306,27 +307,43 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") {
         }
 
         "manage managed actors" in {
-            withNotStartedActor [ManagingTestActor] (actor => {
-                actor ! 1
-                actor.managedTestActor ! 2
+            var managedActorSpy =
+                withNotStartedActor [ManagingTestActor] (actor => {
+                    val managedSpy = actor.manOnSpy (spy)
 
-                actor.received                   must_==  0
-                actor.managedTestActor.received  must_==  0
+                    actor ! 1
+                    actor.managedTestActor ! 2
 
-                waitForMessageAfter (actor) {
-                    waitForMessageAfter (actor.managedTestActor) {actor.start}
-                }
+                    actor.received                   must_==  0
+                    actor.managedTestActor.received  must_==  0
 
-                actor.received                   must_==  1
-                actor.managedTestActor.received  must_==  1
-            })
+                    waitForMessageAfter (actor) {
+                        waitForMessageAfter (actor.managedTestActor) {actor.start}
+                    }
+
+                    actor.received                   must_==  1
+                    actor.managedTestActor.received  must_==  1
+
+                    actor.managedTestActor
+
+                    managedSpy.stop() wasnt called
+
+                    managedSpy
+                }).asInstanceOf[ManagedTestActor]
+
+            managedActorSpy.stop() was called.once
         }
     }
 }
 
 object ActorTest {
     class ManagingTestActor @Inject() (val managedTestActor : ManagedTestActor) extends TestActor {
-        manage (managedTestActor)
+        def manOnSpy (spier : ManagedTestActor => ManagedTestActor) : ManagedTestActor = {
+            val spy = spier (managedTestActor)
+
+            manage (spy)
+            spy
+        }
         
         var received = 0
 

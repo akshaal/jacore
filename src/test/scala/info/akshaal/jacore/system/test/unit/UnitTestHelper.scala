@@ -32,11 +32,11 @@ object UnitTestHelper {
      * Created actor will be started and passed to function f. When function is completed
      * its work, actor will be stopped.
      * @param f function receiving actor
-     * @param [T] actor class
+     * @param [A] actor class
      */
-    def withStartedActor[T <: Actor] (f : T => Any) (implicit clazz : ClassManifest[T]) : Unit =
+    def withStartedActor[A <: Actor] (f : A => Any) (implicit clazz : ClassManifest[A]) : Any =
     {
-        withNotStartedActor[T] (actor => {
+        withNotStartedActor[A] (actor => {
             actor.start
             f (actor)
         })
@@ -47,11 +47,11 @@ object UnitTestHelper {
      * starter explicitly in f.
      * @param f function receiving actor, when execution of this function is done, actor
      *          will be stopped
-     * @param [T] actor class to instantiate
+     * @param [A] actor class to instantiate
      */
-    def withNotStartedActor[T <: Actor] (f : T => Any) (implicit clazz : ClassManifest[T]) : Unit =
+    def withNotStartedActor[A <: Actor] (f : A => Any) (implicit clazz : ClassManifest[A]) : Any =
     {
-        val actor = TestModule.injector.getInstanceOf[T]
+        val actor = TestModule.injector.getInstanceOf[A]
         try {
             f (actor)
         } finally {
