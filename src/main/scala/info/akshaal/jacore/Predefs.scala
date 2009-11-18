@@ -121,6 +121,7 @@ object Predefs {
     @inline
     def iterateOverJavaIterable[T] (c : JavaIterable[T]) (f : T => Unit) {
         val it = c.iterator
+
         while (it.hasNext) {
             f (it.next)
         }

@@ -15,8 +15,8 @@ import logger.Logging
  */
 abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
 {
-    // TODO: Split to traits
-    // TODO: Extract transport (fibers) out of this class
+    // TODO: Split to traits: Transporting, Managing, Broadcasting,
+    //       Scheduling, Autosubscribing, ...
 
     /**
      * A set of descriptions for methods annotated with @Act annotation.
@@ -63,6 +63,20 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * of actor's act() like methods with not system messages.
      */
     protected var afterActsNeeded = false
+
+    /**
+     * Managed actors. Managed actor is an actor that is stopped when this actor is stopped
+     * and started when this actor is started. This is done automatically.
+     */
+    private[this] var managed : List[Actor] = Nil
+
+    /**
+     * Starts managing a new actor. Next time this actor this actor is stopped
+     * or started, the actor given as argument will be started or stopped automatically.
+     */
+    protected final def manage (actor : Actor) : Unit = {
+        managed = actor :: managed
+    }
 
     /**
      * Method returns a partial function which must process
@@ -165,7 +179,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
     /**
      * Start actor.
      */
-    def start () = {
+    def start () : Unit = {
         debug ("About to start")
 
         // Subscribe first. This is very first thing to do before publish any event.
@@ -178,12 +192,15 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
 
         // Publish event
         broadcaster.broadcast (ActorStartedEvent (this))
+
+        // Start managed actors
+        managed.foreach (_.start)
     }
 
     /**
      * Stop the actor.
      */
-    def stop() = {
+    def stop() : Unit = {
         debug ("About to stop")
         
         // Unsubscribe
@@ -196,6 +213,9 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
 
         // Publish event
         broadcaster.broadcast (ActorStoppedEvent (this))
+
+        // Stop managed actors
+        managed.foreach (_.stop)
     }
 
     /**

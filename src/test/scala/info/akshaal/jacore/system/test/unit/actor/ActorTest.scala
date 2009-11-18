@@ -8,7 +8,7 @@ package system.test.unit
 package actor
 
 import org.specs.SpecificationWithJUnit
-import com.google.inject.ProvisionException
+import com.google.inject.{ProvisionException, Inject}
 
 import Predefs._
 import UnitTestHelper._
@@ -304,10 +304,45 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") {
         "not allow @Act method specify same extractor on one method by @ExtractBy and user defined annotation" in {
             mustBeInvalidActor [InvalidTestActorWithDuplicatedExtracorInDifferentForms]
         }
+
+        "manage managed actors" in {
+            withNotStartedActor [ManagingTestActor] (actor => {
+                actor ! 1
+                actor.managedTestActor ! 2
+
+                actor.received                   must_==  0
+                actor.managedTestActor.received  must_==  0
+
+                waitForMessageAfter (actor) {
+                    waitForMessageAfter (actor.managedTestActor) {actor.start}
+                }
+
+                actor.received                   must_==  1
+                actor.managedTestActor.received  must_==  1
+            })
+        }
     }
 }
 
 object ActorTest {
+    class ManagingTestActor @Inject() (val managedTestActor : ManagedTestActor) extends TestActor {
+        manage (managedTestActor)
+        
+        var received = 0
+
+        override def act () = {
+            case i : Int => received += 1
+        }
+    }
+
+    class ManagedTestActor extends TestActor {
+        var received = 0
+
+        override def act () = {
+            case i : Int => received += 1
+        }
+    }
+
     class ConstructionTestActor extends TestActor
 
     class MessageReceivingTestActor extends TestActor {
