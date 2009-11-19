@@ -9,13 +9,12 @@ package info.akshaal.jacore.system
 package actor
 
 import org.aopalliance.intercept.{MethodInterceptor, MethodInvocation}
-import logger.Logging
 
 /**
  * This class is supposed to handle invocations of methods annotated with
  * @CallByMessage annotation.
  */
-class CallByMessageMethodInterceptor extends MethodInterceptor with Logging {
+class CallByMessageMethodInterceptor extends MethodInterceptor {
     /*
      * NOTE: Implementation details.
      *
@@ -53,17 +52,8 @@ class CallByMessageMethodInterceptor extends MethodInterceptor with Logging {
     override def invoke (invocation : MethodInvocation) : Object = {
         if (CallByMessageMethodInterceptor.callNow.get) {
             CallByMessageMethodInterceptor.callNow.set (false)
-
-            debugLazy ("Proceeding with invocation on object "
-                       + invocation.getThis + " of method "
-                       + invocation.getMethod.getName)
-
             invocation.proceed
         } else {
-            debugLazy ("Wrapping invocation on object "
-                       + invocation.getThis + " of method "
-                       + invocation.getMethod.getName)
-
             invocation.getThis.asInstanceOf[Actor] ! (Call (invocation))
         }
 
