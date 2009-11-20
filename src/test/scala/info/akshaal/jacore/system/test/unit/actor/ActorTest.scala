@@ -37,18 +37,17 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
         }
 
         "speak to other actors and get feedback" in {
-            withStartedActor [SpeakingStringTestActor] (stringActor =>
-                withStartedActor [SpeakingTestActor] (speakingActor => {
-                    speakingActor.stringMaker = Some (stringActor)
+            withStartedActors [SpeakingStringTestActor,
+                               SpeakingTestActor] ((stringActor, speakingActor) => {
+                speakingActor.stringMaker = Some (stringActor)
 
-                    waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 1}
-                    waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 3}
-                    waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 7}
-                    
-                    speakingActor.accuInt      must_==  List (7, 3, 1)
-                    speakingActor.accuString   must_==  List ("x7", "x3", "x1")
-                })
-            )
+                waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 1}
+                waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 3}
+                waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 7}
+
+                speakingActor.accuInt      must_==  List (7, 3, 1)
+                speakingActor.accuString   must_==  List ("x7", "x3", "x1")
+            })
         }
 
         "be exception resistant" in {

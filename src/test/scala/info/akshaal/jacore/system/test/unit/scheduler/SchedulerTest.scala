@@ -30,26 +30,24 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
         }
 
         "provide one time scheduling" in {
-            withStartedActor [OneTimeTestActor] (actor => {
-                withStartedActor [OneTimeTestActor2] (actor2 => {
-                    TestModule.scheduler.in (actor, 123, 130.milliseconds)
-                    TestModule.scheduler.in (actor2, 234, 50.milliseconds)
+            withStartedActors [OneTimeTestActor, OneTimeTestActor2] ((actor, actor2) => {
+                TestModule.scheduler.in (actor, 123, 130.milliseconds)
+                TestModule.scheduler.in (actor2, 234, 50.milliseconds)
 
-                    Thread.sleep (30)
+                Thread.sleep (30)
 
-                    actor.executed   must_==  0
-                    actor2.executed  must_==  0
+                actor.executed   must_==  0
+                actor2.executed  must_==  0
 
-                    Thread.sleep (60)
+                Thread.sleep (60)
 
-                    actor.executed   must_==  0
-                    actor2.executed  must_==  1
+                actor.executed   must_==  0
+                actor2.executed  must_==  1
 
-                    Thread.sleep (200)
+                Thread.sleep (200)
 
-                    actor.executed   must_==  1
-                    actor2.executed  must_==  1
-                })
+                actor.executed   must_==  1
+                actor2.executed  must_==  1
             })
         }
     }

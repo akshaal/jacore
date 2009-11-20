@@ -20,29 +20,28 @@ class BroadcasterTest extends SpecificationWithJUnit ("Broadcaster specification
     
     "Broadcaster" should {
         "broadcast messages to subscribers" in {
-            withStartedActor [StringBroadcasterTestActor] (stringActor => {
-                withStartedActor [IntBroadcasterTestActor] (intActor => {
-                    val broadcaster = TestModule.injector.getInstanceOf[Broadcaster]
+            withStartedActors [StringBroadcasterTestActor,
+                               IntBroadcasterTestActor] ((stringActor, intActor) => {
+                val broadcaster = TestModule.injector.getInstanceOf[Broadcaster]
 
-                    stringActor.intCalls     must_==  0
-                    stringActor.stringCalls  must_==  0
-                    intActor.intCalls        must_==  0
-                    intActor.stringCalls     must_==  0
+                stringActor.intCalls     must_==  0
+                stringActor.stringCalls  must_==  0
+                intActor.intCalls        must_==  0
+                intActor.stringCalls     must_==  0
 
-                    waitForMessageAfter (intActor) {broadcaster.broadcast (1)}
+                waitForMessageAfter (intActor) {broadcaster.broadcast (1)}
 
-                    stringActor.intCalls     must_==  0
-                    stringActor.stringCalls  must_==  0
-                    intActor.intCalls        must_==  1
-                    intActor.stringCalls     must_==  0
+                stringActor.intCalls     must_==  0
+                stringActor.stringCalls  must_==  0
+                intActor.intCalls        must_==  1
+                intActor.stringCalls     must_==  0
 
-                    waitForMessageAfter (stringActor) {broadcaster.broadcast ("hi")}
+                waitForMessageAfter (stringActor) {broadcaster.broadcast ("hi")}
 
-                    stringActor.intCalls     must_==  0
-                    stringActor.stringCalls  must_==  1
-                    intActor.intCalls        must_==  1
-                    intActor.stringCalls     must_==  0
-                })
+                stringActor.intCalls     must_==  0
+                stringActor.stringCalls  must_==  1
+                intActor.intCalls        must_==  1
+                intActor.stringCalls     must_==  0
             })
         }
     }
