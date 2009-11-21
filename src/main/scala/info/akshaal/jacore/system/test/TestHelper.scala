@@ -10,6 +10,10 @@ package test
 import com.google.inject.Injector
 
 import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
+import java.io.{PrintWriter, File}
+import com.google.inject.Guice
+import com.google.inject.grapher.{GrapherModule,InjectorGrapher}
+import com.google.inject.grapher.graphviz.{GraphvizModule, GraphvizRenderer}
 
 import Predefs._
 import actor.Actor
@@ -28,6 +32,18 @@ trait TestHelper {
      * Injector to use for tests.
      */
     val injector : Injector
+
+    /**
+     * Draw graph.
+     */
+    def createModuleGraph (filename : String) : Unit = {
+        val out = new PrintWriter (new File(filename), "UTF-8")
+        val graphInjector = Guice.createInjector (new GrapherModule, new GraphvizModule)
+        val renderer = graphInjector.getInstanceOf [GraphvizRenderer]
+
+        renderer.setOut (out).setRankdir ("TB");
+        graphInjector.getInstanceOf [InjectorGrapher].of (injector).graph ()
+    }
 
     /**
      * Execute function with the actor constructed by using guice injector.

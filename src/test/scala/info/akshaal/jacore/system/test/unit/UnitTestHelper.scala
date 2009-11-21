@@ -50,9 +50,7 @@ object UnitTestHelper extends TestHelper {
         val lowPriorityActorEnv = injector.getInstanceOf[LowPriorityActorEnv]
         val scheduler = injector.getInstanceOf[Scheduler]
         val textFile = injector.getInstanceOf[TextFile]
-
-        override def configure (binder : Binder) : Unit = {
-            super.configure (binder)
-        }
     }
+
+    createModuleGraph (TestModule.daemonStatusFileFile.getAbsolutePath + "-graph.dot")
 }
