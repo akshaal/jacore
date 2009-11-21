@@ -26,6 +26,8 @@ object UnitTestHelper extends TestHelper {
     override val timeout = 2.seconds
     override val injector = TestModule.injector
 
+    createModuleGraphInDebugDir ("test-module.dot")
+
     /**
      * Basic ancestor for all actor that are to be used in tests.
      */
@@ -51,6 +53,4 @@ object UnitTestHelper extends TestHelper {
         val scheduler = injector.getInstanceOf[Scheduler]
         val textFile = injector.getInstanceOf[TextFile]
     }
-
-    createModuleGraphInDebugDir ("test-module.dot")
 }
