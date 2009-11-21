@@ -62,7 +62,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
      * Indicates a need to execute afterActs method. Must be set during invocation
      * of actor's act() like methods with not system messages.
      */
-    protected var afterActsNeeded = false
+    private[this] var afterActsNeeded = false
 
     /**
      * Managed actors. Managed actor is an actor that is stopped when this actor is stopped

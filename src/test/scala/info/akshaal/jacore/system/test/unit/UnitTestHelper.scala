@@ -7,7 +7,7 @@ package info.akshaal.jacore
 package system.test
 package unit
 
-import com.google.inject.Guice
+import com.google.inject.{Guice, Binder}
 import java.io.File
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
@@ -50,5 +50,9 @@ object UnitTestHelper extends TestHelper {
         val lowPriorityActorEnv = injector.getInstanceOf[LowPriorityActorEnv]
         val scheduler = injector.getInstanceOf[Scheduler]
         val textFile = injector.getInstanceOf[TextFile]
+
+        override def configure (binder : Binder) : Unit = {
+            super.configure (binder)
+        }
     }
 }

@@ -4,7 +4,8 @@
  */
 
 package info.akshaal.jacore
-package system.test.unit
+package system.test
+package unit
 package actor
 
 import org.specs.SpecificationWithJUnit
@@ -306,45 +307,57 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
         }
 
         "manage managed actors" in {
-            var managedActorSpy =
+            var managingActor =
                 withNotStartedActor [ManagingTestActor] (actor => {
-                    val managedSpy = actor.manOnSpy (spy)
-
                     actor ! 1
                     actor.managedTestActor ! 2
 
+                    actor.starts                     must_==  0
+                    actor.stops                      must_==  0
                     actor.received                   must_==  0
                     actor.managedTestActor.received  must_==  0
+                    actor.managedTestActor.starts    must_==  0
+                    actor.managedTestActor.stops     must_==  0
 
                     waitForMessageAfter (actor) {
-                        waitForMessageAfter (actor.managedTestActor) {actor.start}
+                        waitForMessageAfter (actor.managedTestActor) {actor.start ()}
                     }
 
+                    actor.starts                     must_==  1
+                    actor.stops                      must_==  0
                     actor.received                   must_==  1
                     actor.managedTestActor.received  must_==  1
+                    actor.managedTestActor.starts    must_==  1
+                    actor.managedTestActor.stops     must_==  0
 
-                    actor.managedTestActor
+                    actor
+                }).asInstanceOf[ManagingTestActor]
 
-                    managedSpy.stop() wasnt called
-
-                    managedSpy
-                }).asInstanceOf[ManagedTestActor]
-
-            managedActorSpy.stop() was called.once
+            managingActor.starts                     must_==  1
+            managingActor.stops                      must_==  1
+            managingActor.managedTestActor.starts    must_==  1
+            managingActor.managedTestActor.stops     must_==  1
         }
     }
 }
 
 object ActorTest {
     class ManagingTestActor @Inject() (val managedTestActor : ManagedTestActor) extends TestActor {
-        def manOnSpy (spier : ManagedTestActor => ManagedTestActor) : ManagedTestActor = {
-            val spy = spier (managedTestActor)
+        manage (managedTestActor)
 
-            manage (spy)
-            spy
-        }
-        
         var received = 0
+        var starts = 0
+        var stops = 0
+
+        override def start () : Unit = {
+            super.start ()
+            starts += 1
+        }
+
+        override def stop () : Unit = {
+            super.stop ()
+            stops += 1
+        }
 
         override def act () = {
             case i : Int => received += 1
@@ -353,6 +366,18 @@ object ActorTest {
 
     class ManagedTestActor extends TestActor {
         var received = 0
+        var starts = 0
+        var stops = 0
+
+        override def start () : Unit = {
+            super.start ()
+            starts += 1
+        }
+
+        override def stop () : Unit = {
+            super.stop ()
+            stops += 1
+        }
 
         override def act () = {
             case i : Int => received += 1

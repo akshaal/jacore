@@ -56,7 +56,7 @@ trait TestHelper {
                                             (implicit clazzA : ClassManifest[A],
                                              clazzB : ClassManifest[B]) : Any =
     {
-        withNotStartedActors[A, B] ((actor1, actor2) => {
+        withNotStartedActors[A, B] ((actor1 , actor2) => {
             actor1.start
             actor2.start
             f (actor1, actor2)
