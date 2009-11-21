@@ -34,7 +34,8 @@ trait TestHelper {
     val injector : Injector
 
     /**
-     * Draw graph.
+     * Create graph definition (.dot file)
+     * @param filename name of the file to create
      */
     def createModuleGraph (filename : String) : Unit = {
         val out = new PrintWriter (new File(filename), "UTF-8")
@@ -43,6 +44,17 @@ trait TestHelper {
 
         renderer.setOut (out).setRankdir ("TB");
         graphInjector.getInstanceOf [InjectorGrapher].of (injector).graph ()
+    }
+
+    /**
+     * Create graph definition if property jacore.module.debug.dir is defined.
+     */
+    def createModuleGraphInDebugDir (filenameSuffix : String) : Unit = {
+        val debugDir = System.getProperty ("jacore.module.debug.dir")
+        if (debugDir != null) {
+            new File (debugDir).mkdirs
+            createModuleGraph (debugDir + "/" + filenameSuffix)
+        }
     }
 
     /**

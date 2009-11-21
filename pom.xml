@@ -197,8 +197,9 @@
 		<artifactId>maven-surefire-plugin</artifactId>
 		<configuration>
 		    <argLine>
-		        -Dcglib.debugLocation=${basedir}/target/cglib
-	            </argLine>
+		        -Dcglib.debugLocation=${basedir}/target/cglib \
+                -Djacore.module.debug.dir=${basedir}/target/jacore
+            </argLine>
 		</configuration>
 	    </plugin>
 

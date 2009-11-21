@@ -52,5 +52,5 @@ object UnitTestHelper extends TestHelper {
         val textFile = injector.getInstanceOf[TextFile]
     }
 
-    createModuleGraph (TestModule.daemonStatusFileFile.getAbsolutePath + "-graph.dot")
+    createModuleGraphInDebugDir ("test-module.dot")
 }
