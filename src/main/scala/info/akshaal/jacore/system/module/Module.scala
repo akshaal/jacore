@@ -70,6 +70,7 @@ class Module extends GuiceModule with Logging {
         // Internal implemntation bindings
         binder.bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
         binder.bind (classOf[TextFile]).to (classOf[TextFileActor])
+        binder.bind (classOf[JacoreManager]).to (classOf[JacoreManagerImpl])
 
         // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
         

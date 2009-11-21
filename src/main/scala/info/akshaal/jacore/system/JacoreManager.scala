@@ -22,19 +22,7 @@ import logger.Logging
 /**
  * Manager for an instance of jacore framework.
  */
-@Singleton
-final class JacoreManager @Inject() (
-                    textFileActor : TextFileActor,
-                    daemonStatusActor : DaemonStatusActor,
-                    daemonStatus : DaemonStatus,
-                    monitoringActors : MonitoringActors,
-                    broadcasterActor : BroadcasterActor,
-                    scheduler : Scheduler
-                ) extends Logging
-{
-    private[this] var stopped = false
-    private[this] var started = false
-
+trait JacoreManager {
     // - - - - -- - - - - - - - - - - - - - - - - - - - --
     // Useful addons
 
@@ -42,47 +30,95 @@ final class JacoreManager @Inject() (
      * Convenient method to help start actors.
      * @param actors variable argument parameters
      */
-    def startActors (actors : Actor*) : Unit = {
-        startActors (actors)
-    }
+    def startActors (actors : Actor*) : Unit
 
     /**
      * Convenient method to help start actors.
      * @param it iterable object
      */
-    def startActors (it : Iterable[Actor]) : Unit = {
-        it.foreach (_.start)
-    }
+    def startActors (it : Iterable[Actor]) : Unit
 
     /**
      * Convenient method to help start actors.
      * @param it iterable object
      */
-    def startActors (it : JavaIterable[Actor]) : Unit = {
-        startActors (it : Iterable[Actor])
-    }
+    def startActors (it : JavaIterable[Actor]) : Unit
 
     /**
      * Convenient method to help stop actors.
      * @param actors variable argument parameters
      */
-    def stopActors (actors : Actor*) : Unit = {
+    def stopActors (actors : Actor*) : Unit
+
+    /**
+     * Convenient method to help stop actors.
+     * @param it iterable object
+     */
+    def stopActors (it : Iterable[Actor]) : Unit
+
+    /**
+     * Convenient method to help stop actors.
+     * @param it iterable object
+     */
+    def stopActors (it : JavaIterable[Actor]) : Unit
+
+    /**
+     * Start instance of jacore.
+     */
+    def start : Unit
+
+    /**
+     * Stop instance of jacore.
+     */
+    def stop : Unit
+}
+
+/**
+ * Manager for an instance of jacore framework. Implementation.
+ */
+@Singleton
+private[system] final class JacoreManagerImpl @Inject() (
+                    textFileActor : TextFileActor,
+                    daemonStatusActor : DaemonStatusActor,
+                    daemonStatus : DaemonStatus,
+                    monitoringActors : MonitoringActors,
+                    broadcasterActor : BroadcasterActor,
+                    scheduler : Scheduler
+                ) extends JacoreManager with Logging
+{
+    private[this] var stopped = false
+    private[this] var started = false
+
+    // - - - - -- - - - - - - - - - - - - - - - - - - - --
+    // Useful addons
+
+    /** {@inheritDoc} */
+    override def startActors (actors : Actor*) : Unit = {
+        startActors (actors)
+    }
+
+    /** {@inheritDoc} */
+    override def startActors (it : Iterable[Actor]) : Unit = {
+        it.foreach (_.start)
+    }
+
+    /** {@inheritDoc} */
+    override def startActors (it : JavaIterable[Actor]) : Unit = {
+        startActors (it : Iterable[Actor])
+    }
+
+    /** {@inheritDoc} */
+    override def stopActors (actors : Actor*) : Unit = {
         stopActors (actors)
     }
 
-    /**
-     * Convenient method to help stop actors.
-     * @param it iterable object
-     */
-    def stopActors (it : Iterable[Actor]) : Unit = {
+    /** {@inheritDoc} */
+    override def stopActors (it : Iterable[Actor]) : Unit = {
         it.foreach (_.stop)
     }
 
-    /**
-     * Convenient method to help stop actors.
-     * @param it iterable object
-     */
-    def stopActors (it : JavaIterable[Actor]) : Unit = {
+    /** {@inheritDoc} */
+    override def stopActors (it : JavaIterable[Actor]) : Unit = {
         stopActors (it : Iterable[Actor])
     }
 
@@ -98,10 +134,8 @@ final class JacoreManager @Inject() (
          :: daemonStatusActor
          :: Nil)
 
-    /**
-     * Start instance of jacore.
-     */
-    lazy val start : Unit = {
+    /** {@inheritDoc} */
+    override lazy val start : Unit = {
         require (!stopped,
             "Unable to start JacoreManager. JacoreManager has been stopped")
 
@@ -119,10 +153,8 @@ final class JacoreManager @Inject() (
         debug ("Jacore started")
     }
 
-    /**
-     * Stop instance of jacore.
-     */
-    lazy val stop : Unit = {
+    /** {@inheritDoc} */
+    override lazy val stop : Unit = {
         require (started,
                  "Unable to stop JacoreManager. JacoreManager is not started")
 

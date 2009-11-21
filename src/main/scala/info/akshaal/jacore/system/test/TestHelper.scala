@@ -43,11 +43,13 @@ trait TestHelper {
         val renderer = graphInjector.getInstanceOf [GraphvizRenderer]
 
         renderer.setOut (out).setRankdir ("TB");
+
         graphInjector.getInstanceOf [InjectorGrapher].of (injector).graph ()
     }
 
     /**
      * Create graph definition if property jacore.module.debug.dir is defined.
+     * @param ilenameSuffix suffix for name of the file to create
      */
     def createModuleGraphInDebugDir (filenameSuffix : String) : Unit = {
         val debugDir = System.getProperty ("jacore.module.debug.dir")
