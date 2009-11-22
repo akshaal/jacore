@@ -19,7 +19,7 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
     import IbatisTest._
 
     "IbatisDataInserterActor" should {
-        // We use the same mockedSqlMapClientForInserter so test must be run in parallel
+        // We use the same mockedSqlMapClientForInserter so test must not be run in parallel
         setSequential ()
 
         "insert data" in {
