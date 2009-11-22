@@ -13,7 +13,7 @@ import com.ibatis.sqlmap.client.{SqlMapClient, SqlMapSession}
 
 import Predefs._
 import UnitTestHelper._
-import system.dao.ibatis.IbatisDataInserterActor
+import system.dao.ibatis.AbstractIbatisDataInserterActor
 
 class IbatisTest extends SpecificationWithJUnit ("iBatis support specification") with Mockito {
     import IbatisTest._
@@ -80,7 +80,7 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
 object IbatisTest {
     var mockedSqlMapClientForInserter : SqlMapClient = null
 
-    class InserterTestActor extends IbatisDataInserterActor[String] (
+    class InserterTestActor extends AbstractIbatisDataInserterActor[String] (
                                  lowPriorityActorEnv = TestModule.lowPriorityActorEnv,
                                  sqlMapClient = mockedSqlMapClientForInserter)
                             with Waitable

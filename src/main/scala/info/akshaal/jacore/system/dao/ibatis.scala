@@ -16,8 +16,8 @@ import actor.{Actor, LowPriorityActorEnv}
 /**
  * Implementation of data inserter using iBatis.
  */
-abstract class IbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
-                                           lowPriorityActorEnv : LowPriorityActorEnv)
+abstract class AbstractIbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
+                                                   lowPriorityActorEnv : LowPriorityActorEnv)
                                 extends Actor (actorEnv = lowPriorityActorEnv)
                                 with DataInserter[T] {
     protected val insertStatementId : String
