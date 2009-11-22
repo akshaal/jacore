@@ -35,19 +35,21 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
      * Creates a JMS Message from domain message.
      * @param msg domain message
      */
-    protected def createJmsMessage (msg : T) : Message
+    protected def createJmsMessage (session : Session, msg : T) : Message
 
     /**
      * Perform send operation.
      * @param msg message to send
      */
     protected def doSend (msg : T) : Unit = {
-        val producer = context match {
-            case Some ((prod, _, _)) => prod
-            case None => initContext
-        }
+        context match {
+            case Some ((producer, session, _)) =>
+                producer.send (createJmsMessage (session, msg))
 
-        producer.send (createJmsMessage (msg))
+            case None =>
+                context = Some (initContext)
+                doSend (msg)
+        }
     }
 
     /**
@@ -63,17 +65,13 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
 
     /**
      * Init connection, session and producer.
-     *
-     * NOTE: context must be updated by this method.
      */
-    private[this] def initContext () : MessageProducer = {
+    private[this] def initContext () : (MessageProducer, Session, Connection) = {
         val connection = createConnection ()
         val session = createSession (connection)
         val producer = createProducer (session)
         
-        context = Some (producer, session, connection)
-
-        producer
+        (producer, session, connection)
     }
 
     /**
