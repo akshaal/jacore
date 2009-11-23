@@ -11,6 +11,7 @@ import javax.jms.{Connection, ConnectionFactory, Destination, Message, MessagePr
 
 import Predefs._
 import actor.{Actor, LowPriorityActorEnv}
+import annotation.CallByMessage
 
 /**
  * Issued to the requester when sending is finished.
@@ -38,6 +39,27 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
     protected def createJmsMessage (session : Session, msg : T) : Message
 
     /**
+     * Send message.
+     * @param msg message to send
+     */
+    @CallByMessage
+    def send (msg : T) : Unit = {
+        doSend (msg)
+    }
+
+    /**
+     * Send message.
+     * @param msg message to send
+     * @param payload send this message back to sender
+     */
+    @CallByMessage
+    def send (msg : T, payload : Any) : Unit = {
+        doSend (msg)
+
+        sender.foreach (actor => notifications = (actor, payload) :: notifications)
+    }
+
+    /**
      * Perform send operation.
      * @param msg message to send
      */
@@ -53,21 +75,12 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
     }
 
     /**
-     * Perform send operation.
-     * @param msg message to send
-     * @param payload send this message back to sender
-     */
-    protected def doSend (msg : T, payload : Any) : Unit = {
-        doSend (msg)
-
-        sender.foreach (actor => notifications = (actor, payload) :: notifications)
-    }
-
-    /**
      * Init connection, session and producer.
      */
     private[this] def initContext () : (MessageProducer, Session, Connection) = {
         val connection = createConnection ()
+        connection.start
+
         val session = createSession (connection)
         val producer = createProducer (session)
         
@@ -101,24 +114,22 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
      * Used to commit end session.
      */
     protected override def afterActs () : Unit = {
-        context match {
-            case None => ()
-            case Some ((producer, session, connection)) =>
-                context = None
+        for ((producer, session, connection) <- context) {
+            context = None
 
-                try {
-                    producer.close ()
+            try {
+                producer.close ()
 
-                    for ((actor, payload) <- notifications) {
-                        actor ! JmsMessageSent (payload)
-                    }
-                } finally {
-                    try {
-                        session.close ()
-                    } finally {
-                        connection.close ()
-                    }
+                for ((actor, payload) <- notifications) {
+                    actor ! JmsMessageSent (payload)
                 }
+            } finally {
+                try {
+                    session.close ()
+                } finally {
+                    connection.close ()
+                }
+            }
         }
     }
 }

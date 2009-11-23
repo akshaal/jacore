@@ -29,7 +29,23 @@ class JmsSenderActorTest extends SpecificationWithJUnit ("AbstractJmsSenderActor
             mockedConnectionFactory = mock [ConnectionFactory]
 
             withNotStartedActor [JmsSenderTestActor] (actor => {
-                // TODO
+                val factory = mockedConnectionFactory
+                val connection = mock [Connection]
+                val session = mock [Session]
+                val producer = mock [MessageProducer]
+
+                factory.createConnection() returns connection
+                connection.createSession (false, Session.AUTO_ACKNOWLEDGE) returns session
+                session.createProducer (MockHelper.destination) returns producer
+
+                actor.send ("one")
+                actor.send ("two")
+                actor.send ("3")
+
+                waitForMessageAfter (actor) {actor.start}
+
+                (factory.createConnection()                   on factory)     then
+                (connection.close ()                          on connection)  were calledInOrder
             })
         }
     }
@@ -41,7 +57,8 @@ object JmsSenderActorTest {
     class JmsSenderTestActor extends AbstractJmsSenderActor[String] (
                                 lowPriorityActorEnv = TestModule.lowPriorityActorEnv,
                                 connectionFactory = mockedConnectionFactory,
-                                destination = MockHelper.mockedDestination)
+                                destination = MockHelper.destination)
+                             with Waitable
     {
         override protected def createJmsMessage (session : Session, msg : String) : Message = {
             session.createObjectMessage (msg)
@@ -53,6 +70,6 @@ object JmsSenderActorTest {
      * scala failed to work if JmsSenderActorTest extends MockCreation trait.
      */
     object MockHelper extends MocksCreation {
-        val mockedDestination = mock [Destination]
+        val destination = mock [Destination]
     }
 }
