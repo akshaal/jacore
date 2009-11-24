@@ -22,13 +22,13 @@ import daemon.DaemonStatus
  * Marks an actor for which scheduling shift can be selected at random
  * (depending on actor's hashcode).
  */
-private[system] trait UnfixedScheduling
+trait UnfixedScheduling
 
 /**
  * Scheduler class.
  */
 @Singleton
-private[system] class Scheduler @Inject() (
+class Scheduler @Inject() (
                   @Named("jacore.scheduler.latency") latencyLimit : TimeUnit,
                   threadPriorityChanger : ThreadPriorityChanger,
                   daemonStatus : DaemonStatus,
