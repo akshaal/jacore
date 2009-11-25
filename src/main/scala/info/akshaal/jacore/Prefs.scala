@@ -25,7 +25,7 @@ final class Prefs (file : String) {
 
     final def getString (name : String) : String =
         throwIfNull (properties.getProperty (name)) {
-            new IllegalArgumentException ("Property " + name + " is required")
+            new IllegalArgumentException (file + ": Property " + name + " is required")
         }
 
     final def getTimeUnit (name : String) : TimeUnit =
