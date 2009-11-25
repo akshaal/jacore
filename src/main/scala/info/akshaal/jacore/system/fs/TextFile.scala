@@ -17,6 +17,7 @@ import java.nio.channels.CompletionHandler
 import java.nio.charset.Charset
 
 import com.google.inject.{Inject, Singleton}
+import com.google.inject.name.Named
 
 import Predefs._
 import actor.{Actor, NormalPriorityActorEnv}
@@ -84,11 +85,10 @@ trait TextFile {
 @Singleton
 private[system] class TextFileActor @Inject() (
                        normalPriorityActorEnv : NormalPriorityActorEnv,
-                       prefs : Prefs)
+                       @Named ("jacore.os.file.encoding") encoding : String)
                     extends Actor (actorEnv = normalPriorityActorEnv)
                        with TextFile
 {
-    private val encoding = prefs.getString ("jacore.os.file.encoding")
     private val encoder = Charset.forName (encoding).newEncoder ()
     private val decoder = Charset.forName (encoding).newDecoder ()
 

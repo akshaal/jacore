@@ -10,29 +10,24 @@ import daemon.DaemonStatus
  * Help measure time.
  */
 private[system] final class Timing (limit : TimeUnit,
-                                    daemonStatus : DaemonStatus,
-                                    prefs : Prefs)
+                                    daemonStatus : DaemonStatus)
                         extends NotNull
 {
     private[this] val valuesNumber = 100
     private[this] val frame = new LongValueFrame (valuesNumber)
-    private[this] val allowedAfter =
-        (daemonStatus.startedAt + prefs.getTimeUnit ("jacore.timing.skip.first"))
-            .asNanoseconds
-
     private[this] def measure (startNano : Long,
                                logger : Logger) (message : => String) =
     {
-        if (startNano > allowedAfter) {
+        if (daemonStatus.isQosAllowed) {
             val stopNano = System.nanoTime
             val time = stopNano - startNano
             frame.put (time)
 
             // Inform
             if (time > limit.asNanoseconds) {
-                logger.warn(message + ". Timing = " + time.nanoseconds)
+                logger.warn (message + ". Timing = " + time.nanoseconds)
             } else {
-                logger.debugLazy(message + ". Timing = " + time.nanoseconds)
+                logger.debugLazy (message + ". Timing = " + time.nanoseconds)
             }
         }
     }

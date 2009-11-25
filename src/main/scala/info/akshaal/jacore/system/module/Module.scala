@@ -28,6 +28,8 @@ class Module extends GuiceModule with Logging {
     lazy val prefsResource = "/jacore.properties"
     lazy val prefs = new Prefs (prefsResource)
 
+    lazy val osFileEncoding = prefs.getString("jacore.os.file.encoding")
+
     lazy val monitoringInterval = prefs.getTimeUnit("jacore.monitoring.interval")
 
     lazy val lowPriorityPoolThreads = prefs.getInt("jacore.pool.low.threads")
@@ -43,10 +45,13 @@ class Module extends GuiceModule with Logging {
     lazy val hiPriorityPoolExecutionLimit = prefs.getTimeUnit("jacore.pool.hi.execution")
 
     lazy val schedulerLatencyLimit = prefs.getTimeUnit("jacore.scheduler.latency")
+    lazy val schedulerDrift = prefs.getTimeUnit("jacore.scheduler.drift")
 
     lazy val daemonStatusJmxName = prefs.getString("jacore.status.jmx.name")
     lazy val daemonStatusUpdateInterval = prefs.getTimeUnit("jacore.status.update.interval")
     lazy val daemonStatusFile = prefs.getString("jacore.status.file")
+
+    lazy val qosSkipFirst = prefs.getTimeUnit ("jacore.qos.skip.first")
 
     lazy val threadPriorityChangerImplClass : Class[T] forSome {type T <: ThreadPriorityChanger} =
                     classOf[DummyThreadPriorityChanger]
@@ -78,16 +83,19 @@ class Module extends GuiceModule with Logging {
                                Matchers.annotatedWith (classOf[CallByMessage]),
                                new CallByMessageMethodInterceptor)
 
-        // - - - - - - - - - - - - Instances - - - - - - - - -  -- - 
-
-        binder.bind (classOf[Prefs])
-              .toInstance (prefs)
-
         //  - - - - - - - - - - -  Named - - - - - - - - - -  - - - -
+
+        binder.bind (classOf[TimeUnit])
+              .annotatedWith (Names.named ("jacore.qos.skip.first"))
+              .toInstance (qosSkipFirst)
 
         binder.bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.scheduler.latency"))
               .toInstance (schedulerLatencyLimit)
+
+        binder.bind (classOf[TimeUnit])
+              .annotatedWith (Names.named ("jacore.scheduler.drift"))
+              .toInstance (schedulerDrift)
 
         binder.bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.monitoring.interval"))
@@ -101,6 +109,9 @@ class Module extends GuiceModule with Logging {
               .annotatedWith (Names.named ("jacore.status.file"))
               .toInstance (daemonStatusFile)
 
+        binder.bind (classOf[String])
+              .annotatedWith (Names.named ("jacore.os.file.encoding"))
+              .toInstance (osFileEncoding)
 
         // Hi priority pool parameters
 

@@ -18,21 +18,23 @@ import scala.collection.mutable.Map
 
 import Predefs._
 import logger.DummyLogging
-import jmx.{SimpleJmx, JmxAttr, JmxOper}
+import jmx.{SimpleJmx, JmxOper, JmxAttr}
+import utils.TimeUnit
 
 @Singleton
 final class DaemonStatus @Inject() (
-                 @Named("jacore.status.jmx.name") val jmxObjectName : String)
+                 @Named ("jacore.status.jmx.name") val jmxObjectName : String,
+                 @Named ("jacore.qos.skip.first") val qosSkipFirst : TimeUnit)
               extends DummyLogging with SimpleJmx
 {
     @volatile
-    private var shuttingDown = false
+    private[this] var shuttingDown = false
 
     @volatile
-    private var dying = false
+    private[this] var dying = false
     
     @volatile
-    private var lastAliveTimestamp = System.nanoTime.nanoseconds
+    private[this] var lastAliveTimestamp = System.nanoTime.nanoseconds
 
     /**
      * List of exposed JMX attributes.
@@ -52,32 +54,42 @@ final class DaemonStatus @Inject() (
     /**
      * Holds information about a time when daemon was started
      */
-    final val startedAt = System.nanoTime.nanoseconds
+    val startedAt = System.nanoTime.nanoseconds
+
+    /**
+     * After this nanoseconds (compered to System.nanoTime) it is allowed to do qos measurements
+     */
+    private[this] val qosAllowedAfterNanos = (startedAt + qosSkipFirst).asNanoseconds
 
     /**
      * Returns true if application is dying (feels bad).
      */
-    final def isDying = dying
+    def isDying = dying
 
     /**
      * Returns true if the application is shutting down.
      */
-    final def isShuttingDown = shuttingDown
+    def isShuttingDown = shuttingDown
 
     /**
      * Returns timestamp when the application was alive last time.
      */
-    final def lastAlive = lastAliveTimestamp
+    def lastAlive = lastAliveTimestamp
 
     /**
      * Called by monitoring actor to set
      */
-    final def monitoringAlive () = lastAliveTimestamp = System.nanoTime.nanoseconds
+    def monitoringAlive () = lastAliveTimestamp = System.nanoTime.nanoseconds
+
+    /**
+     * Check if QoS measurements are allowed at the current point in time.
+     */
+    def isQosAllowed = System.nanoTime > qosAllowedAfterNanos
 
     /**
      * Called when application is no more reliable and must die.
      */
-    final lazy val die : Unit = {
+    lazy val die : Unit = {
         // Mark as dying
         dying = true
 
@@ -92,7 +104,7 @@ final class DaemonStatus @Inject() (
     /**
      * Called when shutdown is requested.
      */
-    final lazy val shutdown = {
+    lazy val shutdown = {
         info ("Shutdown requested. Shutting down...")
         shuttingDown = true
     }

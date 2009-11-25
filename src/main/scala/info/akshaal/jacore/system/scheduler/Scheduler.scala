@@ -30,16 +30,16 @@ trait UnfixedScheduling
 @Singleton
 class Scheduler @Inject() (
                   @Named("jacore.scheduler.latency") latencyLimit : TimeUnit,
+                  @Named("jacore.scheduler.drift") schedulerDrift : TimeUnit,
                   threadPriorityChanger : ThreadPriorityChanger,
-                  daemonStatus : DaemonStatus,
-                  prefs : Prefs)
+                  daemonStatus : DaemonStatus)
             extends Logging
 {
     private[this] val schedulerThread =
             new SchedulerThread (latencyLimit = latencyLimit,
                                  threadPriorityChanger = threadPriorityChanger,
-                                 daemonStatus = daemonStatus,
-                                 prefs = prefs)
+                                 schedulerDrift = schedulerDrift,
+                                 daemonStatus = daemonStatus)
 
     /**
      * Get average latency of the scheduler.

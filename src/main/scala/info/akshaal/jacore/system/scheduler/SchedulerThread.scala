@@ -20,7 +20,7 @@ import utils.{Timing, TimeUnit, ThreadPriorityChanger}
 private[scheduler] final class SchedulerThread
                              (latencyLimit : TimeUnit,
                               threadPriorityChanger : ThreadPriorityChanger,
-                              prefs : Prefs,
+                              schedulerDrift : TimeUnit,
                               daemonStatus : DaemonStatus)
                          extends Thread with Logging
 {
@@ -29,12 +29,10 @@ private[scheduler] final class SchedulerThread
     private val lock = new ReentrantLock
     private val condition = lock.newCondition
     private val queue = new PriorityQueue[Schedule]
-    private val schedulerDrift =
-            prefs.getTimeUnit("jacore.scheduler.drift").asNanoseconds
+    private val schedulerDriftNanos = schedulerDrift.asNanoseconds
     
     val latencyTiming = new Timing (limit = latencyLimit,
-                                    daemonStatus = daemonStatus,
-                                    prefs = prefs)
+                                    daemonStatus = daemonStatus)
 
     def schedule (item : Schedule) = {
         synchronized {
@@ -82,7 +80,7 @@ private[scheduler] final class SchedulerThread
         } else {
             val delay = item.nanoTime - System.nanoTime
 
-            if (delay < schedulerDrift) {
+            if (delay < schedulerDriftNanos) {
                 locked { processFromHead }
             } else {
                 locked { condition.awaitNanos (delay) }
