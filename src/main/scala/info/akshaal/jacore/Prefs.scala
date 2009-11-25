@@ -12,8 +12,6 @@ import java.util.Properties
 import Predefs._
 import system.utils.TimeUnit
 
-// TODO: No classes must use this by default. Move to system
-
 final class Prefs (file : String) {
     private[this] val properties = new Properties ()
 
