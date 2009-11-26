@@ -4,8 +4,8 @@
  */
 
 package info.akshaal.jacore
-package system.test.unit
-package actor
+package test
+package unit.actor
 
 import org.specs.SpecificationWithJUnit
 import com.google.inject.Guice
@@ -14,13 +14,12 @@ import java.lang.management.ManagementFactory
 import javax.management.ObjectName
 
 import Predefs._
-import system.module.Module
-import system.actor.{Actor, HiPriorityActorEnv}
-import system.JacoreManager
-import system.daemon.DaemonStatus
+import module.Module
+import actor.{Actor, HiPriorityActorEnv}
+import daemon.DaemonStatus
 
 class MonitoringTest extends SpecificationWithJUnit ("Monitoring specification") {
-    import UnitTestHelper._
+    import unit.UnitTestHelper._
     import MonitoringTest._
 
     // TODO: Need to suppress this terrible message shown in console

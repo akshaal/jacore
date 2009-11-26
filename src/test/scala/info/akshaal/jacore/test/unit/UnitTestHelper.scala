@@ -3,21 +3,18 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore
-package system.test
-package unit
+package info.akshaal.jacore.test.unit
 
 import com.google.inject.{Guice, Binder}
 import java.io.File
 
-import java.util.concurrent.{CountDownLatch, TimeUnit}
-
-import Predefs._
-import system.JacoreManager
-import system.actor.{Actor, HiPriorityActorEnv, LowPriorityActorEnv}
-import system.module.Module
-import system.scheduler.Scheduler
-import system.fs.TextFile
+import info.akshaal.jacore.Predefs._
+import info.akshaal.jacore.actor.{Actor, HiPriorityActorEnv, LowPriorityActorEnv}
+import info.akshaal.jacore.module.Module
+import info.akshaal.jacore.scheduler.Scheduler
+import info.akshaal.jacore.fs.TextFile
+import info.akshaal.jacore.test.TestHelper
+import info.akshaal.jacore.JacoreManager
 
 /**
  * Helper methods for convenient testing of actors and stuff depending on actors.

@@ -4,15 +4,15 @@
  */
 
 package info.akshaal.jacore
-package system.test.unit
-package fs
+package test
+package unit.fs
 
 import org.specs.SpecificationWithJUnit
 import java.io.{File, FileReader, BufferedReader, BufferedWriter, FileWriter}
 
 import Predefs._
-import UnitTestHelper._
-import system.fs.{WriteFileDone, WriteFileFailed, ReadFileDone, ReadFileFailed}
+import unit.UnitTestHelper._
+import fs.{WriteFileDone, WriteFileFailed, ReadFileDone, ReadFileFailed}
 
 class TextFileTest extends SpecificationWithJUnit ("TextFile specification") {
     import TextFileTest._

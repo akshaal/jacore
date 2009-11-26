@@ -4,18 +4,17 @@
  */
 
 package info.akshaal.jacore
-package system.test
-package unit
-package actor
+package test
+package unit.actor
 
 import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
 import com.google.inject.{ProvisionException, Inject}
 
 import Predefs._
-import UnitTestHelper._
-import system.annotation.{CallByMessage, Act, ExtractBy}
-import system.actor.MessageExtractor
+import unit.UnitTestHelper._
+import annotation.{CallByMessage, Act, ExtractBy}
+import actor.MessageExtractor
 
 class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mockito {
     import ActorTest._

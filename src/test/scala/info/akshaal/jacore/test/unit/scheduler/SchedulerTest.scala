@@ -4,14 +4,14 @@
  */
 
 package info.akshaal.jacore
-package system.test.unit
-package scheduler
+package test
+package unit.scheduler
 
 import org.specs.SpecificationWithJUnit
 
 import Predefs._
-import UnitTestHelper._
-import system.scheduler.TimeOut
+import unit.UnitTestHelper._
+import scheduler.TimeOut
 
 class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
     import SchedulerTest._

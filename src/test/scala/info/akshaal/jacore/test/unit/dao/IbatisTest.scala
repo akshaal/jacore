@@ -4,16 +4,16 @@
  */
 
 package info.akshaal.jacore
-package system.test.unit
-package dao
+package test
+package unit.dao
 
 import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
 import com.ibatis.sqlmap.client.{SqlMapClient, SqlMapSession}
 
 import Predefs._
-import UnitTestHelper._
-import system.dao.ibatis.AbstractIbatisDataInserterActor
+import unit.UnitTestHelper._
+import dao.ibatis.AbstractIbatisDataInserterActor
 
 class IbatisTest extends SpecificationWithJUnit ("iBatis support specification") with Mockito {
     import IbatisTest._

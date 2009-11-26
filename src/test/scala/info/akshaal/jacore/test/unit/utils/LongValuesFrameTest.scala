@@ -3,12 +3,11 @@
  */
 
 package info.akshaal.jacore
-package system
 package test.unit.utils
 
 import org.specs.SpecificationWithJUnit
 
-import system.utils.LongValueFrame
+import utils.LongValueFrame
 
 /**
  * Test Long Value Frame.

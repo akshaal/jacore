@@ -4,16 +4,16 @@
  */
 
 package info.akshaal.jacore
-package system.test.unit
-package actor
+package test
+package unit.actor
 
 import org.specs.SpecificationWithJUnit
 
 import Predefs._
-import UnitTestHelper._
+import unit.UnitTestHelper._
 
-import system.annotation.{Act, ExtractBy}
-import system.actor.{MessageExtractor, Broadcaster}
+import annotation.{Act, ExtractBy}
+import actor.{MessageExtractor, Broadcaster}
 
 class BroadcasterTest extends SpecificationWithJUnit ("Broadcaster specification") {
     import BroadcasterTest._

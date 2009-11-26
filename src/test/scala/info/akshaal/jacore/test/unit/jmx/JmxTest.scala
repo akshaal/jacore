@@ -4,15 +4,15 @@
  */
 
 package info.akshaal.jacore
-package system
-package test.unit.jmx
+package test
+package unit.jmx
 
 import java.lang.management.ManagementFactory
 import javax.management.{ObjectName, Attribute}
 
 import org.specs.SpecificationWithJUnit
 
-import system.jmx.{JmxAttr, JmxOper, SimpleJmx}
+import jmx.{JmxAttr, JmxOper, SimpleJmx}
 
 class JmxTest extends SpecificationWithJUnit ("JMX support specification") {
     def expose = addToSusVerb ("expose")

@@ -3,7 +3,7 @@
  */
 
 package info.akshaal.jacore
-package system.test.unit.utils
+package test.unit.utils
 
 import Predefs._
 
