@@ -3,9 +3,9 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.annotation;
+package info.akshaal.jacore.annotation;
 
-import info.akshaal.jacore.system.actor.MessageExtractor;
+import info.akshaal.jacore.actor.MessageExtractor;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;

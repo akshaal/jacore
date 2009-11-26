@@ -4,7 +4,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package actor
 
 import java.lang.annotation.Annotation

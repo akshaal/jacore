@@ -6,7 +6,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package scheduler
 
 import java.util.concurrent.locks.ReentrantLock

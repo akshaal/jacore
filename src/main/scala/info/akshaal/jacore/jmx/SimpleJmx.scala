@@ -5,7 +5,8 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.jmx
+package info.akshaal.jacore
+package jmx
 
 import java.lang.management.ManagementFactory
 import javax.management.{MBeanInfo, DynamicMBean, Attribute,

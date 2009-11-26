@@ -6,12 +6,10 @@
  */
 
 package info.akshaal.jacore
-package system
 package actor
 
-import scheduler.Scheduler
-import utils.TimeUnit
 import Predefs._
+import scheduler.Scheduler
 
 final class TimeSpec[T] (number : Long, action : TimeUnit => T) extends NotNull {
     def nanoseconds  = action (number.nanoseconds)

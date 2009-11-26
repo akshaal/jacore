@@ -6,7 +6,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package module
 
 import com.google.inject.{Module => GuiceModule, Binder, Singleton, Inject}
@@ -19,6 +18,7 @@ import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterAct
 import fs.{TextFile, TextFileActor}
 import annotation.CallByMessage
 import logger.Logging
+import utils.Prefs
 
 /**
  * This module is supposed to help instantiate all classes needed for jacore

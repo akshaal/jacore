@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system
+package info.akshaal.jacore
 package actor
 
 import org.aopalliance.intercept.{MethodInterceptor, MethodInvocation}

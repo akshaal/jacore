@@ -6,7 +6,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package fs
 
 import java.nio.channels.AsynchronousFileChannel
@@ -83,7 +82,7 @@ trait TextFile {
  * Fast async file reader/writer.
  */
 @Singleton
-private[system] class TextFileActor @Inject() (
+private[jacore] class TextFileActor @Inject() (
                        normalPriorityActorEnv : NormalPriorityActorEnv,
                        @Named ("jacore.os.file.encoding") encoding : String)
                     extends Actor (actorEnv = normalPriorityActorEnv)

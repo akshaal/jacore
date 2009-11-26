@@ -11,10 +11,11 @@ import java.io.{IOException, Closeable}
 import java.lang.{Iterable => JavaIterable}
 import com.google.inject.Injector
 
-import system.logger.Logger
+import logger.Logger
 
 object Predefs {
-    type TimeUnit = system.utils.TimeUnit
+    type TimeUnit = utils.TimeUnit
+    val TimeUnit = utils.TimeUnit
 
     /**
      * Create list repeating code n times.

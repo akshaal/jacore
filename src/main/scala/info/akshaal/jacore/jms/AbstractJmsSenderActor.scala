@@ -4,7 +4,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package jms
 
 import javax.jms.{Connection, ConnectionFactory, Destination, Message, MessageProducer, Session}

@@ -6,7 +6,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package utils
 
 import Predefs._

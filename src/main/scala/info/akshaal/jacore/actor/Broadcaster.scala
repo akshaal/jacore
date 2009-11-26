@@ -4,7 +4,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package actor
 
 import com.google.inject.{Inject, Singleton}
@@ -44,7 +43,7 @@ trait Broadcaster {
  * Implementation of broadcaster service.
  */
 @Singleton
-private[system] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorityActorEnv)
+private[jacore] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorityActorEnv)
                 extends Actor (actorEnv = hiPriorityActorEnv)
                    with Broadcaster
 {

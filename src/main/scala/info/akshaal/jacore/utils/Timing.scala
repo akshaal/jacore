@@ -1,5 +1,4 @@
 package info.akshaal.jacore
-package system
 package utils
 
 import Predefs._
@@ -9,7 +8,7 @@ import daemon.DaemonStatus
 /**
  * Help measure time.
  */
-private[system] final class Timing (limit : TimeUnit,
+private[jacore] final class Timing (limit : TimeUnit,
                                     daemonStatus : DaemonStatus)
                         extends NotNull
 {

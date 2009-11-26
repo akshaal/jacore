@@ -1,6 +1,5 @@
 
 package info.akshaal.jacore
-package system
 package daemon
 
 import com.google.inject.{Inject, Singleton}
@@ -11,7 +10,6 @@ import java.io.File
 import Predefs._
 import actor.{Actor, NormalPriorityActorEnv}
 import scheduler.TimeOut
-import utils.TimeUnit
 import fs.{TextFile, WriteFileDone, WriteFileFailed}
 
 /**
@@ -27,7 +25,7 @@ import fs.{TextFile, WriteFileDone, WriteFileFailed}
  * @param statusFileName name of status file
  */
 @Singleton
-private[system] class DaemonStatusActor @Inject() (
+private[jacore] class DaemonStatusActor @Inject() (
                  normalPriorityActorEnv : NormalPriorityActorEnv,
                  daemonStatus : DaemonStatus,
                  textFile : TextFile,

@@ -6,7 +6,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package actor
 
 import com.google.inject.{Inject, Singleton}

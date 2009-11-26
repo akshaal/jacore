@@ -1,4 +1,5 @@
-package info.akshaal.jacore.system.logger
+package info.akshaal.jacore
+package logger
 
 import org.slf4j.LoggerFactory
 import org.slf4j.{Logger => SlfLogger}

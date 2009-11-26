@@ -6,7 +6,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package daemon
 
 import com.google.inject.{Inject, Singleton}
@@ -19,7 +18,6 @@ import scala.collection.mutable.Map
 import Predefs._
 import logger.DummyLogging
 import jmx.{SimpleJmx, JmxOper, JmxAttr}
-import utils.TimeUnit
 
 @Singleton
 final class DaemonStatus @Inject() (

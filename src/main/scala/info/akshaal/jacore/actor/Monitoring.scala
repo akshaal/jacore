@@ -1,6 +1,6 @@
 /** Akshaal (C) 2009. GNU GPL. http://akshaal.info */
 
-package info.akshaal.jacore.system
+package info.akshaal.jacore
 package actor
 
 import com.google.inject.{Inject, Singleton}
@@ -9,13 +9,13 @@ import com.google.inject.name.Named
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.Set
 
+import Predefs._
 import annotation.Act
 import daemon.DaemonStatus
 import scheduler.{UnfixedScheduling, TimeOut}
-import utils.TimeUnit
 
 @Singleton
-private[system] final class MonitoringActors @Inject() (
+private[jacore] final class MonitoringActors @Inject() (
                         val monitoringActor1 : MonitoringActor,
                         val monitoringActor2 : MonitoringActor)
 
@@ -26,7 +26,7 @@ private[actor] case object Monitor extends NotNull
 /**
  * Implementation of monitoring actor.
  */
-private[system] final class MonitoringActor @Inject() (
+private[jacore] final class MonitoringActor @Inject() (
                      normalPriorityActorEnv : NormalPriorityActorEnv,
                      @Named("jacore.monitoring.interval") interval : TimeUnit,
                      daemonStatus : DaemonStatus)

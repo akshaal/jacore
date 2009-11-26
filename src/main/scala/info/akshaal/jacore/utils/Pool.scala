@@ -1,7 +1,6 @@
 /** Akshaal (C) 2009. GNU GPL. http://akshaal.info */
 
 package info.akshaal.jacore
-package system
 package utils
 
 import com.google.inject.{Inject, Singleton}

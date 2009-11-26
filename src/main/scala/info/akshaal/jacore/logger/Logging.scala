@@ -5,7 +5,8 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.logger
+package info.akshaal.jacore
+package logger
 
 private[logger] trait AbstractLogging {
     protected[logger] implicit val logger : Logger

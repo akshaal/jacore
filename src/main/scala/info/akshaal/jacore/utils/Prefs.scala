@@ -5,7 +5,8 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.utils.jacore
+package info.akshaal.jacore
+package utils
 
 import java.util.Properties
 

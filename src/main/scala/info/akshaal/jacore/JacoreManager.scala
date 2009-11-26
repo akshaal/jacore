@@ -6,7 +6,6 @@
  */
 
 package info.akshaal.jacore
-package system
 
 import com.google.inject.{Singleton, Inject}
 import java.lang.{Iterable => JavaIterable}
@@ -77,7 +76,7 @@ trait JacoreManager {
  * Manager for an instance of jacore framework. Implementation.
  */
 @Singleton
-private[system] final class JacoreManagerImpl @Inject() (
+private[jacore] final class JacoreManagerImpl @Inject() (
                     textFileActor : TextFileActor,
                     daemonStatusActor : DaemonStatusActor,
                     daemonStatus : DaemonStatus,

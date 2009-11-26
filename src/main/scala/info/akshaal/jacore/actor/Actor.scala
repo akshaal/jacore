@@ -1,5 +1,4 @@
 package info.akshaal.jacore
-package system
 package actor
 
 import org.jetlang.fibers.PoolFiberFactory

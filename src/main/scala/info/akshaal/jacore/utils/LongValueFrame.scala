@@ -5,7 +5,8 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.utils
+package info.akshaal.jacore
+package utils
 
 /**
  * Frame of values with maximum fixed number of elements.

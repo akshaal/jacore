@@ -4,7 +4,6 @@
  */
 
 package info.akshaal.jacore
-package system
 package test
 
 import com.google.inject.Injector
@@ -17,7 +16,6 @@ import com.google.inject.grapher.graphviz.{GraphvizModule, GraphvizRenderer}
 
 import Predefs._
 import actor.Actor
-import utils.TimeUnit
 
 /**
  * Helper methods for convenient testing of actors and stuff depending on actors.
