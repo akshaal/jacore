@@ -5,12 +5,11 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore
+package info.akshaal.utils.jacore
 
 import java.util.Properties
 
 import Predefs._
-import system.utils.TimeUnit
 
 final class Prefs (file : String) {
     private[this] val properties = new Properties ()

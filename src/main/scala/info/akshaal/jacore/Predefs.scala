@@ -12,9 +12,10 @@ import java.lang.{Iterable => JavaIterable}
 import com.google.inject.Injector
 
 import system.logger.Logger
-import system.utils.TimeUnit
 
 object Predefs {
+    type TimeUnit = system.utils.TimeUnit
+
     /**
      * Create list repeating code n times.
      */
