@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.actor;
+package info.akshaal.jacore.actor;
 
 /**
  * Extract an object from message. Classes implementing this interfaces are used
