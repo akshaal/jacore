@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.test.unit.actor;
+package info.akshaal.jacore.test.unit.actor;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
-import info.akshaal.jacore.system.annotation.ExtractBy;
+import info.akshaal.jacore.annotation.ExtractBy;
 
 /**
  * Annotation to test cause extraction.

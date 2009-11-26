@@ -3,9 +3,9 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.system.test.unit.actor;
+package info.akshaal.jacore.test.unit.actor;
 
-import info.akshaal.jacore.system.actor.MessageExtractor;
+import info.akshaal.jacore.actor.MessageExtractor;
 
 /**
  * Cause extractor. Used in tests.
