@@ -70,14 +70,25 @@ class ClassUtilsTest extends SpecificationWithJUnit ("ClassUtils specification")
             classes  must contain (classOf[findclasses.sub.subsub.D])
             classes  must haveSize (4)
         }
-/*
-        "find resources of jar package" in {
-            val urls = findResources ("com.google.inject.name",
-                                      this.getClass.getClassLoader,
-                                      _ => true)
 
-            urls.size  must beGreaterThan (3)
-        }*/
+        "find classes of file package filtering results" in {
+            val classes = findClasses ("info.akshaal.jacore.test.unit.utils.findclasses",
+                                       this.getClass.getClassLoader,
+                                       classOf[findclasses.B].isAssignableFrom (_))
+
+            classes  must contain (classOf[findclasses.B])
+            classes  must contain (classOf[findclasses.C])
+            classes  must contain (classOf[findclasses.sub.subsub.D])
+            classes  must haveSize (3)
+        }
+
+        "find classes of jar package" in {
+            val classes = findClasses ("com.google.inject.name",
+                                       this.getClass.getClassLoader,
+                                       _ => true)
+
+            classes  must contain (classOf[com.google.inject.name.Named])
+        }
     }
 }
 
@@ -86,11 +97,11 @@ package findclasses {
         class A
 
         package subsub {
-            class D
+            class D extends B
         }
     }
 
     class B
 
-    class C
+    class C extends B
 }
