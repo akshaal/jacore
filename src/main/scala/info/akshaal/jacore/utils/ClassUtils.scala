@@ -6,6 +6,9 @@
 package info.akshaal.jacore
 package utils
 
+import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConversions._
+
 /**
  * Class utils.
  */
@@ -28,5 +31,30 @@ object ClassUtils {
             case java.lang.Short.TYPE        => classOf [java.lang.Short]
             case java.lang.Void.TYPE         => classOf [java.lang.Void]
         }
+    }
+
+    /**
+     * Convert fully qualified java name to a way java class can be read on filesystem.
+     */
+    def javaName2fsName (pkg : String) : String = pkg.replace ('.', '/')
+
+    /**
+     * Convert file path to class into a java fully qualified name.
+     */
+    def fsName2javaName (path : String) : String = path.replace ('/', '.')
+
+    /**
+     * Find all classes under the given package. Classes are not initialized!
+     * @param pkg package
+     * @param loader loader
+     */
+    def findClasses (pkg : String, loader : ClassLoader) : List[Class[_]] = {
+        val buf = new ListBuffer [Class[_]]
+
+        for (url <- loader.getResources (javaName2fsName (pkg))) {
+
+        }
+
+        buf.toList
     }
 }
