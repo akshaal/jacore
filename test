@@ -6,6 +6,6 @@ rm -rf target/jacore
 rm -f target/test-log4j.log
 rm -rf target/cglib
 
-mvn -o test || exit
+mvn -o test "$@" || exit
 
 dot -T png target/jacore/test-module.dot > target/jacore/test-module.png

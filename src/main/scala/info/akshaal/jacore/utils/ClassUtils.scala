@@ -6,8 +6,10 @@
 package info.akshaal.jacore
 package utils
 
-import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
+
+import java.net.URL
 
 /**
  * Class utils.
@@ -44,15 +46,51 @@ object ClassUtils {
     def fsName2javaName (path : String) : String = path.replace ('/', '.')
 
     /**
-     * Find all classes under the given package. Classes are not initialized!
+     * Find all resource under the given package matching predicate
      * @param pkg package
      * @param loader loader
      */
-    def findClasses (pkg : String, loader : ClassLoader) : List[Class[_]] = {
-        val buf = new ListBuffer [Class[_]]
+    def findResources (pkg : String,
+                       loader : ClassLoader,
+                       pred : URL => Boolean) : List[URL] =
+    {
+        val buf = new ListBuffer [URL]
 
         for (url <- loader.getResources (javaName2fsName (pkg))) {
+            ResourceUtils.findResources (buf, url, pred)
+        }
 
+        buf.toList
+    }
+
+    /**
+     * Find all resource under the given package matching predicate. Classes are not initialized!
+     * @param pkg package
+     * @param loader loader
+     */
+    def findClasses (pkg : String,
+                     loader : ClassLoader,
+                     pred : Class[_] => Boolean) : List[Class[_]] =
+    {
+        val buf = new ListBuffer [Class[_]]
+
+        for (pkgUrl <- loader.getResources (javaName2fsName (pkg))) {
+            val pkgUrlPath = pkgUrl.getPath
+            val pkgUrlPathSize = pkgUrlPath.size
+            val urlBuf = new ListBuffer [URL]
+            
+            ResourceUtils.findResources (urlBuf, pkgUrl, _.getPath.endsWith(".class"))
+
+            for (url <- urlBuf) {
+                val urlPath = url.getPath
+                val urlPathRelative = urlPath.substring (pkgUrlPathSize, urlPath.length - 6)
+                val fqClassName = pkg + fsName2javaName (urlPathRelative)
+
+                val clazz = Class.forName (fqClassName, false, loader)
+                if (pred (clazz)) {
+                    buf += clazz
+                }
+            }
         }
 
         buf.toList

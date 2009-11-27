@@ -39,4 +39,58 @@ class ClassUtilsTest extends SpecificationWithJUnit ("ClassUtils specification")
             fsName2javaName ("aaa/bbb/CCC")  must_==  "aaa.bbb.CCC"
         }
     }
+
+    "ClassUtils.findResources" should {
+        "find resources of file package" in {
+            val urls = findResources ("info.akshaal.jacore.test.unit.utils.findclasses",
+                                      this.getClass.getClassLoader,
+                                      _ => true)
+
+            urls.size  must beGreaterThan (3)
+        }
+
+        "find resources of jar package" in {
+            val urls = findResources ("com.google.inject.name",
+                                      this.getClass.getClassLoader,
+                                      _ => true)
+
+            urls.size  must beGreaterThan (3)
+        }
+    }
+
+    "ClassUtils.findClasses" should {
+        "find classes of file package" in {
+            val classes = findClasses ("info.akshaal.jacore.test.unit.utils.findclasses",
+                                       this.getClass.getClassLoader,
+                                       _ => true)
+
+            classes  must contain (classOf[findclasses.B])
+            classes  must contain (classOf[findclasses.C])
+            classes  must contain (classOf[findclasses.sub.A])
+            classes  must contain (classOf[findclasses.sub.subsub.D])
+            classes  must haveSize (4)
+        }
+/*
+        "find resources of jar package" in {
+            val urls = findResources ("com.google.inject.name",
+                                      this.getClass.getClassLoader,
+                                      _ => true)
+
+            urls.size  must beGreaterThan (3)
+        }*/
+    }
+}
+
+package findclasses {
+    package sub {
+        class A
+
+        package subsub {
+            class D
+        }
+    }
+
+    class B
+
+    class C
 }
