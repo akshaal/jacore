@@ -91,8 +91,10 @@ trait SimpleJmx {
                              params : Array[Object],
                              signature : Array[String]) : Object =
         {
-            operMap.get(actionName).foreach (_.f ())
-            null
+            operMap.get (actionName) match {
+                case None => null
+                case Some (oper) => oper.f ().asInstanceOf [Object]
+            }
         }
 
         override def getMBeanInfo () : MBeanInfo = {

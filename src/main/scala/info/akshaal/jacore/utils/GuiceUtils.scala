@@ -6,7 +6,7 @@
 package info.akshaal.jacore
 package utils
 
-import java.io.{PrintWriter, File}
+import java.io.{PrintWriter, StringWriter, File}
 import java.util.Collection
 
 import scala.collection.JavaConversions._
@@ -29,8 +29,39 @@ object GuiceUtils {
     /**
      * Create graph definition (.dot file)
      * @param filename name of the file to create
+     * @param injector injector to use
+     * @classes additional root classes
+     */
+    def createModuleGraphAsString (injector : Injector, classes : Class[_]*) : String =
+    {
+        val stringWriter = new StringWriter
+        val out = new PrintWriter (stringWriter)
+
+        createModuleGraph (out, injector, classes : _*)
+
+        stringWriter.toString
+    }
+
+    /**
+     * Create graph definition (.dot file)
+     * @param filename name of the file to create
+     * @param injector injector to use
+     * @classes additional root classes
      */
     def createModuleGraph (filename : String, injector : Injector, classes : Class[_]*) : Unit =
+    {
+        withCloseableIO (new PrintWriter (new File (filename), "UTF-8")) (out =>
+            createModuleGraph (out, injector, classes : _*)
+        )
+    }
+
+    /**
+     * Create graph definition (.dot file)
+     * @param out print writer
+     * @param injector injector to use
+     * @classes additional root classes
+     */
+    def createModuleGraph (out : PrintWriter, injector : Injector, classes : Class[_]*) : Unit =
     {
         // Create list of keys to draw
         val keys = new HashSet [Key [_]]
@@ -47,7 +78,6 @@ object GuiceUtils {
         }
 
         // Create graph
-        val out = new PrintWriter (new File (filename), "UTF-8")
         val graphInjector = Guice.createInjector (new GrapherModule, new GraphvizModule)
         val renderer = graphInjector.getInstanceOf [GraphvizRenderer]
 
