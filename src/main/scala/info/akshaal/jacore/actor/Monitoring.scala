@@ -37,6 +37,7 @@ private[jacore] final class MonitoringActor @Inject() (
 
     private val currentActors : Set[Actor] = new HashSet[Actor]
     private var monitoringActors : Set[Actor] = new HashSet[Actor]
+    private var pingSentAt : TimeUnit = 0.nanoseconds
 
     /**
      * This method is called when an actor has been started. Used to start monitoring
@@ -70,19 +71,21 @@ private[jacore] final class MonitoringActor @Inject() (
      */
     private[this] def monitor () = {
         // Check currently monitoring actors
-        val notResponding =
-                monitoringActors.filter (currentActors.contains (_))
+        val notResponding = monitoringActors.filter (currentActors.contains (_))
 
         if (notResponding.isEmpty) {
             debug ("Actors are OK")
             daemonStatus.monitoringAlive
         } else {
-            error ("There are actors not responding: " + notResponding)
+            val diff = System.nanoTime.nanoseconds - pingSentAt
+
+            error ("There are actors not responding: " + notResponding + ": for " + diff)
             daemonStatus.die
         }
 
         // Start monitoring current set of actors
         monitoringActors = currentActors.clone
         monitoringActors.foreach (_ ! Ping)
+        pingSentAt = System.nanoTime.nanoseconds
     }
 }
