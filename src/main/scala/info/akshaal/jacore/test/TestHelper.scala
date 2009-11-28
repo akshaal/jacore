@@ -9,13 +9,11 @@ package test
 import com.google.inject.Injector
 
 import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
-import java.io.{PrintWriter, File}
-import com.google.inject.Guice
-import com.google.inject.grapher.{GrapherModule,InjectorGrapher}
-import com.google.inject.grapher.graphviz.{GraphvizModule, GraphvizRenderer}
+import java.io.File
 
 import Predefs._
 import actor.Actor
+import utils.GuiceUtils
 
 /**
  * Helper methods for convenient testing of actors and stuff depending on actors.
@@ -32,20 +30,6 @@ trait TestHelper {
     val injector : Injector
 
     /**
-     * Create graph definition (.dot file)
-     * @param filename name of the file to create
-     */
-    def createModuleGraph (filename : String) : Unit = {
-        val out = new PrintWriter (new File(filename), "UTF-8")
-        val graphInjector = Guice.createInjector (new GrapherModule, new GraphvizModule)
-        val renderer = graphInjector.getInstanceOf [GraphvizRenderer]
-
-        renderer.setOut (out).setRankdir ("TB");
-
-        graphInjector.getInstanceOf [InjectorGrapher].of (injector).graph ()
-    }
-
-    /**
      * Create graph definition if property jacore.module.debug.dir is defined.
      * @param ilenameSuffix suffix for name of the file to create
      */
@@ -53,7 +37,7 @@ trait TestHelper {
         val debugDir = System.getProperty ("jacore.module.debug.dir")
         if (debugDir != null) {
             new File (debugDir).mkdirs
-            createModuleGraph (debugDir + "/" + filenameSuffix)
+            GuiceUtils.createModuleGraph (debugDir + "/" + filenameSuffix, injector)
         }
     }
 
