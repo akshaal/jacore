@@ -13,7 +13,7 @@ import java.util.Properties
 import Predefs._
 
 final class Prefs (file : String) {
-    private[this] val properties = new Properties ()
+    final val properties = new Properties ()
 
     withCloseableIO {
         throwIfNull (this.getClass.getResourceAsStream (file)) {
