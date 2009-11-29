@@ -9,7 +9,7 @@ package unit.dao
 
 import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
-import com.ibatis.sqlmap.client.{SqlMapClient, SqlMapSession}
+import org.apache.ibatis.session.{SqlSessionFactory, SqlSession, ExecutorType}
 
 import Predefs._
 import unit.UnitTestHelper._
@@ -23,13 +23,13 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
         setSequential ()
 
         "insert data" in {
-            mockedSqlMapClientForInserter = mock[SqlMapClient]
+            mockedSqlSessionFactoryForInserter = mock [SqlSessionFactory]
             
             withNotStartedActor [InserterTestActor] (actor => {
-                val client = mockedSqlMapClientForInserter
-                val session = mock[SqlMapSession]
+                val client = mockedSqlSessionFactoryForInserter
+                val session = mock[SqlSession]
 
-                client.openSession() returns session
+                client.openSession (ExecutorType.BATCH, true) returns session
 
                 actor insert ("Hello")
                 actor insert ("Actor")
@@ -37,52 +37,42 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
 
                 waitForMessageAfter (actor) {actor.start}
 
-                (client.openSession()                   on client)   then
-                (session.startTransaction ()            on session)  then
-                (session.startBatch ()                  on session)  then
-                (session.insert ("testInsert", "Hello") on session)  then
-                (session.insert ("testInsert", "Actor") on session)  then
-                (session.insert ("testInsert", "Bye")   on session)  then
-                (session.executeBatch ()                on session)  then
-                (session.commitTransaction ()           on session)  then
-                (session.endTransaction ()              on session)  then
-                (session.close ()                       on session)  were calledInOrder
+                (client.openSession (ExecutorType.BATCH, true)      on client)   then
+                (session.insert ("testInsert", "Hello")             on session)  then
+                (session.insert ("testInsert", "Actor")             on session)  then
+                (session.insert ("testInsert", "Bye")               on session)  then
+                (session.close ()                                   on session)  were calledInOrder
             })
         }
 
-        "end transaction and close session even if exception during execute batch and end transaction" in {
-            mockedSqlMapClientForInserter = mock[SqlMapClient]
+        "close session even if exception occured" in {
+            mockedSqlSessionFactoryForInserter = mock [SqlSessionFactory]
 
             withNotStartedActor [InserterTestActor] (actor => {
-                val client = mockedSqlMapClientForInserter
-                val session = mock[SqlMapSession]
+                val client = mockedSqlSessionFactoryForInserter
+                val session = mock[SqlSession]
 
-                client.openSession() returns session
-                session.executeBatch() throws new RuntimeException ("Error executing batch")
-                session.endTransaction() throws new RuntimeException ("Error ending transaction")
+                client.openSession (ExecutorType.BATCH, true) returns session
+                session.insert ("testInsert", "Hello") throws new RuntimeException ("test exc")
 
                 actor insert "Hello"
 
                 waitForMessageAfter (actor) {actor.start}
 
-                (client.openSession()                   on client)   then
-                (session.startTransaction ()            on session)  then
-                (session.startBatch ()                  on session)  then
-                (session.insert ("testInsert", "Hello") on session)  then
-                (session.executeBatch ()                on session)  then
-                (session.endTransaction ()              on session)  then
-                (session.close ()                       on session)  were calledInOrder
+                (client.openSession (ExecutorType.BATCH, true)      on client)   then
+                (session.insert ("testInsert", "Hello")             on session)  then
+                (session.close ()                                   on session)  were calledInOrder
             })
         }
     }
 }
 
 object IbatisTest {
-    var mockedSqlMapClientForInserter : SqlMapClient = null
+    var mockedSqlSessionFactoryForInserter : SqlSessionFactory = null
 
     class InserterTestActor extends AbstractIbatisDataInserterActor[String] (
                                  lowPriorityActorEnv = TestModule.lowPriorityActorEnv,
-                                 sqlMapClient = mockedSqlMapClientForInserter)
+                                 sqlSessionFactory = mockedSqlSessionFactoryForInserter)
                             with Waitable
     {
         protected override val insertStatementId = "testInsert"

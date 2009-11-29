@@ -7,7 +7,7 @@ package info.akshaal.jacore
 package dao
 package ibatis
 
-import com.ibatis.sqlmap.client.{SqlMapClient, SqlMapSession}
+import org.apache.ibatis.session.{SqlSessionFactory, SqlSession, ExecutorType}
 
 import annotation.CallByMessage
 import actor.{Actor, LowPriorityActorEnv}
@@ -15,12 +15,13 @@ import actor.{Actor, LowPriorityActorEnv}
 /**
  * Implementation of data inserter using iBatis.
  */
-abstract class AbstractIbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
+abstract class AbstractIbatisDataInserterActor[T] (sqlSessionFactory : SqlSessionFactory,
                                                    lowPriorityActorEnv : LowPriorityActorEnv)
                                 extends Actor (actorEnv = lowPriorityActorEnv)
-                                with DataInserter[T] {
+                                with DataInserter[T]
+{
     protected val insertStatementId : String
-    protected var curSession : Option [SqlMapSession] = None
+    protected var curSession : Option [SqlSession] = None
     protected var notifications : List[(Actor, Any)] = Nil
 
     /**
@@ -45,26 +46,21 @@ abstract class AbstractIbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
      * Perform insert operation.
      */
     protected def doInsert (data : T) : Unit = {
-        val session =
-            curSession match {
-                case Some (ses) => ses
-                case None       => openSession ()
-            }
+        curSession match {
+            case Some (session) =>
+                session.insert (insertStatementId, data)
 
-        session.insert (insertStatementId, data)
+            case None =>
+                curSession = Some (openSession ())
+                doInsert (data)
+        }
     }
 
     /**
-     * Open session. curSession must be updated.
+     * Open session.
      */
-    protected def openSession () : SqlMapSession = {
-        val session = sqlMapClient.openSession ()
-        session.startTransaction ()
-        session.startBatch ()
-
-        curSession = Some (session)
-
-        session
+    protected def openSession () : SqlSession = {
+        sqlSessionFactory.openSession (ExecutorType.BATCH, true)
     }
 
     /**
@@ -73,25 +69,16 @@ abstract class AbstractIbatisDataInserterActor[T] (sqlMapClient : SqlMapClient,
      * Used to commit transaction and send notification if any.
      */
     protected override def afterActs () : Unit = {
-        curSession match {
-            case None => ()
-            case Some (session) =>
-                curSession = None
+        for (session <- curSession) {
+            curSession = None
 
-                try {
-                    session.executeBatch ()
-                    session.commitTransaction ()
-
-                    for ((actor, payload) <- notifications) {
-                        actor ! InsertFinished (payload)
-                    }
-                } finally {
-                    try {
-                        session.endTransaction ()
-                    } finally {
-                        session.close ()
-                    }
+            try {
+                for ((actor, payload) <- notifications) {
+                    actor ! InsertFinished (payload)
                 }
+            } finally {
+                session.close ()
+            }
         }
     }
 }
