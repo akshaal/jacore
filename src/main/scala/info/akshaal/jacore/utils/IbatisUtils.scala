@@ -7,6 +7,8 @@ package info.akshaal.jacore
 package utils
 
 import java.util.{HashMap => JavaHashMap}
+import java.net.URL
+import java.io.InputStreamReader
 import javax.sql.DataSource
 
 import org.apache.ibatis.datasource.pooled.PooledDataSourceFactory
@@ -73,7 +75,10 @@ object IbatisUtils {
      * Rich configuration (pimp my library pattern takes place here).
      */
     class RichConfiguration (configuration : Configuration) {
-        def parseMapperXml (resourceFileNames : String*) : Unit = {
+        /**
+         * Parse given mapper xmls.
+         */
+        def parseMapperXmls (resourceFileNames : String*) : Unit = {
             val sqlFragments = new JavaHashMap [String, XNode]
 
             for (resourceFileName <- resourceFileNames) {
@@ -82,6 +87,27 @@ object IbatisUtils {
                         new XMLMapperBuilder (reader,
                                               configuration,
                                               resourceFileName,
+                                              sqlFragments)
+
+                mapperBuilder.parse ()
+            }
+        }
+
+        /**
+         * Find and parse mapper xmls under the given directories.
+         */
+        def parseMapperXmlsInPackages (packages : String*) : Unit = {
+            val sqlFragments = new JavaHashMap [String, XNode]
+            val loader = Thread.currentThread.getContextClassLoader
+            val xmlPred = (_ : URL).getPath.endsWith (".xml")
+
+            for (pkg <- packages; url <- ClassUtils.findResources (pkg, loader, xmlPred)) {
+                val reader = new InputStreamReader (url.openConnection ().getInputStream ())
+
+                val mapperBuilder =
+                        new XMLMapperBuilder (reader,
+                                              configuration,
+                                              url.getPath,
                                               sqlFragments)
 
                 mapperBuilder.parse ()
