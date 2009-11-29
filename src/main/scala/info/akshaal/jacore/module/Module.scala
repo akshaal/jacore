@@ -25,7 +25,7 @@ import utils.Prefs
  * to work.
  */
 class Module extends GuiceModule with Logging {
-    lazy val prefsResource = "/jacore.properties"
+    lazy val prefsResource = "jacore.properties"
     lazy val prefs = new Prefs (prefsResource)
 
     lazy val osFileEncoding = prefs.getString("jacore.os.file.encoding")
