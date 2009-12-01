@@ -8,7 +8,7 @@
 package info.akshaal.jacore
 package module
 
-import com.google.inject.{Module => GuiceModule, Binder, Singleton, Inject}
+import com.google.inject.AbstractModule
 import com.google.inject.matcher.Matchers
 import com.google.inject.name.Names
 
@@ -24,7 +24,7 @@ import utils.Prefs
  * This module is supposed to help instantiate all classes needed for jacore
  * to work.
  */
-class Module extends GuiceModule with Logging {
+class Module extends AbstractModule with Logging {
     lazy val prefsResource = "jacore.properties"
     lazy val prefs = new Prefs (prefsResource)
 
@@ -68,99 +68,99 @@ class Module extends GuiceModule with Logging {
 
     // - - - - - - - - - - - - Bindings - - - - - - - - - -
 
-    override def configure (binder : Binder) = {
+    override def configure () = {
         // Configurable implementation bindings
-        binder.bind (classOf[ThreadPriorityChanger]).to (threadPriorityChangerImplClass)
+        bind (classOf[ThreadPriorityChanger]).to (threadPriorityChangerImplClass)
 
         // Internal implemntation bindings
-        binder.bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
-        binder.bind (classOf[TextFile]).to (classOf[TextFileActor])
-        binder.bind (classOf[JacoreManager]).to (classOf[JacoreManagerImpl])
+        bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
+        bind (classOf[TextFile]).to (classOf[TextFileActor])
+        bind (classOf[JacoreManager]).to (classOf[JacoreManagerImpl])
 
         // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
         
-        binder.bindInterceptor(Matchers.subclassesOf(classOf[Actor]),
-                               Matchers.annotatedWith (classOf[CallByMessage]),
-                               new CallByMessageMethodInterceptor)
+        bindInterceptor(Matchers.subclassesOf(classOf[Actor]),
+                        Matchers.annotatedWith (classOf[CallByMessage]),
+                        new CallByMessageMethodInterceptor)
 
         //  - - - - - - - - - - -  Named - - - - - - - - - -  - - - -
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.qos.skip.first"))
               .toInstance (qosSkipFirst)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.scheduler.latency"))
               .toInstance (schedulerLatencyLimit)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.scheduler.drift"))
               .toInstance (schedulerDrift)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.monitoring.interval"))
               .toInstance (monitoringInterval)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.status.update.interval"))
               .toInstance (daemonStatusUpdateInterval)
 
-        binder.bind (classOf[String])
+        bind (classOf[String])
               .annotatedWith (Names.named ("jacore.status.file"))
               .toInstance (daemonStatusFile)
 
-        binder.bind (classOf[String])
+        bind (classOf[String])
               .annotatedWith (Names.named ("jacore.os.file.encoding"))
               .toInstance (osFileEncoding)
 
         // Hi priority pool parameters
 
-        binder.bind (classOf[Int])
+        bind (classOf[Int])
               .annotatedWith (Names.named ("jacore.pool.hi.threads"))
               .toInstance (hiPriorityPoolThreads)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.pool.hi.latency"))
               .toInstance (hiPriorityPoolLatencyLimit)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.pool.hi.execution"))
               .toInstance (hiPriorityPoolExecutionLimit)
 
 
         // Normal priority pool parameters
 
-        binder.bind (classOf[Int])
+        bind (classOf[Int])
               .annotatedWith (Names.named ("jacore.pool.normal.threads"))
               .toInstance (normalPriorityPoolThreads)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.pool.normal.latency"))
               .toInstance (normalPriorityPoolLatencyLimit)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.pool.normal.execution"))
               .toInstance (normalPriorityPoolExecutionLimit)
 
         
         // Low priority pool parameters
 
-        binder.bind (classOf[Int])
+        bind (classOf[Int])
               .annotatedWith (Names.named ("jacore.pool.low.threads"))
               .toInstance (lowPriorityPoolThreads)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.pool.low.latency"))
               .toInstance (lowPriorityPoolLatencyLimit)
 
-        binder.bind (classOf[TimeUnit])
+        bind (classOf[TimeUnit])
               .annotatedWith (Names.named ("jacore.pool.low.execution"))
               .toInstance (lowPriorityPoolExecutionLimit)
 
 
         // Daemon
 
-        binder.bind (classOf[String])
+        bind (classOf[String])
               .annotatedWith (Names.named("jacore.status.jmx.name"))
               .toInstance (daemonStatusJmxName)
     }
