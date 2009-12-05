@@ -186,13 +186,6 @@ private[jacore] class TextFileActor @Inject() (
             }
         }
 
-        /**
-         * Called when write operation is canceled. This must not happen.
-         */
-        override def cancelled (ignored : Object) : Nothing = {
-            throw new RuntimeException ("Impossible")
-        }
-
         def closeChannel () = {
             if (channel != null) {
                 logIgnoredException ("unable to close channel of file "
@@ -257,13 +250,6 @@ private[jacore] class TextFileActor @Inject() (
             } finally {
                 closeChannel ()
             }
-        }
-
-        /**
-         * Called when read operation is canceled. This must not happen.
-         */
-        override def cancelled (ignored : Object) : Nothing = {
-            throw new RuntimeException ("Impossible")
         }
 
         def closeChannel () = {
