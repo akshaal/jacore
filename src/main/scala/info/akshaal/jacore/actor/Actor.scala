@@ -2,10 +2,10 @@ package info.akshaal.jacore
 package actor
 
 import org.jetlang.fibers.PoolFiberFactory
-import org.jetlang.core.BatchExecutor
+import org.jetlang.core.{BatchExecutor, EventReader}
 
-import Predefs._
 import logger.Logging
+import Predefs._
 
 /**
  * Implementation of actors.
@@ -266,7 +266,7 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
  */
 private[actor] class ActorExecutor (actor : Actor)
                 extends BatchExecutor {
-    final override def execute (commands: Array[Runnable]) = {
+    final override def execute (commands: EventReader) = {
         // Remember the current actor in thread local variable.
         // So later it may be referenced from ! method of other actors
         ThreadLocalState.current.set (Some(actor))
@@ -274,7 +274,7 @@ private[actor] class ActorExecutor (actor : Actor)
         try {
             // Execute
             try {
-                commands.foreach (_.run)
+                (0 to commands.size - 1) foreach (commands.get(_).run)
             } finally {
                 actor.executeAfterActs ()
             }
