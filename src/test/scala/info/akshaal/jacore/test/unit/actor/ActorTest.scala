@@ -7,6 +7,8 @@ package info.akshaal.jacore
 package test
 package unit.actor
 
+import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
+
 import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
 import com.google.inject.{ProvisionException, Inject}
@@ -337,10 +339,55 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
             managingActor.managedTestActor.starts    must_==  1
             managingActor.managedTestActor.stops     must_==  1
         }
+
+        "execute actors concurrently" in {
+            // We need this for test
+            TestModule.hiPriorityPoolThreads  must beGreaterThan (1)
+            ConcurrentLoadTestActor.MSGS      must beGreaterThan (1)
+
+            // Test
+            withStartedActors [ConcurrentLoadTestActor, ConcurrentLoadTestActor] (
+                (actor1, actor2) => {
+                    var expectedSum : Long = 0
+
+                    for (i <- 1 to ConcurrentLoadTestActor.MSGS) {
+                        expectedSum += i
+
+                        actor1 ! i
+                        actor2 ! i
+                    }
+
+                    for (actor <- List(actor1, actor2)) {
+                        actor.msgsLatch.await (unit.UnitTestHelper.timeout.asMilliseconds,
+                                               JavaTimeUnit.MILLISECONDS)
+                    }
+
+                    actor1.sum  must_==  expectedSum
+                    actor2.sum  must_==  expectedSum
+                }
+            )
+        }
     }
 }
 
 object ActorTest {
+    class ConcurrentLoadTestActor extends TestActor {
+        import ConcurrentLoadTestActor._
+
+        var msgsLatch : CountDownLatch = new CountDownLatch (MSGS)
+        var sum : Long = 0
+
+        @Act
+        def handle (msg : Int) : Unit = {
+            sum += msg
+            msgsLatch.countDown
+        }
+    }
+
+    object ConcurrentLoadTestActor {
+        val MSGS = 10000
+    }
+
     class ManagingTestActor @Inject() (val managedTestActor : ManagedTestActor) extends TestActor {
         manage (managedTestActor)
 
