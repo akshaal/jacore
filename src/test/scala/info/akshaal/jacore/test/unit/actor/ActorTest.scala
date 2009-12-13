@@ -367,10 +367,36 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 }
             )
         }
+
+        "postpone method execution without annotation" in {
+            withNotStartedActor [PostponedTestActor] (actor => {
+                actor.called  must_==  0
+                actor.test ()
+                actor.called  must_==  0
+
+                waitForMessageAfter (actor) {actor.start ()}
+
+                actor.called  must_==  1
+
+                waitForMessageAfter (actor) {actor.test ()}
+
+                actor.called  must_==  2
+            })
+        }
     }
 }
 
 object ActorTest {
+    class PostponedTestActor extends TestActor {
+        var called = 0
+        
+        def test () : Unit = {
+            postponed ("test ()") {
+                called += 1
+            }
+        }
+    }
+
     class ConcurrentLoadTestActor extends TestActor {
         import ConcurrentLoadTestActor._
 

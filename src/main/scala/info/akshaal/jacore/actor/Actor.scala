@@ -12,7 +12,9 @@ import Predefs._
  *
  * @param actorEnv environment for actor
  */
-abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
+abstract class Actor (actorEnv : ActorEnv) extends ActorDelegation
+                                              with Logging
+                                              with NotNull
 {
     // TODO: Split to traits: Transporting, Managing, Broadcasting,
     //       Scheduling, Autosubscribing, ...
@@ -131,8 +133,11 @@ abstract class Actor (actorEnv : ActorEnv) extends Logging with NotNull
                     userMessage = false
                     sentFrom.foreach (_ ! Pong)
 
-                case call @ Call (inv) =>
+                case call : Call =>
                     CallByMessageMethodInterceptor.call (call)
+
+                case PostponedBlock (_, code) =>
+                    code ()
 
                 case other if dispatcher.dispatch(msg) =>
 
