@@ -79,10 +79,15 @@ abstract sealed class Pool (name : String,
                             daemonStatus : DaemonStatus,
                             threadPriorityChanger : ThreadPriorityChanger)
 {
-    final val latencyTiming = new Timing (limit = latencyLimit,
-                                          daemonStatus = daemonStatus)
-    final val executionTiming = new Timing (limit = latencyLimit,
-                                            daemonStatus = daemonStatus)
+    final val latencyTiming =
+        new ThreadSafeTiming (limit = latencyLimit,
+                              daemonStatus = daemonStatus,
+                              maxThreads = threads)
+
+    final val executionTiming =
+        new ThreadSafeTiming (limit = latencyLimit,
+                              daemonStatus = daemonStatus,
+                              maxThreads = threads)
 
     private val threadFactory = new ThreadFactory {
         val counter = new AtomicInteger (0)

@@ -33,18 +33,28 @@ final class LongValueFrame (maximum : Int) extends NotNull {
 
         if (count < maximum) {
             count += 1
+            sum += value
         } else {
-            sum -= array(pos)
+            sum += value - array(pos)
         }
 
         array (pos) = value
-        sum += value
     }
 
    /**
      * @return the average
      */
     def average () : Long = {
-        if (count == 0) 0L else this.sum / count
+        if (count == 0) 0L else sum / count
     }
+
+    /**
+     * Returns current count.
+     */
+    def currentCount : Int = count
+
+    /**
+     * Returns current sum.
+     */
+    def currentSum : Long = sum
 }
