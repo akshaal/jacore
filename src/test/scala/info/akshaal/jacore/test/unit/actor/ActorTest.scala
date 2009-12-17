@@ -383,10 +383,76 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.called  must_==  2
             })
         }
+
+        "not allow code blocks injections for postpone" in {
+            withNotStartedActors [PostponedTestActor, PostponedBadTestActor] (
+                (actor, badActor) => {
+                    actor.called  must_==  0
+                    badActor.called  must_==  0
+
+                    badActor.test (actor)
+
+                    waitForMessageAfter (actor) {
+                        actor.start ()
+                        badActor.start ()
+                        actor.test ()
+                    }
+
+                    actor.called     must_==  1
+                    badActor.called  must_==  0
+                }
+            )
+        }
+
+        "provide a convenient way to handle/passing message processing result" in {
+            withNotStartedActors [ResponseRequesterTestActor, ResponserTestActor] (
+                (reqActor, respActor) => {
+                    reqActor.responses  must_==  0
+                    reqActor.start
+                    reqActor.responses  must_==  0
+
+                    reqActor.request (respActor)
+                    reqActor.responses  must_==  0
+
+                    waitForMessageAfter (reqActor) {
+                        respActor.start ()
+                    }
+
+                    reqActor.responses  must_==  1
+
+                    waitForMessageAfter (reqActor) {
+                        reqActor.request (respActor)
+                    }
+
+                    reqActor.responses  must_==  2
+                }
+            )
+        }
     }
 }
 
 object ActorTest {
+    class ResponseRequesterTestActor extends TestActor {
+        var responses = 0
+        
+        @CallByMessage
+        def request (responser : ResponserTestActor) : Unit = {
+            responser.justCallBack matchResult {
+                case i : Int =>
+                    responses += 1
+            }
+        }
+    }
+
+    class ResponserTestActor extends TestActor {
+        def justCallBack =
+            new OperationWithResult [Int] ("just operation") {
+                def processRequest (matcher : Int => Unit) : Unit = {
+                    matcher (123)
+                }
+            }
+    }
+
     class PostponedTestActor extends TestActor {
         var called = 0
         
@@ -394,6 +460,16 @@ object ActorTest {
             postponed ("test ()") {
                 called += 1
             }
+        }
+    }
+
+    class PostponedBadTestActor extends TestActor {
+        var called = 0
+
+        def test (someOtherActor : TestActor) : Unit = {
+            val block = PostponedBlock ("bad something", () => called += 1)
+
+            someOtherActor ! block
         }
     }
 
