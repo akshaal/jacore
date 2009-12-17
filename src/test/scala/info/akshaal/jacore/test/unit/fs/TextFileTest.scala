@@ -12,7 +12,7 @@ import java.io.{File, FileReader, BufferedReader, BufferedWriter, FileWriter}
 
 import Predefs._
 import unit.UnitTestHelper._
-import fs.{WriteFileDone, WriteFileFailed, ReadFileDone, ReadFileFailed}
+import fs.text.{WriteFileDone, WriteFileFailed, ReadFileDone, ReadFileFailed}
 
 class TextFileTest extends SpecificationWithJUnit ("TextFile specification") {
     import TextFileTest._
@@ -51,8 +51,77 @@ class TextFileTest extends SpecificationWithJUnit ("TextFile specification") {
             })
         }
 
+        "support write operation using result matchers" in {
+            withStartedActor [WriteMatchTestActor] (actor => {
+                val file = File.createTempFile ("jacore", "writeTest")
+                file.deleteOnExit
+
+                actor.payload  must beNull
+                actor.done       must_==  0
+                actor.excs       must_==  0
+
+                waitForMessageBatchesAfter (actor, 2) {actor ! (file, "Hi", "1x")}
+
+                readLine (file)  must_==  "Hi"
+                actor.payload    must_==  "1x"
+                actor.done       must_==  1
+                actor.excs       must_==  0
+
+                waitForMessageBatchesAfter (actor, 2) {actor ! (file, "Bye", "2x")}
+
+                readLine (file)  must_==  "Bye"
+                actor.payload    must_==  "2x"
+                actor.done       must_==  2
+                actor.excs       must_==  0
+
+                waitForMessageBatchesAfter (actor, 2) {
+                    actor ! (new File ("/oops/oops/ooopsss!!"), "Ooops", "3x")
+                }
+
+                actor.payload    must_==  "3x"
+                actor.done       must_==  2
+                actor.excs       must_==  1
+            })
+        }
+
         "support read operation" in {
             withStartedActor [ReadTestActor] (actor => {
+                val file = File.createTempFile ("jacore", "readTest")
+                file.deleteOnExit
+
+                actor.payload  must beNull
+                actor.done     must_==  0
+                actor.excs     must_==  0
+
+                writeLine (file, "Hi")
+                waitForMessageBatchesAfter (actor, 2) {actor ! (file, "1x")}
+
+                actor.payload  must_==  "1x"
+                actor.done     must_==  1
+                actor.excs     must_==  0
+                actor.content  must_==  "Hi"
+
+                writeLine (file, "Bye")
+                waitForMessageBatchesAfter (actor, 2) {actor ! (file, "2x")}
+
+                actor.payload  must_==  "2x"
+                actor.done     must_==  2
+                actor.excs     must_==  0
+                actor.content  must_==  "Bye"
+
+                waitForMessageBatchesAfter (actor, 2) {
+                    actor ! (new File ("/ook/ooook/ooooooook"), "3x")
+                }
+
+                actor.payload  must_==  "3x"
+                actor.done     must_==  2
+                actor.excs     must_==  1
+                actor.content  must_==  "Bye"
+            })
+        }
+
+        "support read operation using result matchers" in {
+            withStartedActor [ReadMatchTestActor] (actor => {
                 val file = File.createTempFile ("jacore", "readTest")
                 file.deleteOnExit
 
@@ -133,6 +202,27 @@ object TextFileTest {
         }
     }
 
+    class WriteMatchTestActor extends TestActor {
+        var done = 0
+        var excs = 0
+        var payload : Any = null
+
+        override def act () = {
+            case msg @ (file : File, content : String, payl : Any) =>
+                debug ("Received message: " + msg)
+                
+                TestModule.textFile.writeFile (file, content) matchResult {
+                    case Success (_) =>
+                        done = done + 1
+                        this.payload = payl
+
+                    case Failure (exc) =>
+                        this.payload = payl
+                        excs = excs + 1
+                }
+        }
+    }
+
     class ReadTestActor extends TestActor {
         var done = 0
         var excs = 0
@@ -157,6 +247,28 @@ object TextFileTest {
                 excs = excs + 1
                 debug ("Received message: " + msg)
             }
+        }
+    }
+
+    class ReadMatchTestActor extends TestActor {
+        var done = 0
+        var excs = 0
+        var payload : Any = null
+        var content : String = null
+
+        override def act () = {
+            case msg @ (file : File, payl) =>
+                debug ("Received message: " + msg)
+                TestModule.textFile.readFile (file) matchResult {
+                    case Success (cont) =>
+                        done = done + 1
+                        this.payload = payl
+                        this.content = cont
+
+                    case Failure (exc) =>
+                        this.payload = payl
+                        excs = excs + 1
+                }
         }
     }
 }

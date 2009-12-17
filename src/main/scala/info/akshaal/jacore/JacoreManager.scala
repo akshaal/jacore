@@ -12,7 +12,7 @@ import java.lang.{Iterable => JavaIterable}
 
 import collection.JavaConversions._
 
-import fs.{TextFileActor}
+import fs.text.{TextFileActor}
 import daemon.{DaemonStatusActor, DaemonStatus}
 import actor.{MonitoringActors, BroadcasterActor, Actor}
 import scheduler.Scheduler

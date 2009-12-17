@@ -17,6 +17,12 @@ object Predefs {
     type TimeUnit = utils.TimeUnit
     val TimeUnit = utils.TimeUnit
 
+    type Result [A] = utils.Result [A]
+    type Success [A] = utils.Success [A]
+    type Failure [A] = utils.Failure [A]
+    val Success = utils.Success
+    val Failure = utils.Failure
+
     /**
      * Create list repeating code n times.
      */

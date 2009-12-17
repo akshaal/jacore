@@ -12,7 +12,7 @@ import info.akshaal.jacore.Predefs._
 import info.akshaal.jacore.actor.{Actor, HiPriorityActorEnv, LowPriorityActorEnv}
 import info.akshaal.jacore.module.Module
 import info.akshaal.jacore.scheduler.Scheduler
-import info.akshaal.jacore.fs.TextFile
+import info.akshaal.jacore.fs.text.TextFile
 import info.akshaal.jacore.test.TestHelper
 import info.akshaal.jacore.JacoreManager
 

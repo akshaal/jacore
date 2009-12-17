@@ -3,7 +3,8 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.actor
+package info.akshaal.jacore
+package actor
 
 /**
  * This trait provides a way for actor to delegate a code execution by passing
@@ -49,7 +50,9 @@ trait ActorDelegation {
      *
      * @param description text description of operation, used for debug only
      */
-    abstract class OperationWithResult [A] (description : String) {
+    abstract class OperationWithResult [A] (description : String)
+                                                extends actor.OperationWithResult [A]
+    {
         /**
          * Method to be called to run operation.
          *
@@ -70,9 +73,20 @@ trait ActorDelegation {
     }
 }
 
+sealed trait OperationWithResult [A] {
+    /**
+     * Method to be called to run operation.
+     *
+     * @param matcher function that will receive result by applier when operation is over
+     * @param applier object that applies matcher to a result. An implementation of applier
+     *                is supposed to run matcher by message to caller actor.
+     */
+    def matchResult (matcher : A => Unit) (implicit applier : ResultMatchApplier)
+}
+
 /**
  * Applier of operation results to result matchers.
  */
-trait ResultMatchApplier {
+sealed trait ResultMatchApplier {
     def apply [A] (resultMatch : A => Unit, result : A) : Unit
 }
