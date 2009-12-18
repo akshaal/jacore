@@ -17,52 +17,37 @@ trait ActorSchedule { this : Actor =>
     /**
      * Schedule to be used by this actor.
      */
-    protected object schedule {
-        def payload (payload : Any) = new Trigger (payload)
+    protected object schedule {        
+        def in (number : Long)      = new ScheduleWhen (number, ScheduleIn)
+        def every (number : Long)   = new ScheduleWhen (number, ScheduleEvery)
 
-        def in (number : Long)    = new TimeSpec (number, scheduleIn)
-        def every (number : Long) = new TimeSpec (number, scheduleEvery)
-
-        def in (time : TimeUnit)    = scheduleIn (time)
-        def every (time : TimeUnit) = scheduleEvery (time)
-
-        protected def scheduleIn (time : TimeUnit) = {
-            def doIt (code : => Unit) : Unit =
-                actorEnv.scheduler.in (ActorSchedule.this, ScheduledCode (() => code), time)
-
-            doIt _
-        }
-
-        protected def scheduleEvery (time : TimeUnit) = {
-            def doIt (code : => Unit) : Unit =
-                actorEnv.scheduler.every (ActorSchedule.this, ScheduledCode (() => code), time)
-
-            doIt _
-        }
+        def in (time : TimeUnit)    = new ScheduleWhat (time, ScheduleIn)
+        def every (time : TimeUnit) = new ScheduleWhat (time, ScheduleEvery)
     }
 
-    protected final class Trigger (payload : Any) {
-        def in (number : Long)    = new TimeSpec (number, scheduleIn)
-        def every (number : Long) = new TimeSpec (number, scheduleEvery)
-
-        def in (time : TimeUnit)    = scheduleIn (time)
-        def every (time : TimeUnit) = scheduleEvery (time)
-
-        protected def scheduleIn (time : TimeUnit) =
-            actorEnv.scheduler.in (ActorSchedule.this, payload, time)
-
-        protected def scheduleEvery (time : TimeUnit) =
-            actorEnv.scheduler.every (ActorSchedule.this, payload, time)
+    protected final class ScheduleWhen (number : Long, option : ScheduleOption) extends NotNull {
+        def nanoseconds  = new ScheduleWhat (number.nanoseconds, option)
+        def microseconds = new ScheduleWhat (number.microseconds, option)
+        def milliseconds = new ScheduleWhat (number.milliseconds, option)
+        def seconds      = new ScheduleWhat (number.seconds, option)
+        def minutes      = new ScheduleWhat (number.minutes, option)
+        def hours        = new ScheduleWhat (number.hours, option)
     }
 
-    final class TimeSpec[T] (number : Long, action : TimeUnit => T) extends NotNull {
-        def nanoseconds  : T = action (number.nanoseconds)
-        def microseconds : T = action (number.microseconds)
-        def milliseconds : T = action (number.milliseconds)
-        def seconds      : T = action (number.seconds)
-        def minutes      : T = action (number.minutes)
-        def hours        : T = action (number.hours)
+    protected final class ScheduleWhat (when : TimeUnit, option : ScheduleOption) extends NotNull {
+        def payload (payload : Any) : Unit =
+            option match {
+                case ScheduleIn => actorEnv.scheduler.in (ActorSchedule.this, payload, when)
+                case ScheduleEvery => actorEnv.scheduler.every (ActorSchedule.this, payload, when)
+            }
+
+        def executionOf (code : => Unit) : Unit =
+            payload (ScheduledCode (() => code))
     }
 
     protected final case class ScheduledCode (code : () => Unit)
+
+    private[ActorSchedule] abstract sealed class ScheduleOption
+    private[ActorSchedule] case object ScheduleIn extends ScheduleOption
+    private[ActorSchedule] case object ScheduleEvery extends ScheduleOption
 }

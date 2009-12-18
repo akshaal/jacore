@@ -35,7 +35,7 @@ private[jacore] class DaemonStatusActor @Inject() (
     final val statusFile = new File (statusFileName)
 
     if (interval > 0.nanoseconds) {
-        (schedule every interval) {
+        schedule every interval executionOf {
             val passedSinceAlive = System.nanoTime.nanoseconds - daemonStatus.lastAlive
             val isReallyAlive = !daemonStatus.isDying && passedSinceAlive < interval
 

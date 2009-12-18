@@ -12,7 +12,7 @@ import scala.collection.mutable.Set
 import Predefs._
 import annotation.Act
 import daemon.DaemonStatus
-import scheduler.{UnfixedScheduling, TimeOut}
+import scheduler.UnfixedScheduling
 
 @Singleton
 private[jacore] final class MonitoringActors @Inject() (
@@ -21,7 +21,6 @@ private[jacore] final class MonitoringActors @Inject() (
 
 private[actor] case object Ping extends NotNull
 private[actor] case object Pong extends NotNull
-private[actor] case object Monitor extends NotNull
 
 /**
  * Implementation of monitoring actor.
@@ -33,11 +32,11 @@ private[jacore] final class MonitoringActor @Inject() (
             extends Actor (actorEnv = normalPriorityActorEnv)
             with UnfixedScheduling
 {
-    schedule payload Monitor every interval
-
     private val currentActors : Set[Actor] = new HashSet[Actor]
     private var monitoringActors : Set[Actor] = new HashSet[Actor]
     private var pingSentAt : TimeUnit = 0.nanoseconds
+
+    schedule every interval executionOf monitor ()
 
     /**
      * This method is called when an actor has been started. Used to start monitoring
@@ -61,8 +60,6 @@ private[jacore] final class MonitoringActor @Inject() (
      * Process messages.
      */
     override def act () = {
-        case TimeOut (Monitor) => monitor
-
         case Pong => sender.foreach (actor => monitoringActors -= actor)
     }
 

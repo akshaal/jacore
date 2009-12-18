@@ -89,7 +89,7 @@ object SchedulerTest {
     }
 
     class RecurrentTestActor extends TestActor {
-        schedule payload "Hi" every 50 milliseconds
+        schedule every 50.milliseconds payload "Hi"
 
         var invocations = 0
 
@@ -104,7 +104,7 @@ object SchedulerTest {
     class RecurrentCodeTestActor extends TestActor {
         var invocations = 0
 
-        schedule every 50 milliseconds {
+        schedule every 50.milliseconds executionOf {
             debug ("Triggered")
             invocations += 1
         }
