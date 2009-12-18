@@ -29,6 +29,18 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
             })
         }
 
+        "provide recurrent scheduling of code blocks" in {
+            withStartedActor [RecurrentCodeTestActor] (actor => {
+                Thread.sleep (400)
+
+                actor.invocations must beIn (6 to 10)
+
+                Thread.sleep (400)
+
+                actor.invocations must beIn (14 to 18)
+            })
+        }
+
         "provide one time scheduling" in {
             withStartedActors [OneTimeTestActor, OneTimeTestActor2] ((actor, actor2) => {
                 TestModule.scheduler.in (actor, 123, 130.milliseconds)
@@ -86,6 +98,15 @@ object SchedulerTest {
                 debug ("Received message: " + x)
                 invocations += 1
             }
+        }
+    }
+
+    class RecurrentCodeTestActor extends TestActor {
+        var invocations = 0
+
+        schedule every 50 milliseconds {
+            debug ("Triggered")
+            invocations += 1
         }
     }
 }

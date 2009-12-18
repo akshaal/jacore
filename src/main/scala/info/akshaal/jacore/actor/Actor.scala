@@ -7,17 +7,20 @@ import org.jetlang.core.{BatchExecutor, EventReader}
 import logger.Logging
 import Predefs._
 
+import scheduler.TimeOut
+
 /**
  * Implementation of actors.
  *
  * @param actorEnv environment for actor
  */
-abstract class Actor (actorEnv : ActorEnv) extends ActorDelegation
-                                              with Logging
-                                              with NotNull
+abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
+                                                            with ActorSchedule
+                                                            with Logging
+                                                            with NotNull
 {
     // TODO: Split to traits: Transporting, Managing, Broadcasting,
-    //       Scheduling, Autosubscribing, ...
+    //       Autosubscribing, ...
 
     /**
      * A set of descriptions for methods annotated with @Act annotation.
@@ -37,11 +40,6 @@ abstract class Actor (actorEnv : ActorEnv) extends ActorDelegation
      * an appropriate method of this class.
      */
     private[this] final val dispatcher = createDispatcher
-
-    /**
-     * Schedule to be used by this actor.
-     */
-    protected final val schedule = new ActorSchedule (this, actorEnv.scheduler)
 
     /**
      * Broadcaster to be used by this actor.
@@ -135,6 +133,9 @@ abstract class Actor (actorEnv : ActorEnv) extends ActorDelegation
 
                 case call : Call =>
                     CallByMessageMethodInterceptor.call (call)
+
+                case TimeOut (ScheduledCode (code)) =>
+                    code ()
 
                 case PostponedBlock (_, code) =>
                     code ()

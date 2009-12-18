@@ -9,7 +9,6 @@ import java.io.File
 
 import Predefs._
 import actor.{Actor, NormalPriorityActorEnv}
-import scheduler.TimeOut
 import fs.text.{TextFile, WriteFileDone, WriteFileFailed}
 
 /**
@@ -36,24 +35,19 @@ private[jacore] class DaemonStatusActor @Inject() (
     final val statusFile = new File (statusFileName)
 
     if (interval > 0.nanoseconds) {
-        schedule payload UpdateStatus every interval
-    }
-
-    final override def act () = {
-        case TimeOut (UpdateStatus) =>
+        (schedule every interval) {
             val passedSinceAlive = System.nanoTime.nanoseconds - daemonStatus.lastAlive
             val isReallyAlive = !daemonStatus.isDying && passedSinceAlive < interval
 
             val curTime = System.currentTimeMillis
             val statusString = if (isReallyAlive) "alive" else "dying"
             val content = curTime + " " + statusString
-            
+
             textFile.writeFile (statusFile, content) matchResult {
                 case Success (_) => debug ("Status file has been updated")
                 case Failure (exc) => error ("Failed to write status into the file: " + statusFile,
                                              exc)
             }
+        }
     }
-
-    private case object UpdateStatus
 }

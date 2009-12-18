@@ -9,31 +9,60 @@ package info.akshaal.jacore
 package actor
 
 import Predefs._
-import scheduler.Scheduler
 
-final class TimeSpec[T] (number : Long, action : TimeUnit => T) extends NotNull {
-    def nanoseconds  = action (number.nanoseconds)
-    def microseconds = action (number.microseconds)
-    def milliseconds = action (number.milliseconds)
-    def seconds      = action (number.seconds)
-    def minutes      = action (number.minutes)
-    def hours        = action (number.hours)
-}
+/**
+ * Scheduling for actor.
+ */
+trait ActorSchedule { this : Actor =>
+    /**
+     * Schedule to be used by this actor.
+     */
+    protected object schedule {
+        def payload (payload : Any) = new Trigger (payload)
 
-final class Trigger (actor : Actor, payload : Any, scheduler : Scheduler)
-                extends NotNull{
-    def in (number : Long)    = new TimeSpec[Unit] (number, scheduleIn)
-    def every (number : Long) = new TimeSpec[Unit] (number, scheduleEvery)
+        def in (number : Long)    = new TimeSpec (number, scheduleIn)
+        def every (number : Long) = new TimeSpec (number, scheduleEvery)
 
-    def in (time : TimeUnit)    = scheduleIn (time)
-    def every (time : TimeUnit) = scheduleEvery (time)
+        def in (time : TimeUnit)    = scheduleIn (time)
+        def every (time : TimeUnit) = scheduleEvery (time)
 
-    private def scheduleIn (time : TimeUnit)    = scheduler.in (actor, payload, time)
-    private def scheduleEvery (time : TimeUnit) = scheduler.every (actor, payload, time)
-}
+        protected def scheduleIn (time : TimeUnit) = {
+            def doIt (code : => Unit) : Unit =
+                actorEnv.scheduler.in (ActorSchedule.this, ScheduledCode (() => code), time)
 
-final class ActorSchedule (actor : Actor, scheduler : Scheduler)
-            extends NotNull
-{
-    def payload (payload : Any) = new Trigger (actor, payload, scheduler)
+            doIt _
+        }
+
+        protected def scheduleEvery (time : TimeUnit) = {
+            def doIt (code : => Unit) : Unit =
+                actorEnv.scheduler.every (ActorSchedule.this, ScheduledCode (() => code), time)
+
+            doIt _
+        }
+    }
+
+    protected final class Trigger (payload : Any) {
+        def in (number : Long)    = new TimeSpec (number, scheduleIn)
+        def every (number : Long) = new TimeSpec (number, scheduleEvery)
+
+        def in (time : TimeUnit)    = scheduleIn (time)
+        def every (time : TimeUnit) = scheduleEvery (time)
+
+        protected def scheduleIn (time : TimeUnit) =
+            actorEnv.scheduler.in (ActorSchedule.this, payload, time)
+
+        protected def scheduleEvery (time : TimeUnit) =
+            actorEnv.scheduler.every (ActorSchedule.this, payload, time)
+    }
+
+    final class TimeSpec[T] (number : Long, action : TimeUnit => T) extends NotNull {
+        def nanoseconds  : T = action (number.nanoseconds)
+        def microseconds : T = action (number.microseconds)
+        def milliseconds : T = action (number.milliseconds)
+        def seconds      : T = action (number.seconds)
+        def minutes      : T = action (number.minutes)
+        def hours        : T = action (number.hours)
+    }
+
+    protected final case class ScheduledCode (code : () => Unit)
 }
