@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 
 import Predefs._
-import actor.{Actor, NormalPriorityActorEnv}
+import actor.{Actor, NormalPriorityActorEnv, OperationWithResult}
 import logger.Logging
 
 // ///////////////////////////////////////////////////////////////////////
@@ -54,8 +54,6 @@ case class ReadFileFailed (file : File,
  * Fast synchronous file reader/writer.
  */
 trait TextFile {
-    import actor.OperationWithResult
-
     /**
      * Write a given content into the file. When writing is done a message will be issued
      * to the caller actor. The possible result messages are <code>WriteFileDone</code>
@@ -130,7 +128,7 @@ private[jacore] class TextFileActor @Inject() (
     }
 
     def writeFile (file : File, content : String) : OperationWithResult [Result [Unit]] = {
-        new OperationWithResult [Result[Unit]] ("writeFile") {
+        new OperationWithResultImpl [Result[Unit]] ("writeFile") {
                 def processRequest (matcher : Result[Unit] => Unit) : Unit = {
                     doWriteFile (file,
                                  content,
@@ -186,7 +184,7 @@ private[jacore] class TextFileActor @Inject() (
     }
 
     override def readFile (file : File) : OperationWithResult [Result [String]] = {
-        new OperationWithResult [Result[String]] ("readFile") {
+        new OperationWithResultImpl [Result[String]] ("readFile") {
                 def processRequest (matcher : Result[String] => Unit) : Unit = {
                     doReadFile (file,
                                 cont => matcher (Success [String] (cont)),

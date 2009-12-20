@@ -50,7 +50,7 @@ trait ActorDelegation {
      *
      * @param description text description of operation, used for debug only
      */
-    abstract class OperationWithResult [A] (description : String)
+    abstract class OperationWithResultImpl [A] (description : String)
                                                 extends actor.OperationWithResult [A]
     {
         /**
