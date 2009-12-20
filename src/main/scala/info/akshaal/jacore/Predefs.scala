@@ -7,7 +7,7 @@
 
 package info.akshaal.jacore
 
-import java.io.{IOException, Closeable}
+import java.io.{IOException, Closeable, File}
 import java.lang.{Iterable => JavaIterable}
 import com.google.inject.Injector
 
@@ -22,6 +22,9 @@ object Predefs {
     type Failure [A] = utils.Failure [A]
     val Success = utils.Success
     val Failure = utils.Failure
+
+    @inline
+    implicit def string2file (absolutePath : String) : File = new File (absolutePath)
 
     /**
      * Create list repeating code n times.
