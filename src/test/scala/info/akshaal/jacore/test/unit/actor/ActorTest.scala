@@ -445,12 +445,7 @@ object ActorTest {
     }
 
     class ResponserTestActor extends TestActor {
-        def justCallBack =
-            new OperationWithResultImpl [Int] ("just operation") {
-                def processRequest (matcher : Int => Unit) : Unit = {
-                    matcher (123)
-                }
-            }
+         def justCallBack = operationWithComplexResult [Int] ("just operation") (_ (123))
     }
 
     class PostponedTestActor extends TestActor {

@@ -20,7 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 
 import Predefs._
-import actor.{Actor, NormalPriorityActorEnv, OperationWithResult}
+import actor.{Actor, NormalPriorityActorEnv, Operation}
 import logger.Logging
 
 // ///////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ trait TextFile {
      * @param file write content to this file
      * @param content string content to write into the file
      */
-    def writeFile (file : File, content : String) : OperationWithResult [Result [Unit]]
+    def writeFile (file : File, content : String) : Operation.WithResult [Unit]
 
     /**
      * Open file and initiate reading from the file. When reading is done a message will sended
@@ -88,7 +88,7 @@ trait TextFile {
      * 
      * @param file file to read from
      */
-    def readFile (file : File) : OperationWithResult [Result [String]]
+    def readFile (file : File) : Operation.WithResult [String]
 }
 
 // ///////////////////////////////////////////////////////////////////////
@@ -127,15 +127,14 @@ private[jacore] class TextFileActor @Inject() (
         }
     }
 
-    def writeFile (file : File, content : String) : OperationWithResult [Result [Unit]] = {
-        new OperationWithResultImpl [Result[Unit]] ("writeFile") {
-                def processRequest (matcher : Result[Unit] => Unit) : Unit = {
-                    doWriteFile (file,
-                                 content,
-                                 matcher (Success [Unit] ()),
-                                 exc => matcher (Failure [Unit] (exc)))
-                }
-            }
+    def writeFile (file : File, content : String) : Operation.WithResult [Unit] = {
+        operation [Unit] ("writeFile") (resultReceiver =>
+                        doWriteFile (file,
+                                     content,
+                                     resultReceiver (Success [Unit] ()),
+                                     exc => resultReceiver (Failure [Unit] (exc)))
+                 )
+
     }
 
     private def doWriteFile (file : File,
@@ -183,14 +182,12 @@ private[jacore] class TextFileActor @Inject() (
         }
     }
 
-    override def readFile (file : File) : OperationWithResult [Result [String]] = {
-        new OperationWithResultImpl [Result[String]] ("readFile") {
-                def processRequest (matcher : Result[String] => Unit) : Unit = {
+    override def readFile (file : File) : Operation.WithResult [String] = {
+        operation [String] ("readFile") (resultReceiver =>
                     doReadFile (file,
-                                cont => matcher (Success [String] (cont)),
-                                exc => matcher (Failure [String] (exc)))
-                }
-            }
+                                cont => resultReceiver (Success [String] (cont)),
+                                exc => resultReceiver (Failure [String] (exc)))
+                )
     }
 
     private def doReadFile (file : File,
