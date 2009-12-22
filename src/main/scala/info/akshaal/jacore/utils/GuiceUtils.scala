@@ -12,13 +12,14 @@ import java.util.Collection
 import scala.collection.JavaConversions._
 import scala.collection.mutable.{HashSet, Set}
 
-import com.google.inject.{Guice, Inject, Injector, Key}
+import com.google.inject.{Guice, Inject, Injector, Key, ConfigurationException}
 
 import com.google.inject.grapher.{GrapherModule, Renderer}
 import com.google.inject.grapher.graphviz.{GraphvizModule, GraphvizRenderer}
 import com.google.inject.spi.BindingTargetVisitor
 
 import Predefs._
+import logger.Logging
 
 /**
  * Utils to help work with Guice.
@@ -94,7 +95,7 @@ object GuiceUtils {
     private[GuiceUtils] class JacoreInjectorGrapher @Inject() (
                                 keyVisitor : BindingTargetVisitor [Any, Collection[Key[_]]],
                                 graphingVisitor : BindingTargetVisitor [Any, Void],
-                                renderer : Renderer)
+                                renderer : Renderer) extends Logging
     {
         def graph (injector : Injector, keys : Set [Key[_]]) : Unit = {
             val visitKeys = new HashSet [Key[_]]
@@ -111,14 +112,19 @@ object GuiceUtils {
                 if (!visitedKeys.contains (key)) {
                     visitedKeys.add (key)
 
-                    // Visit binding for key
-                    val binding = injector.getBinding (key)
-                    binding.acceptTargetVisitor (graphingVisitor)
+                    try {
+                        // Visit binding for key
+                        val binding = injector.getBinding (key)
+                        binding.acceptTargetVisitor (graphingVisitor)
 
-                    // Check keys used for binding
-                    val newKeys = binding.acceptTargetVisitor (keyVisitor)
-                    if (newKeys != null) {
-                        visitKeys ++= newKeys
+                        // Check keys used for binding
+                        val newKeys = binding.acceptTargetVisitor (keyVisitor)
+                        if (newKeys != null) {
+                            visitKeys ++= newKeys
+                        }
+                    } catch {
+                        case exc : ConfigurationException =>
+                            debugLazy ("Ignored: " + exc.getMessage, exc)
                     }
                 }
             }
