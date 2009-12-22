@@ -42,6 +42,21 @@ trait TestHelper {
     }
 
     /**
+     * Start actor, execute code and then stop actor.
+     *
+     * @param actor to manage.
+     */
+    def withStartedActor (actor : Actor) (code : => Unit) {
+        actor.start
+
+        try {
+            code
+        } finally {
+            actor.stop
+        }
+    }
+
+    /**
      * Execute function with the actor constructed by using guice injector.
      * Created actor will be started and passed to function f. When function is completed
      * its work, actor will be stopped.

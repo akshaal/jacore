@@ -411,7 +411,10 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                     reqActor.start
                     reqActor.responses  must_==  0
 
-                    reqActor.request (respActor)
+                    waitForMessageAfter (reqActor) {
+                        reqActor.request (respActor)
+                    }
+                    
                     reqActor.responses  must_==  0
 
                     waitForMessageAfter (reqActor) {
@@ -420,7 +423,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
 
                     reqActor.responses  must_==  1
 
-                    waitForMessageAfter (reqActor) {
+                    waitForMessageBatchesAfter (reqActor, 2) {
                         reqActor.request (respActor)
                     }
 
