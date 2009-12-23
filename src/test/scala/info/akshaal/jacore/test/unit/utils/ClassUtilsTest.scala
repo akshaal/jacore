@@ -90,6 +90,40 @@ class ClassUtilsTest extends SpecificationWithJUnit ("ClassUtils specification")
             classes  must contain (classOf[com.google.inject.name.Named])
         }
     }
+
+    "ClassUtils.isModule" should {
+        "return true for scala object classes (modules)" in {
+            isModule (ismodule.A.getClass)  must beTrue
+            isModule (ismodule.A.B.getClass)  must beTrue
+        }
+
+        "return false for not scala object classes (modules)" in {
+            isModule (classOf [ismodule.C])  must beFalse
+            isModule (classOf [ismodule.A.D])  must beFalse
+        }
+    }
+
+    "ClassUtils.getModuleInstance" should {
+        "return module instance for object classes (modules)" in {
+            (getModuleInstance (ismodule.A.getClass) == Some(ismodule.A))  must beTrue
+            (getModuleInstance (ismodule.A.B.getClass) == Some(ismodule.A.B))  must beTrue
+        }
+
+        "return module None for not object classes (modules)" in {
+            (getModuleInstance (classOf [ismodule.C])  == None)  must beTrue
+            (getModuleInstance (classOf [ismodule.A.D])  == None)  must beTrue
+        }
+    }
+}
+
+package ismodule {
+    object A {
+        object B
+        
+        class D
+    }
+
+    class C
 }
 
 package findclasses {

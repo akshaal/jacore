@@ -6,6 +6,8 @@
 package info.akshaal.jacore
 package utils
 
+import java.lang.reflect.Modifier
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
@@ -94,5 +96,41 @@ object ClassUtils {
         }
 
         buf.toList
+    }
+
+    /**
+     * Check if the given class represents a scala object (module).
+     *
+     * @param clazz class to check
+     */
+    def isModule (clazz : Class [_]) : Boolean = {
+        try {
+            val moduleField = clazz.getField ("MODULE$")
+            val moduleFieldModifiers = moduleField.getModifiers
+            val moduleFieldType = moduleField.getType
+
+            Modifier.isPublic (moduleFieldModifiers) &&
+                Modifier.isStatic (moduleFieldModifiers) &&
+                moduleFieldType.isAssignableFrom (clazz)
+        } catch {
+            case exc : NoSuchFieldException => false
+        }
+    }
+
+    /**
+     * Try to get module instance.
+     *
+     * @param clazz to get module of
+     * @return Some(instnace) or None if not module
+     */
+    def getModuleInstance [A] (clazz : Class [A]) : Option [A] = {
+        if (isModule (clazz)) {
+            val realClazz = Class.forName (clazz.getName)
+            val moduleField = realClazz.getField ("MODULE$")
+            
+            Some (moduleField.get (null).asInstanceOf [A])
+        } else {
+            None
+        }
     }
 }
