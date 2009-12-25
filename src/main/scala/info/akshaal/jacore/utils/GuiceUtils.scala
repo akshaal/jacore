@@ -66,13 +66,22 @@ object GuiceUtils {
     {
         // Create list of keys to draw
         val keys = new HashSet [Key [_]]
-        for (key <- injector.getBindings.keySet) {
-            if (key.getTypeLiteral.getRawType.getPackage != classOf[Guice].getPackage
-                 && key != loggerKey)
-            {
-                keys += key
+        def addKeysForInjector (currentInjector : Injector) {
+            for (key <- currentInjector.getBindings.keySet) {
+                if (key.getTypeLiteral.getRawType.getPackage != classOf[Guice].getPackage
+                     && key != loggerKey)
+                {
+                    keys += key
+                }
+            }
+            
+            val parentInjector = currentInjector.getParent
+            if (parentInjector != null) {
+                addKeysForInjector (parentInjector)
             }
         }
+
+        addKeysForInjector (injector)
 
         for (clazz <- classes) {
             keys += Key.get (clazz)
