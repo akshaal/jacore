@@ -25,12 +25,28 @@ trait Broadcaster {
     def subscribe (actor : Actor, matcherDefinitions : MessageMatcherDefinition[_]*) : Unit
 
     /**
+     * Subscribe the given actor on messages matching the given classes.
+     * Request is ignored if actor is already subscribed to this kind of messages.
+     * @param actor actor that will receive message accepted by matcher.
+     * @param clazz class.
+     */
+    def subscribe (actor : Actor, clazz : Class [_]) : Unit
+
+    /**
      * Unsubscribe the given actor from messages accepted by the given matcher.
      * If actor is not subscribed then request is ingored.
      * @param actor actor that is currently subscribed to the messages accepted by matcher.
      * @param matchers matchers that are currently used by actor to filter broadcasted messages.
      */
     def unsubscribe (actor : Actor, matcherDefinitions : MessageMatcherDefinition[_]*) : Unit
+
+    /**
+     * Unsubscribe the given actor from messages matching the given classes.
+     * If actor is not subscribed then request is ingored.
+     * @param actor actor that is currently subscribed to the messages accepted by matcher.
+     * @param clazz class.
+     */
+    def unsubscribe (actor : Actor, clazz : Class [_]) : Unit
 
     /**
      * Broadcast message to all actors subscribed to this type of msg.
@@ -79,13 +95,39 @@ private[jacore] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
     {
         matcherDefinitions.foreach (subscribeOneMatcher (actor, _))
     }
+1
+    /** {@Inherited} */
+    @CallByMessage
+    override def subscribe (actor : Actor, clazz : Class[_]) : Unit =
+    {
+        val emptySet = Set.empty [MessageExtractionDefinition[Any]]
+
+        val matcher =
+            new MessageMatcherDefinition (acceptMessageClass = clazz.asInstanceOf [Class[Any]],
+                                          messageExtractionDefinitions = emptySet)
+
+        subscribeOneMatcher (actor, matcher)
+    }
 
     /** {@Inherited} */
     @CallByMessage
     override def unsubscribe (actor : Actor,
-                                    matcherDefinitions : MessageMatcherDefinition[_]*) : Unit =
+                              matcherDefinitions : MessageMatcherDefinition[_]*) : Unit =
     {
         matcherDefinitions.foreach (unsubscribeOneMatcher (actor, _))
+    }
+
+    /** {@Inherited} */
+    @CallByMessage
+    override def unsubscribe (actor : Actor, clazz : Class[_]) : Unit =
+    {
+        val emptySet = Set.empty [MessageExtractionDefinition[Any]]
+
+        val matcher =
+            new MessageMatcherDefinition (acceptMessageClass = clazz.asInstanceOf[Class[Any]],
+                                          messageExtractionDefinitions = emptySet)
+
+        unsubscribeOneMatcher (actor, matcher)
     }
 
     /** {@Inherited} */
