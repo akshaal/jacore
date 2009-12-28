@@ -72,7 +72,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
     /**
      * Maintains the state.
      */
-    protected[actor] var started = false
+    protected[actor] var actorStarted = false
 
     /**
      * Starts managing a new actor. Next time this actor this actor is stopped
@@ -210,7 +210,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
         startRecurrentSchedules ()
 
         // Set state
-        started = true
+        actorStarted = true
     }
 
     /**
@@ -237,7 +237,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
         managed.foreach (_.stop)
 
         // Set state
-        started = false
+        actorStarted = false
     }
 
     /**

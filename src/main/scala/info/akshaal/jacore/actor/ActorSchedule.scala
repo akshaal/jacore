@@ -53,7 +53,7 @@ trait ActorSchedule {
                     scheduleControls.put (control, null)
 
                 case ScheduleEvery =>
-                    if (started) {
+                    if (actorStarted) {
                         val control =
                             actorEnv.scheduler.every (ActorSchedule.this, payload, when)
                         scheduleControls.put (control, null)
