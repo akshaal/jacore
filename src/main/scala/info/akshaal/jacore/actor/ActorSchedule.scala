@@ -8,12 +8,23 @@
 package info.akshaal.jacore
 package actor
 
+import java.util.WeakHashMap
+import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConversions._
+
 import Predefs._
+
+import scheduler.ScheduleControl
 
 /**
  * Scheduling for actor.
  */
-trait ActorSchedule { this : Actor =>
+trait ActorSchedule {
+    this : Actor =>
+
+    private val scheduleControls = new WeakHashMap [ScheduleControl, Null]
+    private val recurrentSchedules = new ListBuffer [(Any, TimeUnit)]
+
     /**
      * Schedule to be used by this actor.
      */
@@ -37,15 +48,42 @@ trait ActorSchedule { this : Actor =>
     protected final class ScheduleWhat (when : TimeUnit, option : ScheduleOption) extends NotNull {
         def payload (payload : Any) : Unit =
             option match {
-                case ScheduleIn => actorEnv.scheduler.in (ActorSchedule.this, payload, when)
-                case ScheduleEvery => actorEnv.scheduler.every (ActorSchedule.this, payload, when)
+                case ScheduleIn =>
+                    val control = actorEnv.scheduler.in (ActorSchedule.this, payload, when)
+                    scheduleControls.put (control, null)
+
+                case ScheduleEvery =>
+                    if (started) {
+                        val control =
+                            actorEnv.scheduler.every (ActorSchedule.this, payload, when)
+                        scheduleControls.put (control, null)
+                    }
+                    recurrentSchedules += ((payload, when))
             }
 
         def executionOf (code : => Unit) : Unit =
             payload (ScheduledCode (() => code))
     }
 
-    protected final case class ScheduledCode (code : () => Unit)
+    /**
+     * Cancel all schedules that were created by using 'schedule' object.
+     */
+    private[actor] def cancelSchedules () : Unit = {
+        scheduleControls.keySet.foreach (_.cancel ())
+        scheduleControls.clear ()
+    }
+
+    /**
+     * Start recurrent schedules. That were scheduled before actor was started.
+     */
+    private[actor] def startRecurrentSchedules () : Unit = {
+        for ((payload, when) <- recurrentSchedules) {
+            val control = actorEnv.scheduler.every (ActorSchedule.this, payload, when)
+            scheduleControls.put (control, null)
+        }
+    }
+
+    private[actor] final case class ScheduledCode (code : () => Unit)
 
     private[ActorSchedule] abstract sealed class ScheduleOption
     private[ActorSchedule] case object ScheduleIn extends ScheduleOption

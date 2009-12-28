@@ -11,16 +11,42 @@ package scheduler
 import actor.Actor
 
 /**
+ * Control for scheduled task.
+ */
+final class ScheduleControl {
+    @volatile
+    private[scheduler] var currentSchedule : Option [Schedule] = None
+
+    /**
+     * Cancel sheduled task.
+     */
+    def cancel () : Unit = {
+        currentSchedule match {
+            case None => ()
+            case Some (schedule) =>
+                schedule.cancelled = true
+                currentSchedule = None
+        }
+    }
+}
+
+/**
  * Abstract schedule item.
  */
 private[scheduler] abstract sealed class Schedule (val actor : Actor,
                                                    val payload : Any,
-                                                   val nanoTime : Long)
+                                                   val nanoTime : Long,
+                                                   control : ScheduleControl)
                             extends Comparable[Schedule] with NotNull
 {
+    @volatile
+    var cancelled = false
+
+    control.currentSchedule = Some (this)
+
     def nextSchedule () : Option[Schedule]
 
-    def compareTo (that : Schedule) = nanoTime compare that.nanoTime
+    override def compareTo (that : Schedule) = nanoTime compare that.nanoTime
 }
 
 /**
@@ -28,10 +54,15 @@ private[scheduler] abstract sealed class Schedule (val actor : Actor,
  */
 final private[scheduler] class OneTimeSchedule (actor : Actor,
                                                 payload : Any,
-                                                nanoTime : Long)
-                            extends Schedule (actor, payload, nanoTime)
+                                                nanoTime : Long,
+                                                control : ScheduleControl)
+                            extends Schedule (actor, payload, nanoTime, control)
 {
-    override def nextSchedule () = None
+    override def nextSchedule () = {
+        control.currentSchedule = None
+        
+        None
+    }
 
     override def toString =
         ("OneTimeSchedule(actor=" + actor
@@ -45,16 +76,26 @@ final private[scheduler] class OneTimeSchedule (actor : Actor,
 final private[scheduler] class RecurrentSchedule (actor : Actor,
                                                   payload : Any,
                                                   nanoTime : Long,
-                                                  period : Long)
+                                                  period : Long,
+                                                  control : ScheduleControl)
                             extends Schedule (actor,
                                               payload,
-                                              nanoTime)
+                                              nanoTime,
+                                              control)
 {
     override def nextSchedule () = {
-        Some (new RecurrentSchedule (actor,
-                                     payload,
-                                     nanoTime + period,
-                                     period))
+        val newSchedule =
+            new RecurrentSchedule (actor,
+                                   payload,
+                                   nanoTime + period,
+                                   period,
+                                   control)
+
+        if (cancelled) {
+            newSchedule.cancelled = true
+        }
+
+        Some (newSchedule)
     }
 
     override def toString =

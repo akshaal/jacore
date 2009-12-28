@@ -30,22 +30,20 @@ private[scheduler] final class SchedulerThread
     private val queue = new PriorityQueue[Schedule]
     private val schedulerDriftNanos = schedulerDrift.asNanoseconds
     
-    val latencyTiming = new Timing (limit = latencyLimit,
-                                    daemonStatus = daemonStatus)
+    val latencyTiming = new Timing (limit = latencyLimit, daemonStatus = daemonStatus)
 
-    def schedule (item : Schedule) = {
+    def schedule (item : Schedule) : Unit = {
         synchronized {
             queue.offer (item)
 
-            // We need to reschedule thread if we added something to the
-            // head of the list
+            // We need to reschedule thread if we added something to the head of the list
             if (queue.peek eq item) {
                 locked { condition.signal () }
             }
         }
     }
 
-    def shutdown () = {
+    def shutdown () : Unit = {
         shutdownFlag = true
         locked { condition.signal () }
 
@@ -53,7 +51,7 @@ private[scheduler] final class SchedulerThread
         this.join (1000) // Give it a second to join
     }
 
-    override def run () {
+    override def run () : Unit = {
         info ("Starting scheduler")
         this.setName("Scheduler")
 
@@ -70,7 +68,7 @@ private[scheduler] final class SchedulerThread
         info ("Stopping scheduler")
     }
 
-    private def waitAndProcess () = {
+    private def waitAndProcess () : Unit = {
         val item = synchronized { queue.peek }
 
         if (item == null) {
@@ -87,22 +85,23 @@ private[scheduler] final class SchedulerThread
         }
     }
 
-    private def processFromHead () = {
+    private def processFromHead () : Unit = {
         // Get item from head
         val item = synchronized { queue.poll }
+        if (item.cancelled) {
+            return
+        }
 
         // Measure latency
-        latencyTiming.finishedButExpected (item.nanoTime,
-                                           "Event triggered: " + item)
+        latencyTiming.finishedButExpected (item.nanoTime, "Event triggered: " + item)
 
         // Send message to actor
         item.actor ! (TimeOut (item.payload))
 
         // Reschedule if needed
         item.nextSchedule match {
-            case None => ()
-            case Some (nextItem) =>
-                schedule (nextItem)
+            case None            => ()
+            case Some (nextItem) => schedule (nextItem)
         }
     }
 

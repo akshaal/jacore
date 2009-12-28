@@ -15,7 +15,7 @@ import collection.JavaConversions._
 import fs.text.{TextFileActor}
 import daemon.{DaemonStatusActor, DaemonStatus}
 import actor.{MonitoringActors, BroadcasterActor, Actor}
-import scheduler.Scheduler
+import scheduler.SchedulerImpl
 import logger.Logging
 
 /**
@@ -82,7 +82,7 @@ private[jacore] final class JacoreManagerImpl @Inject() (
                     daemonStatus : DaemonStatus,
                     monitoringActors : MonitoringActors,
                     broadcasterActor : BroadcasterActor,
-                    scheduler : Scheduler
+                    scheduler : SchedulerImpl
                 ) extends JacoreManager with Logging
 {
     private[this] var stopped = false

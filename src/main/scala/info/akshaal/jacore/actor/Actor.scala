@@ -70,6 +70,11 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
     private[this] var managed : List[Actor] = Nil
 
     /**
+     * Maintains the state.
+     */
+    protected[actor] var started = false
+
+    /**
      * Starts managing a new actor. Next time this actor this actor is stopped
      * or started, the actor given as argument will be started or stopped automatically.
      */
@@ -193,13 +198,19 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
         }
 
         // Start transport
-        fiber.start
+        fiber.start ()
 
         // Publish event
         broadcaster.broadcast (ActorStartedEvent (this))
 
         // Start managed actors
         managed.foreach (_.start)
+
+        // Start schedules
+        startRecurrentSchedules ()
+
+        // Set state
+        started = true
     }
 
     /**
@@ -207,20 +218,26 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
      */
     def stop() : Unit = {
         debug ("About to stop")
-        
+
+        // Stop schedules
+        cancelSchedules ()
+
         // Unsubscribe
         if (!matcherDefinitionsForSubscribe.isEmpty) {
             broadcaster.unsubscribe (this, matcherDefinitionsForSubscribe : _*)
         }
 
         // Stop transport
-        fiber.dispose
+        fiber.dispose ()
 
         // Publish event
         broadcaster.broadcast (ActorStoppedEvent (this))
 
         // Stop managed actors
         managed.foreach (_.stop)
+
+        // Set state
+        started = false
     }
 
     /**

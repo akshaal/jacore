@@ -17,6 +17,23 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
     import SchedulerTest._
 
     "Scheduler" should {
+        "provide recurrent scheduling which start when actor starts" in {
+            withNotStartedActor [RecurrentTestActor] (actor => {
+                Thread.sleep (400)
+
+                actor.invocations  must_==  0
+
+                actor.start ()
+                Thread.sleep (400)
+
+                actor.invocations must beIn (6 to 10)
+
+                Thread.sleep (400)
+
+                actor.invocations must beIn (14 to 18)
+            })
+        }
+
         "provide recurrent scheduling" in {
             withStartedActor [RecurrentTestActor] (actor => {
                 Thread.sleep (400)
@@ -62,6 +79,36 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
                 actor2.executed  must_==  1
             })
         }
+
+        "provide cancelation of one time scheduling" in {
+            withStartedActor [OneTimeTestActor] (actor => {
+                val control = TestModule.scheduler.in (actor, 123, 130.milliseconds)
+
+                Thread.sleep (30)
+
+                actor.executed   must_==  0
+                control.cancel ()
+
+                Thread.sleep (400)
+
+                actor.executed   must_==  0
+            })
+        }
+
+        "provide cancelation of recurrent scheduling" in {
+            withStartedActor [RecurrentOutterTestActor] (actor => {
+                val control = TestModule.scheduler.every (actor, "Hail", 100.milliseconds)
+
+                Thread.sleep (400)
+
+                actor.invocations must beIn (3 to 5)
+                control.cancel ()
+
+                Thread.sleep (400)
+
+                actor.invocations must beLessThan (6)
+            })
+        }
     }
 }
 
@@ -91,6 +138,17 @@ object SchedulerTest {
     class RecurrentTestActor extends TestActor {
         schedule every 50.milliseconds payload "Hi"
 
+        var invocations = 0
+
+        override def act () = {
+            case TimeOut (x : String) => {
+                debug ("Received message: " + x)
+                invocations += 1
+            }
+        }
+    }
+
+    class RecurrentOutterTestActor extends TestActor {
         var invocations = 0
 
         override def act () = {

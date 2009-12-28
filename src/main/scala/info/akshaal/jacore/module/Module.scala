@@ -16,6 +16,7 @@ import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
 import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterActor}
 import fs.text.{TextFile, TextFileActor}
+import scheduler.{Scheduler, SchedulerImpl}
 import annotation.CallByMessage
 import logger.Logging
 import utils.Prefs
@@ -76,6 +77,7 @@ class Module extends AbstractModule with Logging {
         bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
         bind (classOf[TextFile]).to (classOf[TextFileActor])
         bind (classOf[JacoreManager]).to (classOf[JacoreManagerImpl])
+        bind (classOf[Scheduler]).to (classOf[SchedulerImpl])
 
         // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
         
