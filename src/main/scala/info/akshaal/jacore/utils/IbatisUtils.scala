@@ -32,13 +32,21 @@ object IbatisUtils {
      * 
      * @param propertyFile file with properties
      */
-    def createPooledDataSource (propertyFile : String) : DataSource = {
-        val dataSourcePrefs = new Prefs ("jdbc.properties")
+    def createWarmedUpPooledDataSource (propertyFile : String) : DataSource = {
+        val dataSourcePrefs = new Prefs (propertyFile)
+        val dataSourceProperties = dataSourcePrefs.properties
         val dataSourceFactory = new PooledDataSourceFactory
         
-        dataSourceFactory.setProperties (dataSourcePrefs.properties)
+        dataSourceFactory.setProperties (dataSourceProperties)
         
-        dataSourceFactory.getDataSource
+        val datasource = dataSourceFactory.getDataSource
+
+        // Warm up
+        val max = dataSourceProperties.getProperty ("poolMaximumIdleConnections", "5").toInt
+        (1 to max) map (_ => datasource.getConnection) foreach (_.close)
+
+        // Return datasource
+        datasource
     }
 
     /**
