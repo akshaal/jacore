@@ -29,8 +29,8 @@
     </properties>
 
     <scm>
-        <connection>scm:git:ssh://fw.home.toril.ru/home/akshaal/jacore</connection>
-        <developerConnection>scm:git:ssh://fw.home.toril.ru/home/akshaal/jacore</developerConnection>
+        <connection>scm:git:ssh://fw.home.toril.ru/home/akshaal/git/jacore</connection>
+        <developerConnection>scm:git:ssh://fw.home.toril.ru/home/akshaal/git/jacore</developerConnection>
     </scm>
 
     <!-- = = = = = = = = = = Dependencies = = = = = = = = = = = = = -->
