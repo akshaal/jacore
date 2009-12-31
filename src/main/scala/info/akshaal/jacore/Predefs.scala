@@ -7,9 +7,11 @@
 
 package info.akshaal.jacore
 
-import java.io.{IOException, Closeable, File}
+import java.io.{IOException, Closeable, File, BufferedReader, InputStreamReader, FileInputStream}
 import java.lang.{Iterable => JavaIterable}
 import com.google.inject.Injector
+
+import scala.collection.mutable.ListBuffer
 
 import logger.Logger
 
@@ -109,6 +111,30 @@ object Predefs {
                 }
             }
         }
+    }
+
+    /**
+     * Read content of the file. Lines feeds are not preserved and replaced with just \n.
+     */
+    def readFileLinesAsString (path : String, encoding : String) : String = {
+        withCloseableIO (new BufferedReader (
+                            new InputStreamReader (
+                                new FileInputStream (path), encoding))) (
+            reader => {
+                val buf = new ListBuffer [String]
+                var cont = true
+                while (cont) {
+                    val line = reader.readLine
+                    if (line == null) {
+                        cont = false
+                    } else {
+                        buf += line
+                    }
+                }
+
+                buf.mkString ("\n")
+            }
+        )
     }
 
     /**
