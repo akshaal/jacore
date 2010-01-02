@@ -7,11 +7,13 @@ package info.akshaal.jacore
 package test
 package unit.scheduler
 
+import java.util.Random
+
 import org.specs.SpecificationWithJUnit
 
 import Predefs._
 import unit.UnitTestHelper._
-import scheduler.TimeOut
+import scheduler.{TimeOut, UnfixedScheduling}
 
 class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
     import SchedulerTest._
@@ -109,6 +111,23 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
                 actor.invocations must beLessThan (6)
             })
         }
+
+        "work properly with negative hashcode" in {
+            1 to 3 foreach (_ =>
+                withStartedActor [RecurrentCodeWithNegativeHashcodeTestActor] (actor => {
+                    val started = System.currentTimeMillis
+
+                    waitForMessageAfter (actor) {}
+                    actor.invocations  must_==  1
+
+                    waitForMessageAfter (actor) {}
+                    actor.invocations  must_==  2
+
+                    val lasted = System.currentTimeMillis - started
+                    lasted  must beIn (90 to 210)
+                })
+            )
+        }
     }
 }
 
@@ -166,5 +185,20 @@ object SchedulerTest {
             debug ("Triggered")
             invocations += 1
         }
+    }
+
+    class RecurrentCodeWithNegativeHashcodeTestActor extends TestActor with UnfixedScheduling {
+        schedule every 100.milliseconds payload "Hi"
+
+        var invocations = 0
+
+        override def act () = {
+            case TimeOut (x : String) => {
+                debug ("Received message: " + x + ", actor's hashCode=" + hashCode)
+                invocations += 1
+            }
+        }
+
+        override val hashCode = -1 * Math.abs (new Random ().nextInt)
     }
 }
