@@ -35,19 +35,22 @@ private[jacore] class DaemonStatusActor @Inject() (
     final val statusFile = new File (statusFileName)
 
     if (interval > 0.nanoseconds) {
-        schedule every interval executionOf {
-            val passedSinceAlive = System.nanoTime.nanoseconds - daemonStatus.lastAlive
-            val isReallyAlive = !daemonStatus.isDying && passedSinceAlive < interval
+        schedule every interval executionOf { updateStatus () }
+        schedule in (1 milliseconds) executionOf { updateStatus () }
+    }
 
-            val curTime = System.currentTimeMillis
-            val statusString = if (isReallyAlive) "alive" else "dying"
-            val content = curTime + " " + statusString
+    private[this] def updateStatus () : Unit = {
+        val passedSinceAlive = System.nanoTime.nanoseconds - daemonStatus.lastAlive
+        val isReallyAlive = !daemonStatus.isDying && passedSinceAlive < interval
 
-            textFile.writeFile (statusFile, content) matchResult {
-                case Success (_) => debug ("Status file has been updated")
-                case Failure (exc) => error ("Failed to write status into the file: " + statusFile,
-                                             exc)
-            }
+        val curTime = System.currentTimeMillis
+        val statusString = if (isReallyAlive) "alive" else "dying"
+        val content = curTime + " " + statusString
+
+        textFile.writeFile (statusFile, content) matchResult {
+            case Success (_) => debug ("Status file has been updated")
+            case Failure (exc) => error ("Failed to write status into the file: " + statusFile,
+                                         exc)
         }
     }
 }
