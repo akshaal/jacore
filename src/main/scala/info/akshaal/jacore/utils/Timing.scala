@@ -81,18 +81,18 @@ private[jacore] final class ThreadSafeTiming (limit : TimeUnit,
     private[this] val valuesCount = 100
 
     // All frames
-    val frames = new AtomicReferenceArray [LongValueFrame] (maxThreads)
+    private[this] val frames = new AtomicReferenceArray [LongValueFrame] (maxThreads)
 
     // Current free frame slot
-    val threadFrameCounter = new AtomicInteger (-1)
+    private[this] val threadFrameLastIndex = new AtomicInteger (-1)
 
     // Number of frame of the currently running thread
-    val threadFrameNumber = new ThreadLocal [Int] {
-        protected override def initialValue : Int = threadFrameCounter.incrementAndGet
+    private[this] val threadFrameNumber = new ThreadLocal [Int] {
+        protected override def initialValue : Int = threadFrameLastIndex.incrementAndGet
     }
 
     // Current thread frame
-    val threadFrame = new ThreadLocal [LongValueFrame] {
+    private[this] val threadFrame = new ThreadLocal [LongValueFrame] {
         protected override def initialValue : LongValueFrame = {
             val frame = new LongValueFrame (valuesCount)
 
@@ -123,7 +123,7 @@ private[jacore] final class ThreadSafeTiming (limit : TimeUnit,
         var totalSum = 0L
         var totalCount = 0L
 
-        for (i <- 0 to (threadFrameCounter.get - 1)) {
+        for (i <- 0 to threadFrameLastIndex.get) {
             val frame = frames.get (i)
             if (frame != null) {
                 // Because these can be changed concurrently and not atomically
