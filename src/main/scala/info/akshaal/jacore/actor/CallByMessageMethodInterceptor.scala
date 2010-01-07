@@ -8,6 +8,7 @@
 package info.akshaal.jacore
 package actor
 
+import java.util.IdentityHashMap
 import org.aopalliance.intercept.{MethodInterceptor, MethodInvocation}
 
 /**
@@ -50,8 +51,7 @@ class CallByMessageMethodInterceptor extends MethodInterceptor {
      * This method is called when annotated method is about to be executed.
      */
     override def invoke (invocation : MethodInvocation) : Object = {
-        if (CallByMessageMethodInterceptor.callNow.get) {
-            CallByMessageMethodInterceptor.callNow.set (false)
+        if (CallByMessageMethodInterceptor.callNow.get.containsKey (invocation)) {
             invocation.proceed
         } else {
             invocation.getThis.asInstanceOf[Actor] ! (Call (invocation))
@@ -66,22 +66,23 @@ class CallByMessageMethodInterceptor extends MethodInterceptor {
  */
 private[actor] object CallByMessageMethodInterceptor {
     /**
-     * True signals that the next interception of the annotated method
-     * must proceed, not wrap invocation into message.
+     * Inocations from this list must not be intercepted again.
      */
-    val callNow = new ThreadLocal[Boolean] {
-        override def initialValue : Boolean = false
+    val callNow = new ThreadLocal [IdentityHashMap[MethodInvocation, Null]] {
+        override def initialValue : IdentityHashMap [MethodInvocation, Null] = new IdentityHashMap
     }
 
     /**
      * Call method.
      */
     def call (call : Call) = {
+        val invocation = call.invocation
+
         try {
-            callNow.set (true)
-            call.invocation.proceed
+            callNow.get.put (invocation, null)
+            invocation.proceed
         } finally {
-            callNow.set (false)
+            callNow.get.remove (invocation)
         }
     }
 }

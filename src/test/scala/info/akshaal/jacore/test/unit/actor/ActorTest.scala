@@ -72,6 +72,30 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
             })
         }
 
+        "support chained call by message invocations" in {
+            withNotStartedActor [CallByMessageChainedTestActor2] (actor2 => {
+                withStartedActor [CallByMessageChainedTestActor] (actor => {
+                    actor.sum  must_==  0
+                    actor2.sum  must_==  0
+
+                    waitForMessageAfter (actor) {actor.inc (actor2)}
+
+                    actor.sum  must_==  1
+                    actor2.sum  must_==  0
+
+                    waitForMessageAfter (actor) {actor.inc (actor2)}
+
+                    actor.sum  must_==  2
+                    actor2.sum  must_==  0
+
+                    waitForMessageAfter (actor2) {actor2.start ()}
+
+                    actor.sum  must_==  2
+                    actor2.sum  must_==  2
+               })
+            })
+        }
+
         "work when both @Act and @CallByMessage annotation present" in {
             withStartedActor [CallByMessageWithActTestActor] (actor => {
                 actor.strCount  must_==  0
@@ -435,6 +459,25 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
 }
 
 object ActorTest {
+    class CallByMessageChainedTestActor extends TestActor {
+        var sum = 0
+
+        @CallByMessage
+        def inc (actor : CallByMessageChainedTestActor2) = {
+            sum = sum + 1
+            actor.inc ()
+        }
+    }
+
+    class CallByMessageChainedTestActor2 extends TestActor {
+        var sum = 0
+
+        @CallByMessage
+        def inc () = {
+            sum = sum + 1
+        }
+    }
+
     class ResponseRequesterTestActor extends TestActor {
         var responses = 0
         
