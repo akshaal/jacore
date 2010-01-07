@@ -21,7 +21,7 @@
         <asm.version>3.2</asm.version>
         <mockito.version>1.8.1-rc1</mockito.version>
         <specs.version>1.6.2-SNAP-20091113</specs.version>
-        <ibatis.version>3.0-beta-5</ibatis.version>
+        <ibatis.version>3.0-beta-7</ibatis.version>
         <jms.version>1.1</jms.version>
 
         <!-- Plugin versions -->
