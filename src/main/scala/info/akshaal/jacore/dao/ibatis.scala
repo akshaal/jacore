@@ -73,6 +73,8 @@ abstract class AbstractIbatisDataInserterActor[T] (sqlSessionFactory : SqlSessio
             curSession = None
 
             try {
+                session.commit ()
+
                 for ((actor, payload) <- notifications) {
                     actor ! InsertFinished (payload)
                 }

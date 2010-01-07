@@ -41,6 +41,7 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
                 (session.insert ("testInsert", "Hello")             on session)  then
                 (session.insert ("testInsert", "Actor")             on session)  then
                 (session.insert ("testInsert", "Bye")               on session)  then
+                (session.commit ()                                  on session)  then
                 (session.close ()                                   on session)  were calledInOrder
             })
         }
@@ -54,6 +55,7 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
 
                 client.openSession (ExecutorType.BATCH, true) returns session
                 session.insert ("testInsert", "Hello") throws new RuntimeException ("test exc")
+                session.commit () throws new RuntimeException ("test exc2")
 
                 actor insert "Hello"
 
@@ -61,6 +63,7 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
 
                 (client.openSession (ExecutorType.BATCH, true)      on client)   then
                 (session.insert ("testInsert", "Hello")             on session)  then
+                (session.commit ()                                  on session)  then
                 (session.close ()                                   on session)  were calledInOrder
             })
         }
