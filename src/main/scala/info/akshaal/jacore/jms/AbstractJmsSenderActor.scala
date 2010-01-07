@@ -6,7 +6,7 @@
 package info.akshaal.jacore
 package jms
 
-import javax.jms.{Connection, ConnectionFactory, Destination, Message, MessageProducer, Session}
+import javax.jms.{Connection, Destination, Message, MessageProducer, Session}
 
 import Predefs._
 import actor.{Actor, LowPriorityActorEnv}
@@ -22,13 +22,15 @@ sealed case class JmsMessageSent (payload : Any)
 /**
  * Template for all actors that are supposed to send messages to some JMS destination.
  * @param [T] type of message this actor sends
+ * @param connection JMS connection
+ * @param destination topic or queue
  */
 abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActorEnv,
-                                          connectionFactory : ConnectionFactory,
+                                          connection : Connection,
                                           destination : Destination)
                                 extends Actor (actorEnv = lowPriorityActorEnv)
 {
-    protected var context : Option [(MessageProducer, Session, Connection)] = None
+    protected var context : Option [(MessageProducer, Session)] = None
     protected var notifications : List[(Actor, Any)] = Nil
 
     /**
@@ -64,7 +66,7 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
      */
     protected def doSend (msg : T) : Unit = {
         context match {
-            case Some ((producer, session, _)) =>
+            case Some ((producer, session)) =>
                 producer.send (createJmsMessage (session, msg))
 
             case None =>
@@ -76,21 +78,11 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
     /**
      * Init connection, session and producer.
      */
-    private[this] def initContext () : (MessageProducer, Session, Connection) = {
-        val connection = createConnection ()
-        connection.start
-
+    private[this] def initContext () : (MessageProducer, Session) = {
         val session = createSession (connection)
         val producer = createProducer (session)
         
-        (producer, session, connection)
-    }
-
-    /**
-     * Creates a connection.
-     */
-    protected def createConnection () : Connection = {
-        connectionFactory.createConnection
+        (producer, session)
     }
 
     /**
@@ -113,7 +105,7 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
      * Used to commit end session.
      */
     protected override def afterActs () : Unit = {
-        for ((producer, session, connection) <- context) {
+        for ((producer, session) <- context) {
             context = None
 
             try {
@@ -123,11 +115,7 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
                     actor ! JmsMessageSent (payload)
                 }
             } finally {
-                try {
-                    session.close ()
-                } finally {
-                    connection.close ()
-                }
+                session.close ()
             }
         }
     }
