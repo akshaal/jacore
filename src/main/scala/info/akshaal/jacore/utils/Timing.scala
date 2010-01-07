@@ -123,7 +123,7 @@ private[jacore] final class ThreadSafeTiming (limit : TimeUnit,
         var totalSum = 0L
         var totalCount = 0L
 
-        for (i <- 0 to threadFrameCounter.get) {
+        for (i <- 0 to (threadFrameCounter.get - 1)) {
             val frame = frames.get (i)
             if (frame != null) {
                 // Because these can be changed concurrently and not atomically
