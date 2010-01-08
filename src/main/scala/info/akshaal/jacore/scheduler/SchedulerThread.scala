@@ -52,7 +52,7 @@ private[scheduler] final class SchedulerThread
     }
 
     override def run () : Unit = {
-        info ("Starting scheduler")
+        debug ("Starting scheduler")
         this.setName("Scheduler")
 
         threadPriorityChanger.change (ThreadPriorityChanger.HiPriority)
@@ -65,7 +65,7 @@ private[scheduler] final class SchedulerThread
         }
 
         // Bye-bye
-        info ("Stopping scheduler")
+        debug ("Stopping scheduler")
     }
 
     private def waitAndProcess () : Unit = {
