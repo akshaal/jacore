@@ -12,6 +12,7 @@ import java.lang.{Iterable => JavaIterable}
 import com.google.inject.Injector
 
 import scala.collection.mutable.ListBuffer
+import java.util.concurrent.{ExecutorService, Callable, Future}
 
 import logger.Logger
 
@@ -116,6 +117,7 @@ object Predefs {
     /**
      * Read content of the file. Lines feeds are not preserved and replaced with just \n.
      */
+    @inline
     def readFileLinesAsString (path : String, encoding : String) : String = {
         withCloseableIO (new BufferedReader (
                             new InputStreamReader (
@@ -162,6 +164,23 @@ object Predefs {
         while (it.hasNext) {
             f (it.next)
         }
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Concurrent
+
+    final class RichExecutorService (executorService : ExecutorService) {
+        @inline
+        def submit [A] (code : => A) : Future [A] = {
+            executorService.submit (new Callable [A] {
+                override def call () : A = code
+            })
+        }
+    }
+
+    @inline
+    implicit def executorService2RichExecutorService (executorService : ExecutorService) : RichExecutorService = {
+        new RichExecutorService (executorService)
     }
 
     // /////////////////////////////////////////////////////////////////////
