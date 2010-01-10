@@ -1,11 +1,5 @@
 #!/bin/sh
 
-mvn install:install-file -DgroupId=org.scala-lang -DartifactId=scala-compiler -Dversion=2.8.0-SNAP-20091113 -Dpackaging=jar -Dfile=scala-compiler-2.8.0-SNAP-20091113.jar
-
-mvn install:install-file -DgroupId=org.scala-lang -DartifactId=scala-library -Dversion=2.8.0-SNAP-20091113 -Dpackaging=jar -Dfile=scala-library-2.8.0-SNAP-20091113.jar
-
-mvn install:install-file -DgroupId=org.specs -DartifactId=specs -Dversion=1.6.2-SNAP-20091113 -Dpackaging=jar -Dfile=specs-1.6.2-SNAP-20091113.jar
-
 mvn install:install-file -DgroupId=com.google.inject.extensions -DartifactId=guice-grapher -Dversion=2.0 -Dpackaging=jar -Dfile=guice-grapher-2.0.jar
 
 mvn install:install-file -DgroupId=javax.jms -DartifactId=jms -Dversion=1.1 -Dpackaging=jar -Dfile=jms.jar
