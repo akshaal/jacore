@@ -69,7 +69,7 @@ object ResourceUtils {
                            file : File,
                            pred : URL => Boolean) : Unit =
     {
-        val url = file.toURL
+        val url = file.toURI.toURL
 
         if (pred (url)) {
             buf += url
