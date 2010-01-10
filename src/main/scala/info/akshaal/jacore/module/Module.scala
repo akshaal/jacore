@@ -70,20 +70,8 @@ class Module extends AbstractModule with Logging {
     // - - - - - - - - - - - - Bindings - - - - - - - - - -
 
     override def configure () = {
-        // Configurable implementation bindings
-        bind (classOf[ThreadPriorityChanger]).to (threadPriorityChangerImplClass)
-
-        // Internal implemntation bindings
-        bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
-        bind (classOf[TextFile]).to (classOf[TextFileActor])
-        bind (classOf[JacoreManager]).to (classOf[JacoreManagerImpl])
-        bind (classOf[Scheduler]).to (classOf[SchedulerImpl])
-
-        // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
-        
-        bindInterceptor(Matchers.subclassesOf(classOf[Actor]),
-                        Matchers.annotatedWith (classOf[CallByMessage]),
-                        new CallByMessageMethodInterceptor)
+        // ----------------------------------------------------------
+        // Instances
 
         //  - - - - - - - - - - -  Named - - - - - - - - - -  - - - -
 
@@ -165,5 +153,24 @@ class Module extends AbstractModule with Logging {
         bind (classOf[String])
               .annotatedWith (Names.named("jacore.status.jmx.name"))
               .toInstance (daemonStatusJmxName)
+
+        // ----------------------------------------------------------
+        // Classes
+
+        // Configurable implementation bindings
+        bind (classOf[ThreadPriorityChanger]).to (threadPriorityChangerImplClass)
+
+        // Internal implemntation bindings
+        bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
+        bind (classOf[TextFile]).to (classOf[TextFileActor])
+        bind (classOf[JacoreManager]).to (classOf[JacoreManagerImpl])
+        bind (classOf[Scheduler]).to (classOf[SchedulerImpl])
+
+        // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
+        
+        bindInterceptor(Matchers.subclassesOf(classOf[Actor]),
+                        Matchers.annotatedWith (classOf[CallByMessage]),
+                        new CallByMessageMethodInterceptor)
+
     }
 }

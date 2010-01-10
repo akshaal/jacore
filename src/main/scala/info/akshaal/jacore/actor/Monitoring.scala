@@ -3,9 +3,6 @@
 package info.akshaal.jacore
 package actor
 
-import com.google.inject.{Inject, Singleton}
-import com.google.inject.name.Named
-
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.Set
 

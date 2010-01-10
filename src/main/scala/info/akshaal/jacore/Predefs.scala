@@ -9,7 +9,9 @@ package info.akshaal.jacore
 
 import java.io.{IOException, Closeable, File, BufferedReader, InputStreamReader, FileInputStream}
 import java.lang.{Iterable => JavaIterable}
-import com.google.inject.Injector
+
+import com.google.inject.{Injector, Inject => GuiceInject, Singleton => GuiceSingleton}
+import com.google.inject.name.{Named => GuiceNamed}
 
 import scala.collection.mutable.ListBuffer
 import java.util.concurrent.{ExecutorService, Callable, Future}
@@ -17,15 +19,18 @@ import java.util.concurrent.{ExecutorService, Callable, Future}
 import logger.Logger
 
 object Predefs {
+    // Make timeunit visible
     type TimeUnit = utils.TimeUnit
     val TimeUnit = utils.TimeUnit
 
+    // Make results visible
     type Result [A] = utils.Result [A]
     type Success [A] = utils.Success [A]
     type Failure [A] = utils.Failure [A]
     val Success = utils.Success
     val Failure = utils.Failure
 
+    // File conversion
     @inline
     implicit def string2file (absolutePath : String) : File = new File (absolutePath)
 
@@ -184,7 +189,11 @@ object Predefs {
     }
 
     // /////////////////////////////////////////////////////////////////////
-    // Rich stuff for Guice injector
+    // Rich stuff for Guice
+
+    type Named = GuiceNamed @scala.annotation.target.param
+    type Inject = GuiceInject
+    type Singleton = GuiceSingleton
 
     /**
      * Richness for Guice Injector.

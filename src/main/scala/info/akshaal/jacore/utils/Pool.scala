@@ -3,9 +3,6 @@
 package info.akshaal.jacore
 package utils
 
-import com.google.inject.{Inject, Singleton}
-import com.google.inject.name.Named
-
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{Executors, ThreadFactory}
 

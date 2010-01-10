@@ -2,9 +2,6 @@
 package info.akshaal.jacore
 package daemon
 
-import com.google.inject.{Inject, Singleton}
-import com.google.inject.name.Named
-
 import java.io.File
 
 import Predefs._

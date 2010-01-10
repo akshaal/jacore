@@ -8,9 +8,6 @@
 package info.akshaal.jacore
 package scheduler
 
-import com.google.inject.{Inject, Singleton}
-import com.google.inject.name.Named
-
 import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger}
 import logger.Logging

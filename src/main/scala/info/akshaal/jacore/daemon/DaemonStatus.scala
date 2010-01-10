@@ -8,9 +8,6 @@
 package info.akshaal.jacore
 package daemon
 
-import com.google.inject.{Inject, Singleton}
-import com.google.inject.name.Named
-
 import collection.immutable.{List, Nil}
 import scala.collection.JavaConversions._
 import scala.collection.mutable.Map

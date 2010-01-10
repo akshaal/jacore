@@ -16,9 +16,6 @@ import java.nio.{ByteBuffer, CharBuffer}
 import java.nio.channels.CompletionHandler
 import java.nio.charset.Charset
 
-import com.google.inject.{Inject, Singleton}
-import com.google.inject.name.Named
-
 import Predefs._
 import actor.{Actor, NormalPriorityActorEnv, Operation}
 import logger.Logging
