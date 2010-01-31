@@ -10,7 +10,7 @@
     <!-- = = = = = = = = = = = = Default properties = = = = = = = = = = -->
     <properties>
         <!-- Versions -->
-        <scala.version>2.8.0.Beta1-RC7</scala.version>
+        <scala.version>2.8.0.Beta1</scala.version>
         <jetlang.version>0.2.0</jetlang.version>
         <junit.version>4.7</junit.version>
         <slf4j.version>1.5.8</slf4j.version>
@@ -20,7 +20,7 @@
         <cglib.version>2.2</cglib.version>
         <asm.version>3.2</asm.version>
         <mockito.version>1.8.1-rc1</mockito.version>
-        <specs.version>1.6.1-2.8.0.Beta1-RC7</specs.version>
+        <specs.version>1.6.2</specs.version>
         <ibatis.version>3.0-beta-7</ibatis.version>
         <jms.version>1.1</jms.version>
 
@@ -62,7 +62,7 @@
 
     	<dependency>
             <groupId>org.scala-tools.testing</groupId>
-            <artifactId>specs</artifactId>
+            <artifactId>specs_2.8.0.Beta1</artifactId>
             <version>${specs.version}</version>
             <scope>test</scope>
         </dependency>
@@ -129,47 +129,6 @@
             <version>${guice.version}</version>
         </dependency>
     </dependencies>
-
-    <!-- = = = = = = = = = = = = = Repositories = = = = = = = = = = = = -->
-    <repositories>
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository Snapshots</name>
-            <url>http://scala-tools.org/repo-snapshots</url>
-        </repository>
-
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
-
-        <repository>
-            <id>google-maven-repository</id>
-            <name>Google Maven Repository</name>
-            <url>http://google-maven-repository.googlecode.com/svn/repository/</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tool</id>
-            <name>ScalaTool</name>
-            <url>http://scala-tools.org/repo-releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>scala-tool</id>
-            <name>ScalaTool Snaps</name>
-            <url>http://scala-tools.org/repo-snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <!-- = = = = = = = = = = = = = = Build = = = = = = = = = = = = = = = -->
 
