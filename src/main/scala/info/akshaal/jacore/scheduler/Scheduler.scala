@@ -96,12 +96,12 @@ class SchedulerImpl @Inject() (
         val periodNano = period.asNanoseconds
         val curNanoTime = System.nanoTime
         val semiStableNumber =
-            Math.abs (
-                actor match {
-                    case unfixed : UnfixedScheduling => actor.hashCode
-                    case _ => actor.getClass.getName.toString.hashCode
-                }
-            )
+                (
+                    actor match {
+                        case unfixed : UnfixedScheduling => actor
+                        case _                           => actor.getClass.getName.toString
+                    }
+                ).hashCode.asInstanceOf [Long].abs
 
         def calc (shift : Long) =
             ((curNanoTime / periodNano + shift) * periodNano + semiStableNumber % periodNano)

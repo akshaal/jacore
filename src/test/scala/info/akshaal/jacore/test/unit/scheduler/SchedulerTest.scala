@@ -124,7 +124,41 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
                     actor.invocations  must_==  2
 
                     val lasted = System.currentTimeMillis - started
-                    lasted  must beIn (90 to 210)
+                    lasted  must beIn (160 to 440)
+                })
+            )
+        }
+
+        "work properly with min hashcode" in {
+            1 to 3 foreach (_ =>
+                withStartedActor [RecurrentCodeWithMinHashcodeTestActor] (actor => {
+                    val started = System.currentTimeMillis
+
+                    waitForMessageAfter (actor) {}
+                    actor.invocations  must_==  1
+
+                    waitForMessageAfter (actor) {}
+                    actor.invocations  must_==  2
+
+                    val lasted = System.currentTimeMillis - started
+                    lasted  must beIn (160 to 440)
+                })
+            )
+        }
+
+        "work properly with max hashcode" in {
+            1 to 3 foreach (_ =>
+                withStartedActor [RecurrentCodeWithMaxHashcodeTestActor] (actor => {
+                    val started = System.currentTimeMillis
+
+                    waitForMessageAfter (actor) {}
+                    actor.invocations  must_==  1
+
+                    waitForMessageAfter (actor) {}
+                    actor.invocations  must_==  2
+
+                    val lasted = System.currentTimeMillis - started
+                    lasted  must beIn (160 to 440)
                 })
             )
         }
@@ -188,7 +222,7 @@ object SchedulerTest {
     }
 
     class RecurrentCodeWithNegativeHashcodeTestActor extends TestActor with UnfixedScheduling {
-        schedule every 100.milliseconds payload "Hi"
+        schedule every 200.milliseconds payload "Hi"
 
         var invocations = 0
 
@@ -200,5 +234,35 @@ object SchedulerTest {
         }
 
         override val hashCode = -1 * Math.abs (new Random ().nextInt)
+    }
+
+    class RecurrentCodeWithMinHashcodeTestActor extends TestActor with UnfixedScheduling {
+        schedule every 200.milliseconds payload "Hi"
+
+        var invocations = 0
+
+        override def act () = {
+            case TimeOut (x : String) => {
+                debug ("Received message: " + x + ", actor's hashCode=" + hashCode)
+                invocations += 1
+            }
+        }
+
+        override val hashCode = Integer.MIN_VALUE
+    }
+
+    class RecurrentCodeWithMaxHashcodeTestActor extends TestActor with UnfixedScheduling {
+        schedule every 200.milliseconds payload "Hi"
+
+        var invocations = 0
+
+        override def act () = {
+            case TimeOut (x : String) => {
+                debug ("Received message: " + x + ", actor's hashCode=" + hashCode)
+                invocations += 1
+            }
+        }
+
+        override val hashCode = Integer.MAX_VALUE
     }
 }
