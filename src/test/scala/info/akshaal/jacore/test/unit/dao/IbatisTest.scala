@@ -35,7 +35,7 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
                 actor insert ("Actor")
                 actor insert ("Bye")
 
-                waitForMessageAfter (actor) {actor.start}
+                actor.waitForMessageAfter {actor.start}
 
                 (client.openSession (ExecutorType.BATCH, true)      on client)   then
                 (session.insert ("testInsert", "Hello")             on session)  then
@@ -59,7 +59,7 @@ class IbatisTest extends SpecificationWithJUnit ("iBatis support specification")
 
                 actor insert "Hello"
 
-                waitForMessageAfter (actor) {actor.start}
+                actor.waitForMessageAfter {actor.start}
 
                 (client.openSession (ExecutorType.BATCH, true)      on client)   then
                 (session.insert ("testInsert", "Hello")             on session)  then

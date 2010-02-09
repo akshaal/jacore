@@ -47,7 +47,7 @@ class JmsSenderActorTest extends SpecificationWithJUnit ("AbstractJmsSenderActor
                 actor.send ("two")
                 actor.send ("3")
 
-                waitForMessageAfter (actor) {actor.start}
+                actor.waitForMessageAfter {actor.start}
 
                 (connection.createSession (false, Session.AUTO_ACKNOWLEDGE) on connection)  then
                 (session.createProducer (MockHelper.destination)            on session)     then
@@ -81,7 +81,7 @@ class JmsSenderActorTest extends SpecificationWithJUnit ("AbstractJmsSenderActor
 
                 actor.send ("one")
 
-                waitForMessageAfter (actor) {actor.start}
+                actor.waitForMessageAfter {actor.start}
 
                 (connection.createSession (false, Session.AUTO_ACKNOWLEDGE) on connection)  then
                 (session.createProducer (MockHelper.destination)            on session)     then

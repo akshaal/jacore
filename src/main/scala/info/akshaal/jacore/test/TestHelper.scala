@@ -126,33 +126,6 @@ trait TestHelper {
     }
 
     /**
-     * Execute the given code and wait for a message to be processed by actor. If
-     * message is not received within some timeout interval, then test will be failed.
-     * @param actor actor to wait message on
-     * @param count number of batches to wait
-     * @param f code to execute before waiting for a message on actor
-     */
-    def waitForMessageBatchesAfter[T <: Waitable] (actor : T, count : Int) (f : => Any) : Unit = {
-        actor.messageLatch = new CountDownLatch (count)
-
-        f
-        
-        if (!actor.messageLatch.await (timeout.asMilliseconds, JavaTimeUnit.MILLISECONDS)) {
-            throw new MessageTimeout
-        }
-    }
-
-    /**
-     * Execute the given code and wait for a message to be processed by actor. If
-     * message is not received within some timeout interval, then test will be failed.
-     * @param actor actor to wait message on
-     * @param f code to execute before waiting for a message on actor
-     */
-    def waitForMessageAfter[T <: Waitable] (actor : T) (f : => Any) : Unit = {
-        waitForMessageBatchesAfter (actor, 1) {f}
-    }
-
-    /**
      * Thrown if time is occured.
      */
     class MessageTimeout extends RuntimeException ("Tinmeout while waiting for a message")
@@ -161,9 +134,39 @@ trait TestHelper {
      * Makes it possible to wait a momment when messages are processed by actor.
      */
     trait Waitable extends Actor {
-        var messageLatch : CountDownLatch = null
+        private var messageLatch : CountDownLatch = null
 
-        override def afterActs () : Unit = {
+        /**
+         * Execute the given code and wait for a message to be processed by actor. If
+         * message is not received within some timeout interval, then MessageTimeout exception
+         * will be thrown.
+         * @param count number of batches to wait
+         * @param f code to execute before waiting for a message on actor
+         */
+        def waitForMessageBatchesAfter (count : Int) (f : => Any) : Unit = {
+            messageLatch = new CountDownLatch (count)
+
+            debug ("Executing message trigger before waiting for message(s)")
+
+            f
+
+            debug ("Waiting for " + count + " message(s)")
+            if (!messageLatch.await (timeout.asMilliseconds, JavaTimeUnit.MILLISECONDS)) {
+                throw new MessageTimeout
+            }
+        }
+
+        /**
+         * Execute the given code and wait for a message to be processed by actor. If
+         * message is not received within some timeout interval, then MessageTimeout
+         * exception will be thrown.
+         * @param f code to execute before waiting for a message on actor
+         */
+        def waitForMessageAfter (f : => Any) : Unit = {
+            waitForMessageBatchesAfter (1) {f}
+        }
+
+        protected override def afterActs () : Unit = {
             try {
                 super.afterActs
             } finally {

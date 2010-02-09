@@ -32,7 +32,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
             withStartedActor [MessageReceivingTestActor] (actor => {
                 actor.received  must_==  0
 
-                waitForMessageAfter (actor) {actor ! "Hi"}
+                actor.waitForMessageAfter {actor ! "Hi"}
 
                 actor.received  must_==  1
             })
@@ -43,9 +43,9 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                                SpeakingTestActor] ((stringActor, speakingActor) => {
                 speakingActor.stringMaker = Some (stringActor)
 
-                waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 1}
-                waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 3}
-                waitForMessageBatchesAfter (speakingActor, 2) {speakingActor ! 7}
+                speakingActor.waitForMessageBatchesAfter (2) {speakingActor ! 1}
+                speakingActor.waitForMessageBatchesAfter (2) {speakingActor ! 3}
+                speakingActor.waitForMessageBatchesAfter (2) {speakingActor ! 7}
 
                 speakingActor.accuInt      must_==  List (7, 3, 1)
                 speakingActor.accuString   must_==  List ("x7", "x3", "x1")
@@ -55,7 +55,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
         "be exception resistant" in {
             withStartedActor [UnstableTestActor] (actor => {
                 for (i <- 1 to 10) {
-                    waitForMessageAfter (actor) {actor ! i}
+                    actor.waitForMessageAfter {actor ! i}
                 }
 
                 actor.sum  must_==  (1 + 3 + 5 + 7 + 9)
@@ -65,9 +65,9 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
         "support methods with call by message style" in {
             withStartedActor [CallByMessageTestActor] (actor => {
                 actor.sum  must_==  0
-                waitForMessageAfter (actor) {actor.inc ()}
+                actor.waitForMessageAfter {actor.inc ()}
                 actor.sum  must_==  1
-                waitForMessageAfter (actor) {actor.inc ()}
+                actor.waitForMessageAfter {actor.inc ()}
                 actor.sum  must_==  2
             })
         }
@@ -78,17 +78,17 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                     actor.sum  must_==  0
                     actor2.sum  must_==  0
 
-                    waitForMessageAfter (actor) {actor.inc (actor2)}
+                    actor.waitForMessageAfter {actor.inc (actor2)}
 
                     actor.sum  must_==  1
                     actor2.sum  must_==  0
 
-                    waitForMessageAfter (actor) {actor.inc (actor2)}
+                    actor.waitForMessageAfter {actor.inc (actor2)}
 
                     actor.sum  must_==  2
                     actor2.sum  must_==  0
 
-                    waitForMessageAfter (actor2) {actor2.start ()}
+                    actor2.waitForMessageAfter {actor2.start ()}
 
                     actor.sum  must_==  2
                     actor2.sum  must_==  2
@@ -102,19 +102,19 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.intCount  must_==  0
                 actor.incCount  must_==  0
 
-                waitForMessageAfter (actor) {actor.inc}
+                actor.waitForMessageAfter {actor.inc}
 
                 actor.strCount  must_==  0
                 actor.intCount  must_==  0
                 actor.incCount  must_==  1
 
-                waitForMessageAfter (actor) {actor ! "hi"}
+                actor.waitForMessageAfter {actor ! "hi"}
 
                 actor.strCount  must_==  1
                 actor.intCount  must_==  0
                 actor.incCount  must_==  1
 
-                waitForMessageAfter (actor) {actor ! 123}
+                actor.waitForMessageAfter {actor ! 123}
 
                 actor.strCount  must_==  1
                 actor.intCount  must_==  1
@@ -126,7 +126,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
             withStartedActor [AdoptedProtectedTestActor] (actor => {
                 actor.intReceived  must beFalse
 
-                waitForMessageAfter (actor) {actor ! 123}
+                actor.waitForMessageAfter {actor ! 123}
 
                 actor.intReceived  must beTrue
             })
@@ -137,12 +137,12 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.intReceived  must beFalse
                 actor.strReceived  must beFalse
 
-                waitForMessageAfter (actor) {actor ! "Hi"}
+                actor.waitForMessageAfter {actor ! "Hi"}
 
                 actor.intReceived  must beFalse
                 actor.strReceived  must beTrue
 
-                waitForMessageAfter (actor) {actor ! 123}
+                actor.waitForMessageAfter {actor ! 123}
 
                 actor.intReceived  must beTrue
                 actor.strReceived  must beTrue
@@ -155,13 +155,13 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.intReceived   must beFalse
                 actor.intReceived2  must beFalse
 
-                waitForMessageAfter (actor) {actor ! "Hi"}
+                actor.waitForMessageAfter {actor ! "Hi"}
 
                 actor.strReceived   must beTrue
                 actor.intReceived   must beFalse
                 actor.intReceived2  must beFalse
 
-                waitForMessageAfter (actor) {actor ! 123}
+                actor.waitForMessageAfter {actor ! 123}
 
                 actor.strReceived   must beTrue
                 actor.intReceived   must beFalse
@@ -183,7 +183,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.npeException      must_==  0
 
                 // Test sending int
-                waitForMessageAfter (actor) {actor ! 2}
+                actor.waitForMessageAfter {actor ! 2}
 
                 actor.never1            must_==  0
                 actor.never2            must_==  0
@@ -196,7 +196,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.npeException      must_==  0
 
                 // Test sending string
-                waitForMessageAfter (actor) {actor ! "Hello"}
+                actor.waitForMessageAfter {actor ! "Hello"}
 
                 actor.never1            must_==  0
                 actor.never2            must_==  0
@@ -209,7 +209,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.npeException      must_==  0
 
                 // Test sending object
-                waitForMessageAfter (actor) {actor ! 'ArbObject}
+                actor.waitForMessageAfter {actor ! 'ArbObject}
 
                 actor.never1            must_==  0
                 actor.never2            must_==  0
@@ -222,7 +222,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.npeException      must_==  0
 
                 // Test sending empty string
-                waitForMessageAfter (actor) {actor ! ""}
+                actor.waitForMessageAfter {actor ! ""}
 
                 actor.never1            must_==  0
                 actor.never2            must_==  0
@@ -235,7 +235,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.npeException      must_==  0
 
                 // Test sending some object
-                waitForMessageAfter (actor) {actor ! (new OrderTestObj(5))}
+                actor.waitForMessageAfter {actor ! (new OrderTestObj(5))}
 
                 actor.never1            must_==  0
                 actor.never2            must_==  0
@@ -248,7 +248,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.npeException      must_==  0
 
                 // Test sending runtime exception see if custom annotation works
-                waitForMessageAfter (actor) {
+                actor.waitForMessageAfter {
                     actor ! (new RuntimeException ("123", new NullPointerException ()))
                 }
 
@@ -263,7 +263,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.npeException      must_==  1
 
                 // Test sending runtime exception see if custom annotation is skipped
-                waitForMessageAfter (actor) {
+                actor.waitForMessageAfter {
                     actor ! (new RuntimeException ("123", new IllegalArgumentException ()))
                 }
 
@@ -344,8 +344,8 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                     actor.managedTestActor.starts    must_==  0
                     actor.managedTestActor.stops     must_==  0
 
-                    waitForMessageAfter (actor) {
-                        waitForMessageAfter (actor.managedTestActor) {actor.start ()}
+                    actor.waitForMessageAfter {
+                        actor.managedTestActor.waitForMessageAfter {actor.start ()}
                     }
 
                     actor.starts                     must_==  1
@@ -398,11 +398,11 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 actor.test ()
                 actor.called  must_==  0
 
-                waitForMessageAfter (actor) {actor.start ()}
+                actor.waitForMessageAfter {actor.start ()}
 
                 actor.called  must_==  1
 
-                waitForMessageAfter (actor) {actor.test ()}
+                actor.waitForMessageAfter {actor.test ()}
 
                 actor.called  must_==  2
             })
@@ -416,7 +416,7 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
 
                     badActor.test (actor)
 
-                    waitForMessageAfter (actor) {
+                    actor.waitForMessageAfter {
                         actor.start ()
                         badActor.start ()
                         actor.test ()
@@ -435,19 +435,19 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                     reqActor.start
                     reqActor.responses  must_==  0
 
-                    waitForMessageAfter (reqActor) {
+                    reqActor.waitForMessageAfter {
                         reqActor.request (respActor)
                     }
                     
                     reqActor.responses  must_==  0
 
-                    waitForMessageAfter (reqActor) {
+                    reqActor.waitForMessageAfter {
                         respActor.start ()
                     }
 
                     reqActor.responses  must_==  1
 
-                    waitForMessageBatchesAfter (reqActor, 2) {
+                    reqActor.waitForMessageBatchesAfter (2) {
                         reqActor.request (respActor)
                     }
 

@@ -114,13 +114,13 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
 
         "work properly with negative hashcode" in {
             1 to 3 foreach (_ =>
-                withStartedActor [RecurrentCodeWithNegativeHashcodeTestActor] (actor => {
+                withNotStartedActor [RecurrentCodeWithNegativeHashcodeTestActor] (actor => {
                     val started = System.currentTimeMillis
 
-                    waitForMessageAfter (actor) {}
+                    actor.waitForMessageAfter {actor.start}
                     actor.invocations  must_==  1
 
-                    waitForMessageAfter (actor) {}
+                    actor.waitForMessageAfter {}
                     actor.invocations  must_==  2
 
                     val lasted = System.currentTimeMillis - started
@@ -131,13 +131,13 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
 
         "work properly with min hashcode" in {
             1 to 3 foreach (_ =>
-                withStartedActor [RecurrentCodeWithMinHashcodeTestActor] (actor => {
+                withNotStartedActor [RecurrentCodeWithMinHashcodeTestActor] (actor => {
                     val started = System.currentTimeMillis
 
-                    waitForMessageAfter (actor) {}
+                    actor.waitForMessageAfter {actor.start}
                     actor.invocations  must_==  1
 
-                    waitForMessageAfter (actor) {}
+                    actor.waitForMessageAfter {}
                     actor.invocations  must_==  2
 
                     val lasted = System.currentTimeMillis - started
@@ -148,13 +148,13 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
 
         "work properly with max hashcode" in {
             1 to 3 foreach (_ =>
-                withStartedActor [RecurrentCodeWithMaxHashcodeTestActor] (actor => {
+                withNotStartedActor [RecurrentCodeWithMaxHashcodeTestActor] (actor => {
                     val started = System.currentTimeMillis
 
-                    waitForMessageAfter (actor) {}
+                    actor.waitForMessageAfter {actor.start}
                     actor.invocations  must_==  1
 
-                    waitForMessageAfter (actor) {}
+                    actor.waitForMessageAfter {}
                     actor.invocations  must_==  2
 
                     val lasted = System.currentTimeMillis - started
