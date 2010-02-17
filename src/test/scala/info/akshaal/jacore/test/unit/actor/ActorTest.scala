@@ -455,6 +455,77 @@ class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mock
                 }
             )
         }
+
+        "provide a convenient way to get result of operation using Future object" in {
+            withNotStartedActor [ResponserTestActor] (actor => {
+                val future = actor.justCallBack runWithFutureAsy
+
+                future.isDone  must beFalse
+                Thread.sleep (50)
+                future.isDone  must beFalse
+
+                actor.start ()
+                Thread.sleep (200)
+                future.isDone  must beTrue
+                future.get     must_== 123
+            })
+        }
+
+        "cast exception if operation called more than once using Future" in {
+            withNotStartedActor [ResponserTestActor] (actor => {
+                val op = actor.justCallBack
+
+                op.runWithFutureAsy
+
+                op.runWithFutureAsy must throwA[UnrecoverableError]
+            })
+        }
+
+        "cast exception if actor tries to yield result more than once" in {
+            withStartedActor [ResponserDupTestActor] (actor => {
+                actor.errors   must_== 0
+                
+                val future = actor.justCallBack runWithFutureAsy
+                
+                future.get     must_== 123
+
+                Thread.sleep (50)
+                actor.errors   must_== 1
+            })
+        }
+
+        "cast exception if operation called more than one time" in {
+            withNotStartedActors [ResponseRequesterDupTestActor, ResponserTestActor] (
+                (reqActor, respActor) => {
+                    reqActor.responses   must_==  0
+                    reqActor.exceptions  must_==  0
+                    reqActor.start
+                    reqActor.responses   must_==  0
+                    reqActor.exceptions  must_==  0
+
+                    reqActor.waitForMessageAfter {
+                        reqActor.request (respActor)
+                    }
+
+                    reqActor.responses   must_==  0
+                    reqActor.exceptions  must_==  1
+
+                    reqActor.waitForMessageAfter {
+                        respActor.start ()
+                    }
+
+                    reqActor.responses   must_==  1
+                    reqActor.exceptions  must_==  1
+
+                    reqActor.waitForMessageBatchesAfter (2) {
+                        reqActor.request (respActor)
+                    }
+                    
+                    reqActor.responses   must_==  2
+                    reqActor.exceptions  must_==  2
+                }
+            )
+        }
     }
 }
 
@@ -478,12 +549,38 @@ object ActorTest {
         }
     }
 
+    class ResponseRequesterDupTestActor extends TestActor {
+        var responses = 0
+        var exceptions = 0
+
+        @CallByMessage
+        def request (responser : ResponserTestActor) : Unit = {
+            val cbk = responser.justCallBack
+
+            try {
+                cbk runMatchingResultAsy {
+                    case i : Int => responses += 1
+                }
+            } catch {
+                case e : UnrecoverableError => exceptions += 1
+            }
+
+            try {
+                cbk runMatchingResultAsy {
+                    case i : Int => responses += 1
+                }
+            } catch {
+                case e : UnrecoverableError => exceptions += 1
+            }
+        }
+    }
+
     class ResponseRequesterTestActor extends TestActor {
         var responses = 0
         
         @CallByMessage
         def request (responser : ResponserTestActor) : Unit = {
-            responser.justCallBack matchResult {
+            responser.justCallBack runMatchingResultAsy {
                 case i : Int =>
                     responses += 1
             }
@@ -491,14 +588,40 @@ object ActorTest {
     }
 
     class ResponserTestActor extends TestActor {
-         def justCallBack = operationWithComplexResult [Int] ("just operation") (_ (123))
+        def justCallBack =
+            new AbstractOperation [Int] {
+                override def processRequest () {
+                    yieldResult (123)
+                }
+            }
+    }
+
+    class ResponserDupTestActor extends TestActor {
+        var errors = 0
+
+        def justCallBack =
+            new AbstractOperation [Int] {
+                override def processRequest () {
+                    try {
+                        yieldResult (123)
+                    } catch {
+                        case e : UnrecoverableError => errors += 1
+                    }
+
+                    try {
+                        yieldResult (123)
+                    } catch {
+                        case e : UnrecoverableError => errors += 1
+                    }
+                }
+            }
     }
 
     class PostponedTestActor extends TestActor {
         var called = 0
         
         def test () : Unit = {
-            postponed ("test ()") {
+            postponed {
                 called += 1
             }
         }
@@ -508,7 +631,7 @@ object ActorTest {
         var called = 0
 
         def test (someOtherActor : TestActor) : Unit = {
-            val block = PostponedBlock ("bad something", () => called += 1)
+            val block = PostponedBlock (() => called += 1)
 
             someOtherActor ! block
         }

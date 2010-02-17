@@ -60,7 +60,7 @@ trait TextFile {
      * @param content string content to write into the file
      * @param payload payload to passed back in messsage when writing is done
      */
-    def writeFile (file : File, content : String, payload : Any) : Unit
+    def writeFileAsy (file : File, content : String, payload : Any) : Unit
 
     /**
      * Write a given content into the file providing a way to handle result.
@@ -68,7 +68,7 @@ trait TextFile {
      * @param file write content to this file
      * @param content string content to write into the file
      */
-    def writeFile (file : File, content : String) : Operation.WithResult [Unit]
+    def opWriteFile (file : File, content : String) : Operation.WithResult [Unit]
 
     /**
      * Open file and initiate reading from the file. When reading is done a message will sended
@@ -78,14 +78,14 @@ trait TextFile {
      * @param file file to read from
      * @param payload payload to passed back in messsage when reading is done
      */
-    def readFile (file : File, payload : Any) : Unit
+    def readFileAsy (file : File, payload : Any) : Unit
 
     /**
      * Open file and initiate reading from the file.
      * 
      * @param file file to read from
      */
-    def readFile (file : File) : Operation.WithResult [String]
+    def opReadFile (file : File) : Operation.WithResult [String]
 }
 
 // ///////////////////////////////////////////////////////////////////////
@@ -104,9 +104,9 @@ private[jacore] class TextFileActor @Inject() (
     private val encoder = Charset.forName (encoding).newEncoder ()
     private val decoder = Charset.forName (encoding).newDecoder ()
 
-    override def writeFile (file : File, content : String, payload : Any) : Unit =
+    override def writeFileAsy (file : File, content : String, payload : Any) : Unit =
     {
-        postponed ("writeFile") {
+        postponed {
             val currentSender = sender
             def whenDone = currentSender.foreach (_ ! (WriteFileDone (file, payload)))
             def whenException (exc : Throwable) =
@@ -124,14 +124,15 @@ private[jacore] class TextFileActor @Inject() (
         }
     }
 
-    def writeFile (file : File, content : String) : Operation.WithResult [Unit] = {
-        operation [Unit] ("writeFile") (resultReceiver =>
-                        doWriteFile (file,
-                                     content,
-                                     resultReceiver (Success [Unit] ()),
-                                     exc => resultReceiver (Failure [Unit] (exc)))
-                 )
-
+    def opWriteFile (file : File, content : String) : Operation.WithResult [Unit] = {
+        new AbstractOperation [Result[Unit]] {
+            override def processRequest () {
+                doWriteFile (file,
+                             content,
+                             yieldResult (Success [Unit] ()),
+                             exc => yieldResult (Failure [Unit] (exc)))
+            }
+        }
     }
 
     private def doWriteFile (file : File,
@@ -157,9 +158,9 @@ private[jacore] class TextFileActor @Inject() (
         }
     }
 
-    override def readFile (file : File, payload : Any) : Unit =
+    override def readFileAsy (file : File, payload : Any) : Unit =
     {
-        postponed ("readFile") {
+        postponed {
             val currentSender = sender
 
             def whenDone (content : String) =
@@ -179,12 +180,14 @@ private[jacore] class TextFileActor @Inject() (
         }
     }
 
-    override def readFile (file : File) : Operation.WithResult [String] = {
-        operation [String] ("readFile") (resultReceiver =>
-                    doReadFile (file,
-                                cont => resultReceiver (Success [String] (cont)),
-                                exc => resultReceiver (Failure [String] (exc)))
-                )
+    override def opReadFile (file : File) : Operation.WithResult [String] = {
+        new AbstractOperation [Result[String]] {
+            override def processRequest () {
+                doReadFile (file,
+                            cont => yieldResult (Success [String] (cont)),
+                            exc => yieldResult (Failure [String] (exc)))
+            }
+        }
     }
 
     private def doReadFile (file : File,

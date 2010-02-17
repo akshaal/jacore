@@ -142,7 +142,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
                 case TimeOut (ScheduledCode (code)) =>
                     code ()
 
-                case PostponedBlock (_, code) =>
+                case PostponedBlock (code) =>
                     code ()
 
                 case other if dispatcher.dispatch(msg) =>

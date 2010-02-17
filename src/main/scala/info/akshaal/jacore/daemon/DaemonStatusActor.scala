@@ -45,7 +45,7 @@ private[jacore] class DaemonStatusActor @Inject() (
         val content = curTime + " " + statusString
 
         // TODO: Save to temp file. Rename after save. This will help avoid "empty" files.
-        textFile.writeFile (statusFile, content) matchResult {
+        textFile.opWriteFile (statusFile, content) runMatchingResultAsy {
             case Success (_) => debug ("Status file has been updated")
             case Failure (exc) => error ("Failed to write status into the file: " + statusFile,
                                          exc)

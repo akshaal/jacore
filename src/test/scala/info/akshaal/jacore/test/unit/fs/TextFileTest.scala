@@ -185,7 +185,7 @@ object TextFileTest {
         override def act () = {
             case msg @ (file : File, content : String, payl : Any) => {
                 debug ("Received message: " + msg)
-                TestModule.textFile.writeFile (file, content, payl)
+                TestModule.textFile.writeFileAsy (file, content, payl)
             }
 
             case msg @ WriteFileDone (file, payl) => {
@@ -211,7 +211,7 @@ object TextFileTest {
             case msg @ (file : File, content : String, payl : Any) =>
                 debug ("Received message: " + msg)
                 
-                TestModule.textFile.writeFile (file, content) matchResult {
+                TestModule.textFile.opWriteFile (file, content) runMatchingResultAsy {
                     case Success (_) =>
                         done = done + 1
                         this.payload = payl
@@ -232,7 +232,7 @@ object TextFileTest {
         override def act () = {
             case msg @ (file : File, payl) => {
                 debug ("Received message: " + msg)
-                TestModule.textFile.readFile (file, payl)
+                TestModule.textFile.readFileAsy (file, payl)
             }
 
             case msg @ ReadFileDone (file, cont, payl) => {
@@ -259,7 +259,7 @@ object TextFileTest {
         override def act () = {
             case msg @ (file : File, payl) =>
                 debug ("Received message: " + msg)
-                TestModule.textFile.readFile (file) matchResult {
+                TestModule.textFile.opReadFile (file) runMatchingResultAsy {
                     case Success (cont) =>
                         done = done + 1
                         this.payload = payl

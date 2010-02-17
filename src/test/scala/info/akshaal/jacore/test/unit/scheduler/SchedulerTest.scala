@@ -124,7 +124,7 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
                     actor.invocations  must_==  2
 
                     val lasted = System.currentTimeMillis - started
-                    lasted  must beIn (160 to 440)
+                    lasted  must beIn (140 to 460)
                 })
             )
         }
@@ -141,7 +141,7 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
                     actor.invocations  must_==  2
 
                     val lasted = System.currentTimeMillis - started
-                    lasted  must beIn (160 to 440)
+                    lasted  must beIn (140 to 460)
                 })
             )
         }
@@ -158,7 +158,7 @@ class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
                     actor.invocations  must_==  2
 
                     val lasted = System.currentTimeMillis - started
-                    lasted  must beIn (160 to 440)
+                    lasted  must beIn (140 to 460)
                 })
             )
         }
