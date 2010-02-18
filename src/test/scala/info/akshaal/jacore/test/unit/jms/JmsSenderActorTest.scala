@@ -43,9 +43,9 @@ class JmsSenderActorTest extends SpecificationWithJUnit ("AbstractJmsSenderActor
                 session.createObjectMessage ("two") returns msg2
                 session.createObjectMessage ("3") returns msg3
 
-                actor.send ("one")
-                actor.send ("two")
-                actor.send ("3")
+                actor.sendAsy ("one")
+                actor.sendAsy ("two")
+                actor.sendAsy ("3")
 
                 actor.waitForMessageAfter {actor.start}
 
@@ -79,7 +79,7 @@ class JmsSenderActorTest extends SpecificationWithJUnit ("AbstractJmsSenderActor
                 producer.close () throws new JMSException ("test")
                 session.close () throws new JMSException ("test")
 
-                actor.send ("one")
+                actor.sendAsy ("one")
 
                 actor.waitForMessageAfter {actor.start}
 

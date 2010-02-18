@@ -10,7 +10,6 @@ import javax.jms.{Connection, Destination, Message, MessageProducer, Session}
 
 import Predefs._
 import actor.{Actor, LowPriorityActorEnv}
-import annotation.CallByMessage
 
 /**
  * Issued to the requester when sending is finished.
@@ -43,9 +42,10 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
      * Send message.
      * @param msg message to send
      */
-    @CallByMessage
-    def send (msg : T) : Unit = {
-        doSend (msg)
+    def sendAsy (msg : T) : Unit = {
+        postponed {
+            doSend (msg)
+        }
     }
 
     /**
@@ -53,11 +53,12 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
      * @param msg message to send
      * @param payload send this message back to sender
      */
-    @CallByMessage
-    def send (msg : T, payload : Any) : Unit = {
-        doSend (msg)
+    def sendAsy (msg : T, payload : Any) : Unit = {
+        postponed {
+            doSend (msg)
 
-        sender.foreach (actor => notifications = (actor, payload) :: notifications)
+            sender.foreach (actor => notifications = (actor, payload) :: notifications)
+        }
     }
 
     /**
