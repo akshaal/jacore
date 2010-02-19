@@ -12,7 +12,6 @@ import collection.immutable.{List, Nil}
 import scala.collection.JavaConversions._
 import scala.collection.mutable.Map
 
-import Predefs._
 import logger.DummyLogging
 import jmx.{SimpleJmx, JmxOper, JmxAttr}
 

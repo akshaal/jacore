@@ -13,7 +13,6 @@ import org.specs.mock.{Mockito, MocksCreation}
 import javax.jms.{Connection, Destination, ObjectMessage, Message,
                   MessageProducer, Session, JMSException}
 
-import Predefs._
 import unit.UnitTestHelper._
 import jms.AbstractJmsSenderActor
 

@@ -6,7 +6,6 @@
 package info.akshaal.jacore
 package actor
 
-import Predefs._
 import logger.Logging
 import utils.ClassUtils
 

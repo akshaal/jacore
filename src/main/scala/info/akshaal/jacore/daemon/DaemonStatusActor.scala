@@ -4,7 +4,6 @@ package daemon
 
 import java.io.File
 
-import Predefs._
 import actor.{Actor, NormalPriorityActorEnv}
 import fs.text.{TextFile, WriteFileDone, WriteFileFailed}
 

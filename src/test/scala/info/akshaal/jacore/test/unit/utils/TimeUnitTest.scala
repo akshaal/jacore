@@ -5,8 +5,6 @@
 package info.akshaal.jacore
 package test.unit.utils
 
-import Predefs._
-
 import org.specs.SpecificationWithJUnit
 
 class TimeUnitTest extends SpecificationWithJUnit ("TimeUnit class specification") {

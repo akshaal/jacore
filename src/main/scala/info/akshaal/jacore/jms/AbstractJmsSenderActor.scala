@@ -8,7 +8,6 @@ package jms
 
 import javax.jms.{Connection, Destination, Message, MessageProducer, Session}
 
-import Predefs._
 import actor.{Actor, LowPriorityActorEnv}
 
 /**

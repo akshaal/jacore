@@ -13,7 +13,6 @@ import java.io.File
 import java.lang.management.ManagementFactory
 import javax.management.ObjectName
 
-import Predefs._
 import module.Module
 import actor.{Actor, HiPriorityActorEnv}
 import daemon.DaemonStatus

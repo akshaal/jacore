@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore
+package info.akshaal
 
 import java.io.{IOException, Closeable, File, BufferedReader, InputStreamReader, FileInputStream}
 import java.lang.{Iterable => JavaIterable}
@@ -16,9 +16,9 @@ import com.google.inject.name.{Named => GuiceNamed}
 import scala.collection.mutable.ListBuffer
 import java.util.concurrent.{ExecutorService, Callable, Future}
 
-import logger.Logger
+import jacore.logger.Logger
 
-object Predefs {
+package object jacore {
     // Make timeunit visible
     type TimeUnit = utils.TimeUnit
     val TimeUnit = utils.TimeUnit

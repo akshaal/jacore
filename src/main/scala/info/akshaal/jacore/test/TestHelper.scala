@@ -11,7 +11,6 @@ import com.google.inject.Injector
 import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
 import java.io.File
 
-import Predefs._
 import actor.Actor
 import utils.GuiceUtils
 

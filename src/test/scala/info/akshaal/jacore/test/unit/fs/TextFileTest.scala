@@ -10,7 +10,6 @@ package unit.fs
 import org.specs.SpecificationWithJUnit
 import java.io.{File, FileReader, BufferedReader, BufferedWriter, FileWriter}
 
-import Predefs._
 import unit.UnitTestHelper._
 import fs.text.{WriteFileDone, WriteFileFailed, ReadFileDone, ReadFileFailed}
 

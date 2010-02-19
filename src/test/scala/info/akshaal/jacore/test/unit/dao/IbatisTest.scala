@@ -11,7 +11,6 @@ import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
 import org.apache.ibatis.session.{SqlSessionFactory, SqlSession, ExecutorType}
 
-import Predefs._
 import unit.UnitTestHelper._
 import dao.ibatis.AbstractIbatisDataInserterActor
 

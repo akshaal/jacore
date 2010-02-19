@@ -11,7 +11,6 @@ package scheduler
 import java.util.concurrent.locks.ReentrantLock
 import java.util.PriorityQueue
 
-import Predefs._
 import logger.Logging
 import daemon.DaemonStatus
 import utils.{Timing, TimeUnit, ThreadPriorityChanger}

@@ -6,7 +6,6 @@ package actor
 import scala.collection.mutable.HashSet
 import scala.collection.mutable.Set
 
-import Predefs._
 import annotation.Act
 import daemon.DaemonStatus
 import scheduler.UnfixedScheduling

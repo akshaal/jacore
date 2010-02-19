@@ -20,8 +20,6 @@ import org.apache.ibatis.builder.xml.XMLMapperBuilder
 import org.apache.ibatis.io.Resources
 import org.apache.ibatis.parsing.XNode
 
-import Predefs._
-
 /**
  * Helper methods for work with iBatis.
  * This helper works best if import like import IbatisUtils._

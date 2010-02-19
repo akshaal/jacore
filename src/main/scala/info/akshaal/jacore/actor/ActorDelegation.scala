@@ -6,8 +6,6 @@
 package info.akshaal.jacore
 package actor
 
-import Predefs._
-
 import java.util.concurrent.{Future, FutureTask, Callable}
 import java.util.concurrent.atomic.AtomicBoolean
 

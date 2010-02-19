@@ -6,8 +6,6 @@ package utils
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{Executors, ThreadFactory}
 
-import Predefs._
-
 import ThreadPriorityChanger.{HiPriority, NormalPriority, LowPriority}
 import daemon.DaemonStatus
 

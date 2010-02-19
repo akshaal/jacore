@@ -13,7 +13,6 @@ import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
 import com.google.inject.{ProvisionException, Inject}
 
-import Predefs._
 import unit.UnitTestHelper._
 import annotation.{CallByMessage, Act, ExtractBy}
 import actor.MessageExtractor

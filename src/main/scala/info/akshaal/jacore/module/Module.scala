@@ -12,7 +12,6 @@ import com.google.inject.AbstractModule
 import com.google.inject.matcher.Matchers
 import com.google.inject.name.Names
 
-import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
 import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterActor}
 import fs.text.{TextFile, TextFileActor}

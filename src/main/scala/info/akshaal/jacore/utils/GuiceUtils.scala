@@ -18,7 +18,6 @@ import com.google.inject.grapher.{GrapherModule, Renderer}
 import com.google.inject.grapher.graphviz.{GraphvizModule, GraphvizRenderer}
 import com.google.inject.spi.BindingTargetVisitor
 
-import Predefs._
 import logger.Logging
 
 /**

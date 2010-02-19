@@ -10,8 +10,6 @@ package utils
 
 import java.util.Properties
 
-import Predefs._
-
 final class Prefs (file : String) {
     final val properties = new Properties ()
 

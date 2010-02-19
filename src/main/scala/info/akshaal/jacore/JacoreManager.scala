@@ -7,7 +7,6 @@
 
 package info.akshaal.jacore
 
-import com.google.inject.{Singleton, Inject}
 import java.lang.{Iterable => JavaIterable}
 
 import collection.JavaConversions._

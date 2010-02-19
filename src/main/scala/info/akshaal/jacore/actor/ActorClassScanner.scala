@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation
 import java.lang.reflect.Modifier
 import org.objectweb.asm.Type
 
-import Predefs._
 import logger.Logging
 import annotation.{Act, ExtractBy}
 import utils.ClassUtils

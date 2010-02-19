@@ -3,7 +3,6 @@ package utils
 
 import java.util.concurrent.atomic.{AtomicInteger, AtomicReferenceArray}
 
-import Predefs._
 import logger.Logger
 import daemon.DaemonStatus
 

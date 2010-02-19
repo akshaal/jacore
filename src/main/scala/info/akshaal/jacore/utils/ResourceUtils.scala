@@ -11,8 +11,6 @@ import scala.collection.mutable.ListBuffer
 import java.net.{URL, JarURLConnection}
 import java.io.File
 
-import Predefs._
-
 /**
  * Helper object to work with resources.
  */

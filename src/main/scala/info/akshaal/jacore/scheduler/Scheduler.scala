@@ -8,7 +8,6 @@
 package info.akshaal.jacore
 package scheduler
 
-import Predefs._
 import utils.{TimeUnit, ThreadPriorityChanger}
 import logger.Logging
 import actor.Actor

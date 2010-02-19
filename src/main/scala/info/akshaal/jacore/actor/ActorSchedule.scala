@@ -12,8 +12,6 @@ import java.util.WeakHashMap
 import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 
-import Predefs._
-
 import scheduler.ScheduleControl
 
 /**

@@ -3,12 +3,12 @@
  * and open the template in the editor.
  */
 
-package info.akshaal.jacore.test.unit
+package info.akshaal.jacore
+package test.unit
 
 import com.google.inject.{Guice, Binder}
 import java.io.File
 
-import info.akshaal.jacore.Predefs._
 import info.akshaal.jacore.actor.{Actor, HiPriorityActorEnv, LowPriorityActorEnv}
 import info.akshaal.jacore.module.Module
 import info.akshaal.jacore.scheduler.Scheduler

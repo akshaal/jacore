@@ -6,7 +6,6 @@
 package info.akshaal.jacore
 package actor
 
-import Predefs._
 import logger.Logging
 
 import org.objectweb.asm.{ClassVisitor, MethodVisitor, Opcodes, Type, Label, ClassWriter}

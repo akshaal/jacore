@@ -9,7 +9,6 @@ package actor
 import com.google.inject.{Inject, Singleton}
 import java.util.{IdentityHashMap, WeakHashMap}
 
-import Predefs._
 import annotation.CallByMessage
 
 /**

@@ -8,7 +8,6 @@
 package info.akshaal.jacore
 package utils
 
-import Predefs._
 import logger.Logging
 
 trait ThreadPriorityChanger {

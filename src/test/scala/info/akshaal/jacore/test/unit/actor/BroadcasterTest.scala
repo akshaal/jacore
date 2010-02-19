@@ -9,7 +9,6 @@ package unit.actor
 
 import org.specs.SpecificationWithJUnit
 
-import Predefs._
 import unit.UnitTestHelper._
 
 import annotation.{Act, ExtractBy}

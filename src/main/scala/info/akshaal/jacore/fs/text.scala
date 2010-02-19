@@ -16,7 +16,6 @@ import java.nio.{ByteBuffer, CharBuffer}
 import java.nio.channels.CompletionHandler
 import java.nio.charset.Charset
 
-import Predefs._
 import actor.{Actor, NormalPriorityActorEnv, Operation}
 import logger.Logging
 

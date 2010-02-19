@@ -5,7 +5,6 @@ import org.jetlang.fibers.PoolFiberFactory
 import org.jetlang.core.{BatchExecutor, EventReader}
 
 import logger.Logging
-import Predefs._
 
 import scheduler.TimeOut
 

@@ -8,8 +8,6 @@
 package info.akshaal.jacore
 package utils
 
-import Predefs._
-
 final class TimeUnit (nano : Long) extends NotNull
 {
     @inline

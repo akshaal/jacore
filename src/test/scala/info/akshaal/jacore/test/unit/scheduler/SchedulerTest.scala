@@ -11,7 +11,6 @@ import java.util.Random
 
 import org.specs.SpecificationWithJUnit
 
-import Predefs._
 import unit.UnitTestHelper._
 import scheduler.{TimeOut, UnfixedScheduling}
 
