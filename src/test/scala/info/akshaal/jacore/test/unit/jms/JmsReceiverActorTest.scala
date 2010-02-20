@@ -48,6 +48,7 @@ class JmsReceiverActorTest extends SpecificationWithJUnit ("AbstractJmsReceiverA
                 actor.start ()
 
                 actor.waitForMessageBatchesAfter (2) {messageListener.onMessage (msg1)}
+                messageListener.onMessage (null)
                 actor.waitForMessageBatchesAfter (2) {messageListener.onMessage (msg2)}
                 actor.waitForMessageBatchesAfter (2) {messageListener.onMessage (msg3)}
                 
@@ -111,7 +112,11 @@ object JmsReceiverActorTest {
         var msgs : List[Message] = Nil
 
         override protected def convertMessage (message : Message) : ConvertedMessage = {
-            ConvertedMessage (message)
+            if (message == null) {
+                null
+            } else {
+                ConvertedMessage (message)
+            }
         }
 
         @Act (subscribe = true)

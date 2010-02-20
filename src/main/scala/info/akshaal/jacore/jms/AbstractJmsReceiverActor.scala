@@ -65,8 +65,12 @@ abstract class AbstractJmsReceiverActor[T] (lowPriorityActorEnv : LowPriorityAct
                 override def onMessage (message : Message) : Unit = {
                     val convertedMessage = convertMessage (message)
 
-                    postponed {
-                        handleMessage (convertedMessage)
+                    if (convertedMessage == null) {
+                        debugLazy ("Message skipped because converted returned null: " + message)
+                    } else {
+                        postponed {
+                            handleMessage (convertedMessage)
+                        }
                     }
                 }
             })
