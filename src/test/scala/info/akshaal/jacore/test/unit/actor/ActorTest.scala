@@ -660,14 +660,16 @@ object ActorTest {
         var starts = 0
         var stops = 0
 
-        override def start () : Unit = {
-            super.start ()
+        override def start () : Boolean = {
+            val r = super.start ()
             starts += 1
+            r
         }
 
-        override def stop () : Unit = {
-            super.stop ()
+        override def stop () : Boolean = {
+            val r = super.stop ()
             stops += 1
+            r
         }
 
         override def act () = {
@@ -680,14 +682,16 @@ object ActorTest {
         var starts = 0
         var stops = 0
 
-        override def start () : Unit = {
-            super.start ()
+        override def start () : Boolean = {
+            val r = super.start ()
             starts += 1
+            r
         }
 
-        override def stop () : Unit = {
-            super.stop ()
+        override def stop () : Boolean = {
+            val r = super.stop ()
             stops += 1
+            r
         }
 
         override def act () = {

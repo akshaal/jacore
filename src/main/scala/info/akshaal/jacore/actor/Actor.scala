@@ -4,6 +4,8 @@ package actor
 import org.jetlang.fibers.PoolFiberFactory
 import org.jetlang.core.{BatchExecutor, EventReader}
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import logger.Logging
 
 import scheduler.TimeOut
@@ -71,7 +73,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
     /**
      * Maintains the state.
      */
-    protected[actor] var actorStarted = false
+    protected[actor] var actorStarted = new AtomicBoolean
 
     /**
      * Starts managing a new actor. Next time this actor this actor is stopped
@@ -186,10 +188,17 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
     }
 
     /**
-     * Start actor.
+     * Start actor. If actor is already started, then request to start will be ignored.
+     *
+     * @return true if has been started. Returns false if started request is ignored.
      */
-    def start () : Unit = {
-        debug ("About to start")
+    def start () : Boolean = {
+        if (actorStarted.compareAndSet (false, true)) {
+            debug ("About to start")
+        } else {
+            debug ("Actor is already started")
+            return false
+        }
 
         // Subscribe first. This is very first thing to do before publish any event.
         if (!matcherDefinitionsForSubscribe.isEmpty) {
@@ -208,15 +217,21 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
         // Start schedules
         startRecurrentSchedules ()
 
-        // Set state
-        actorStarted = true
+        return true
     }
 
     /**
-     * Stop the actor.
+     * Stop actor. If actor is already stopped, then request to stop will be ignored.
+     *
+     * @return true if has been stopped. Returns false if stoped request is ignored.
      */
-    def stop() : Unit = {
-        debug ("About to stop")
+    def stop() : Boolean = {
+        if (actorStarted.compareAndSet (true, false)) {
+            debug ("About to stop")
+        } else {
+            debug ("Actor is already stopped")
+            return false
+        }
 
         // Stop schedules
         cancelSchedules ()
@@ -235,8 +250,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
         // Stop managed actors
         managed.foreach (_.stop)
 
-        // Set state
-        actorStarted = false
+        return true
     }
 
     /**
