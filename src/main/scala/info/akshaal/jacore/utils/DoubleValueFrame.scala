@@ -60,7 +60,21 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
 
     /**
      * Returns true if full.
-     * @return true if full
      */
-    def isFull : Boolean = return count >= maximum
+    def full : Boolean = return count >= maximum
+
+    /**
+     * Current (last inserted value).
+     */
+    def current : Double = array (pos)
+
+    /**
+     * Oldest value.
+     */
+    def oldest : Double =
+        if (full && pos != maximum - 1) {
+            array (pos + 1)
+        } else {
+            array (0)
+        }
 }

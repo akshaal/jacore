@@ -25,67 +25,91 @@ class LongValuesFrameTest extends SpecificationWithJUnit ("LongValueFrame class 
         "support frames with size 1" in {
             val frame = new LongValueFrame (1)
             frame.average must_== 0
-            frame.isFull must_== false
+            frame.full must_== false
 
             frame.put (1)
             frame.average must_== 1
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 1
+            frame.oldest must_== 1
 
             frame.put (1)
             frame.average must_== 1
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 1
+            frame.oldest must_== 1
 
             frame.put (2)
             frame.average must_== 2
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 2
+            frame.oldest must_== 2
 
             frame.put (3)
             frame.average must_== 3
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 3
+            frame.oldest must_== 3
         }
 
         "support frames with size 2" in {
             val frame = new LongValueFrame (2)
             frame.average must_== 0
-            frame.isFull must_== false
+            frame.full must_== false
 
             frame.put (1)
             frame.average must_== 1
-            frame.isFull must_== false
+            frame.full must_== false
+            frame.current must_== 1
+            frame.oldest must_== 1
 
             frame.put (1)
             frame.average must_== 1
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 1
+            frame.oldest must_== 1
 
             frame.put (2)
             frame.average must_== 1
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 2
+            frame.oldest must_== 1
 
             frame.put (3)
             frame.average must_== 2
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 3
+            frame.oldest must_== 2
         }
 
         "support frames with size 3" in {
             val frame = new LongValueFrame (3)
             frame.average must_== 0
-            frame.isFull must_== false
+            frame.full must_== false
 
             frame.put (1)
             frame.average must_== 1
-            frame.isFull must_== false
+            frame.full must_== false
+            frame.current must_== 1
+            frame.oldest must_== 1
 
             frame.put (1)
             frame.average must_== 1
-            frame.isFull must_== false
+            frame.full must_== false
+            frame.current must_== 1
+            frame.oldest must_== 1
 
             frame.put (2)
             frame.average must_== 1
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 2
+            frame.oldest must_== 1
 
             frame.put (3)
             frame.average must_== 2
-            frame.isFull must_== true
+            frame.full must_== true
+            frame.current must_== 3
+            frame.oldest must_== 1
         }
     }
 }

@@ -60,7 +60,21 @@ final class LongValueFrame (maximum : Int) extends NotNull {
 
     /**
      * Returns true if full.
-     * @return true if full
      */
-    def isFull : Boolean = return count >= maximum
+    def full : Boolean = return count >= maximum
+
+    /**
+     * Current (last inserted value).
+     */
+    def current : Long = array (pos)
+
+    /**
+     * Oldest value.
+     */
+    def oldest : Long =
+        if (full && pos != maximum - 1) {
+            array (pos + 1)
+        } else {
+            array (0)
+        }
 }
