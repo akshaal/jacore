@@ -57,4 +57,10 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
      * Returns current sum.
      */
     def currentSum : Double = sum
+
+    /**
+     * Returns true if full.
+     * @return true if full
+     */
+    def isFull : Boolean = return count >= maximum
 }

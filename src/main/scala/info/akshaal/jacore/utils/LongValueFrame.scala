@@ -57,4 +57,10 @@ final class LongValueFrame (maximum : Int) extends NotNull {
      * Returns current sum.
      */
     def currentSum : Long = sum
+
+    /**
+     * Returns true if full.
+     * @return true if full
+     */
+    def isFull : Boolean = return count >= maximum
 }
