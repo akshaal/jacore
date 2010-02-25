@@ -6,22 +6,27 @@
 package info.akshaal.jacore
 package test
 
-import com.google.inject.Injector
-
+import java.util.{Timer, TimerTask}
 import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
 import java.io.File
 
-import org.specs.SpecificationWithJUnit
+import scala.collection.mutable.{Map, HashMap}
+
+import com.google.inject.Injector
+
+import org.specs.{SpecificationWithJUnit, Specification}
 import org.specs.specification.{Example, Examples}
 
 import actor.Actor
-import utils.GuiceUtils
+import utils.{GuiceUtils, ThreadUtils}
 import logger.Logger
 
 /**
  * Helper methods for convenient testing of actors and stuff depending on actors.
  */
 trait TestHelper {
+    private val testGuardingTimer = new Timer ("Test guarding timer")
+
     /**
      * How much time we wait for a message to arrive to actor before timing out.
      */
@@ -31,7 +36,7 @@ trait TestHelper {
      * Injector to use for tests.
      */
     val injector : Injector
-
+    
     /**
      * Create graph definition if property jacore.module.debug.dir is defined.
      * @param ilenameSuffix suffix for name of the file to create
@@ -183,8 +188,16 @@ trait TestHelper {
     /**
      * Specification with additional features to be tested specs framework runned by junit.
      */
-    class JacoreSpecWithJUnit (name : String) extends SpecificationWithJUnit (name) {
+    class JacoreSpecWithJUnit (name : String) extends SpecificationWithJUnit (name)
+                                                 with SpecWithAddons
+
+    /**
+     * Support for logging and timeouts in specification.
+     */
+    trait SpecWithAddons extends Specification {
         protected implicit val jacoreLogger : Logger = Logger.get (this)
+        protected val timeoutForOneExample : TimeUnit = 5 minutes
+        private val runningExamples : Map[Example, TimerTask] = new HashMap
 
         override def beforeExample (ex: Examples) = {
             ex match {
@@ -213,6 +226,24 @@ trait TestHelper {
          */
         def beforeOneExample (example : Example) : Unit = {
             jacoreLogger.debugLazy ("== == == About to run example: " + example.description)
+
+            val thread = Thread.currentThread
+            val task =
+                new TimerTask () {
+                    override def run () : Unit = {
+                        ThreadUtils.dumpThreads (
+                            "#=#=#=#=#=#=#=# Dumping threads before killing not responding test")
+
+                        try {
+                            thread.interrupt ()
+                        } catch {
+                            case t : Throwable => ()
+                        }
+                    }
+                }
+
+            runningExamples (example) = task
+            testGuardingTimer.schedule (task, timeoutForOneExample.asMilliseconds)
         }
 
         /**
@@ -220,6 +251,11 @@ trait TestHelper {
          */
         def afterOneExample (example : Example) : Unit = {
             jacoreLogger.debugLazy ("== == == Example execution finished: " + example.description)
+
+            for (task <- runningExamples.get (example)) {
+                task.cancel ()
+                runningExamples.remove (example)
+            }
         }
     }
 }

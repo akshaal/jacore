@@ -8,12 +8,9 @@
 package info.akshaal.jacore
 package daemon
 
-import collection.immutable.{List, Nil}
-import scala.collection.JavaConversions._
-import scala.collection.mutable.Map
-
 import logger.DummyLogging
 import jmx.{SimpleJmx, JmxOper, JmxAttr}
+import utils.ThreadUtils
 
 @Singleton
 final class DaemonStatus @Inject() (
@@ -89,7 +86,7 @@ final class DaemonStatus @Inject() (
 
         // Dying
         error ("Soon will die, but first... postmortum information:")
-        dumpThreads
+        ThreadUtils.dumpThreads ("Dumping threads")
         
         // Shutdown gracefully if possible
         shutdown
@@ -101,23 +98,5 @@ final class DaemonStatus @Inject() (
     lazy val shutdown = {
         info ("Shutdown requested. Shutting down...")
         shuttingDown = true
-    }
-
-    /**
-     * Dump threads stack.
-     */
-    private def dumpThreads () = {
-        val traces : Map[Thread, Array[StackTraceElement]] =
-                        Thread.getAllStackTraces ()
-
-        var threadDumpList : List[String] = Nil
-        for ((thread, stackTraceElements) <- traces) {
-            val name = thread.getName
-            val stack = stackTraceElements.mkString (",\n    ")
-
-            threadDumpList = (name + ":\n    " + stack + "\n") :: threadDumpList
-        }
-
-        error ("Dumping threads:\n" + threadDumpList.mkString ("\n"))
     }
 }
