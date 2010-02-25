@@ -3,16 +3,17 @@
  */
 
 package info.akshaal.jacore
-package test.unit.utils
+package test
+package unit.utils
 
-import org.specs.SpecificationWithJUnit
+import unit.UnitTestHelper._
 
 import utils.ClassUtils._
 
 /**
  * Test Long Value Frame.
  */
-class ClassUtilsTest extends SpecificationWithJUnit ("ClassUtils specification") {
+class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
     "ClassUtils.box" should {
         "box primitive java types to classes" in {
             box (classOf [ClassUtilsTest]).asInstanceOf[Object]  must_==  classOf [ClassUtilsTest]

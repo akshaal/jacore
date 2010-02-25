@@ -9,12 +9,10 @@ package unit.scheduler
 
 import java.util.Random
 
-import org.specs.SpecificationWithJUnit
-
 import unit.UnitTestHelper._
 import scheduler.{TimeOut, UnfixedScheduling}
 
-class SchedulerTest extends SpecificationWithJUnit ("Scheduler specification") {
+class SchedulerTest extends JacoreSpecWithJUnit ("Scheduler specification") {
     import SchedulerTest._
 
     "Scheduler" should {

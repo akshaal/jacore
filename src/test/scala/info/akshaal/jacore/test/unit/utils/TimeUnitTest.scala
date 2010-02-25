@@ -3,11 +3,12 @@
  */
 
 package info.akshaal.jacore
-package test.unit.utils
+package test
+package unit.utils
 
-import org.specs.SpecificationWithJUnit
+import unit.UnitTestHelper._
 
-class TimeUnitTest extends SpecificationWithJUnit ("TimeUnit class specification") {
+class TimeUnitTest extends JacoreSpecWithJUnit ("TimeUnit class specification") {
     "TimeUnit" should {
         "allow conversions to nanoseconds" in {
             10.nanoseconds.asNanoseconds   must_==  10L

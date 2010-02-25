@@ -3,16 +3,17 @@
  */
 
 package info.akshaal.jacore
-package test.unit.utils
+package test
+package unit.utils
 
-import org.specs.SpecificationWithJUnit
+import unit.UnitTestHelper._
 
 import utils.LongValueFrame
 
 /**
  * Test Long Value Frame.
  */
-class LongValuesFrameTest extends SpecificationWithJUnit ("LongValueFrame class specification") {
+class LongValuesFrameTest extends JacoreSpecWithJUnit ("LongValueFrame class specification") {
     "LongValueFrame" should {
         "fail with zero width" in {
             new LongValueFrame (0) must throwA[IllegalArgumentException]

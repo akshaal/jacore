@@ -10,11 +10,11 @@ package unit.jmx
 import java.lang.management.ManagementFactory
 import javax.management.{ObjectName, Attribute}
 
-import org.specs.SpecificationWithJUnit
+import unit.UnitTestHelper._
 
 import jmx.{JmxAttr, JmxOper, SimpleJmx}
 
-class JmxTest extends SpecificationWithJUnit ("JMX support specification") {
+class JmxTest extends JacoreSpecWithJUnit ("JMX support specification") {
     def expose = addToSusVerb ("expose")
 
     "SimpleJmx" should expose {

@@ -1,13 +1,14 @@
 /** Akshaal (C) 2009. GNU GPL. http://akshaal.info */
 
 package info.akshaal.jacore
-package test.unit.logger
+package test
+package unit.logger
 
-import org.specs.SpecificationWithJUnit
+import unit.UnitTestHelper._
 
 import logger.Logging
 
-class LoggerTest extends SpecificationWithJUnit ("Logging trait specification")
+class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
 {
     "Logging" should {
         "provide Logger instance" in {

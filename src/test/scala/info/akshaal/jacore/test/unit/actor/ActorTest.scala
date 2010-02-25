@@ -9,7 +9,6 @@ package unit.actor
 
 import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
 
-import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
 import com.google.inject.{ProvisionException, Inject}
 
@@ -17,7 +16,7 @@ import unit.UnitTestHelper._
 import annotation.{CallByMessage, Act, ExtractBy}
 import actor.MessageExtractor
 
-class ActorTest extends SpecificationWithJUnit ("Actor specification") with Mockito {
+class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito {
     import ActorTest._
 
     "Actor" should {

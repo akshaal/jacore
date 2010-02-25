@@ -11,8 +11,12 @@ import com.google.inject.Injector
 import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
 import java.io.File
 
+import org.specs.SpecificationWithJUnit
+import org.specs.specification.{Example, Examples}
+
 import actor.Actor
 import utils.GuiceUtils
+import logger.Logger
 
 /**
  * Helper methods for convenient testing of actors and stuff depending on actors.
@@ -173,6 +177,49 @@ trait TestHelper {
                     messageLatch.countDown ()
                 }
             }
+        }
+    }
+
+    /**
+     * Specification with additional features to be tested specs framework runned by junit.
+     */
+    class JacoreSpecWithJUnit (name : String) extends SpecificationWithJUnit (name) {
+        protected implicit val jacoreLogger : Logger = Logger.get (this)
+
+        override def beforeExample (ex: Examples) = {
+            ex match {
+                case example : Example =>
+                    beforeOneExample (example)
+                    super.beforeExample (ex)
+
+                case other =>
+                    super.beforeExample (other)
+            }
+        }
+
+        override def afterExample (ex: Examples) = {
+            ex match {
+                case example : Example =>
+                    afterOneExample (example)
+                    super.afterExample (ex)
+
+                case other =>
+                    super.afterExample (other)
+            }
+        }
+
+        /**
+         * Called right before an example is executed.
+         */
+        def beforeOneExample (example : Example) : Unit = {
+            jacoreLogger.debugLazy ("== == == About to run example: " + example.description)
+        }
+
+        /**
+         * Called right after an example is executed.
+         */
+        def afterOneExample (example : Example) : Unit = {
+            jacoreLogger.debugLazy ("== == == Example execution finished: " + example.description)
         }
     }
 }

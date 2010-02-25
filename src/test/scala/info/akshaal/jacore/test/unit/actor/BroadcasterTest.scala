@@ -7,14 +7,12 @@ package info.akshaal.jacore
 package test
 package unit.actor
 
-import org.specs.SpecificationWithJUnit
-
 import unit.UnitTestHelper._
 
 import annotation.{Act, ExtractBy}
 import actor.{MessageExtractor, Broadcaster}
 
-class BroadcasterTest extends SpecificationWithJUnit ("Broadcaster specification") {
+class BroadcasterTest extends JacoreSpecWithJUnit ("Broadcaster specification") {
     import BroadcasterTest._
     
     "Broadcaster" should {

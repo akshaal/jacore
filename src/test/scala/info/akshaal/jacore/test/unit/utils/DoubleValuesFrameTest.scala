@@ -3,16 +3,17 @@
  */
 
 package info.akshaal.jacore
-package test.unit.utils
+package test
+package unit.utils
 
-import org.specs.SpecificationWithJUnit
+import unit.UnitTestHelper._
 
 import utils.DoubleValueFrame
 
 /**
  * Test Double Value Frame.
  */
-class DoubleValuesFrameTest extends SpecificationWithJUnit ("DoubleValueFrame class specification")
+class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class specification")
 {
     "DoubleValueFrame" should {
         "fail with zero width" in {

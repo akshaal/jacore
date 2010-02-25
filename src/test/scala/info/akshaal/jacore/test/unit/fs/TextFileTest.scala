@@ -7,13 +7,12 @@ package info.akshaal.jacore
 package test
 package unit.fs
 
-import org.specs.SpecificationWithJUnit
 import java.io.{File, FileReader, BufferedReader, BufferedWriter, FileWriter}
 
 import unit.UnitTestHelper._
 import fs.text.{WriteFileDone, WriteFileFailed, ReadFileDone, ReadFileFailed}
 
-class TextFileTest extends SpecificationWithJUnit ("TextFile specification") {
+class TextFileTest extends JacoreSpecWithJUnit ("TextFile specification") {
     import TextFileTest._
 
     "TextFile" should {

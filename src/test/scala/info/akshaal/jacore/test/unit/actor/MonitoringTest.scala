@@ -7,7 +7,6 @@ package info.akshaal.jacore
 package test
 package unit.actor
 
-import org.specs.SpecificationWithJUnit
 import com.google.inject.Guice
 import java.io.File
 import java.lang.management.ManagementFactory
@@ -17,7 +16,9 @@ import module.Module
 import actor.{Actor, HiPriorityActorEnv}
 import daemon.DaemonStatus
 
-class MonitoringTest extends SpecificationWithJUnit ("Monitoring specification") {
+import unit.UnitTestHelper._
+
+class MonitoringTest extends JacoreSpecWithJUnit ("Monitoring specification") {
     import unit.UnitTestHelper._
     import MonitoringTest._
 

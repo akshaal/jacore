@@ -7,7 +7,6 @@ package info.akshaal.jacore
 package test
 package unit.jms
 
-import org.specs.SpecificationWithJUnit
 import org.specs.mock.{Mockito, MocksCreation}
 
 import javax.jms.{Connection, Destination, Message, MessageConsumer, Session, MessageListener,
@@ -17,7 +16,7 @@ import unit.UnitTestHelper._
 import jms.AbstractJmsReceiverActor
 import annotation.Act
 
-class JmsReceiverActorTest extends SpecificationWithJUnit ("AbstractJmsReceiverActor specification")
+class JmsReceiverActorTest extends JacoreSpecWithJUnit ("AbstractJmsReceiverActor specification")
                               with Mockito
 {
     import JmsReceiverActorTest._

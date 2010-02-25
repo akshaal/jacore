@@ -7,14 +7,13 @@ package info.akshaal.jacore
 package test
 package unit.dao
 
-import org.specs.SpecificationWithJUnit
 import org.specs.mock.Mockito
 import org.apache.ibatis.session.{SqlSessionFactory, SqlSession, ExecutorType}
 
 import unit.UnitTestHelper._
 import dao.ibatis.AbstractIbatisDataInserterActor
 
-class IbatisTest extends SpecificationWithJUnit ("iBatis support specification") with Mockito {
+class IbatisTest extends JacoreSpecWithJUnit ("iBatis support specification") with Mockito {
     import IbatisTest._
 
     "IbatisDataInserterActor" should {
