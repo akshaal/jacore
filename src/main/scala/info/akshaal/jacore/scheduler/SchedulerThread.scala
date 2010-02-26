@@ -13,12 +13,12 @@ import java.util.PriorityQueue
 
 import logger.Logging
 import daemon.DaemonStatus
-import utils.{Timing, TimeUnit, ThreadPriorityChanger}
+import utils.{Timing, TimeValue, ThreadPriorityChanger}
 
 private[scheduler] final class SchedulerThread
-                             (latencyLimit : TimeUnit,
+                             (latencyLimit : TimeValue,
                               threadPriorityChanger : ThreadPriorityChanger,
-                              schedulerDrift : TimeUnit,
+                              schedulerDrift : TimeValue,
                               daemonStatus : DaemonStatus)
                          extends Thread with Logging
 {

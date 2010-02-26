@@ -8,7 +8,7 @@
 package info.akshaal.jacore
 package scheduler
 
-import utils.{TimeUnit, ThreadPriorityChanger}
+import utils.{TimeValue, ThreadPriorityChanger}
 import logger.Logging
 import actor.Actor
 import daemon.DaemonStatus
@@ -26,17 +26,17 @@ trait Scheduler {
     /**
      * Get average latency of the scheduler.
      */
-    def averageLatency : TimeUnit
+    def averageLatency : TimeValue
 
     /**
-     * Schedule payload for actor to be delivered in timeUnit.
+     * Schedule payload for actor to be delivered in timeValue.
      */
-    def in (actor : Actor, payload : Any, timeUnit : TimeUnit) : ScheduleControl
+    def in (actor : Actor, payload : Any, timeValue : TimeValue) : ScheduleControl
 
     /**
-     * Schedule payload for actor to be delivered every timeUnit.
+     * Schedule payload for actor to be delivered every timeValue.
      */
-    def every (actor : Actor, payload : Any, period : TimeUnit) : ScheduleControl
+    def every (actor : Actor, payload : Any, period : TimeValue) : ScheduleControl
 }
 
 /**
@@ -44,8 +44,8 @@ trait Scheduler {
  */
 @Singleton
 class SchedulerImpl @Inject() (
-                  @Named("jacore.scheduler.latency") latencyLimit : TimeUnit,
-                  @Named("jacore.scheduler.drift") schedulerDrift : TimeUnit,
+                  @Named("jacore.scheduler.latency") latencyLimit : TimeValue,
+                  @Named("jacore.scheduler.drift") schedulerDrift : TimeValue,
                   threadPriorityChanger : ThreadPriorityChanger,
                   daemonStatus : DaemonStatus)
             extends Logging with Scheduler
@@ -72,15 +72,15 @@ class SchedulerImpl @Inject() (
     final def start () = schedulerThread.start
 
     /**
-     * Schedule payload for actor to be delivered in timeUnit.
+     * Schedule payload for actor to be delivered in timeValue.
      */
-    final def in (actor : Actor, payload : Any, timeUnit : TimeUnit) : ScheduleControl = {
+    final def in (actor : Actor, payload : Any, timeValue : TimeValue) : ScheduleControl = {
         val control = new ScheduleControl
 
         val schedule =
             new OneTimeSchedule (actor,
                                  payload,
-                                 timeUnit.asNanoseconds + System.nanoTime,
+                                 timeValue.asNanoseconds + System.nanoTime,
                                  control)
 
         schedulerThread.schedule (schedule)
@@ -89,9 +89,9 @@ class SchedulerImpl @Inject() (
     }
 
     /**
-     * Schedule payload for actor to be delivered every timeUnit.
+     * Schedule payload for actor to be delivered every timeValue.
      */
-    final def every (actor : Actor, payload : Any, period : TimeUnit) : ScheduleControl = {
+    final def every (actor : Actor, payload : Any, period : TimeValue) : ScheduleControl = {
         val periodNano = period.asNanoseconds
         val curNanoTime = System.nanoTime
         val semiStableNumber =

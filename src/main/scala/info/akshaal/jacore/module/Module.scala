@@ -12,7 +12,7 @@ import com.google.inject.AbstractModule
 import com.google.inject.matcher.Matchers
 import com.google.inject.name.Names
 
-import utils.{TimeUnit, ThreadPriorityChanger, DummyThreadPriorityChanger}
+import utils.{TimeValue, ThreadPriorityChanger, DummyThreadPriorityChanger}
 import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterActor}
 import fs.text.{TextFile, TextFileActor}
 import scheduler.{Scheduler, SchedulerImpl}
@@ -30,28 +30,28 @@ class Module extends AbstractModule with Logging {
 
     lazy val osFileEncoding = prefs.getString("jacore.os.file.encoding")
 
-    lazy val monitoringInterval = prefs.getTimeUnit("jacore.monitoring.interval")
+    lazy val monitoringInterval = prefs.getTimeValue("jacore.monitoring.interval")
 
     lazy val lowPriorityPoolThreads = prefs.getInt("jacore.pool.low.threads")
-    lazy val lowPriorityPoolLatencyLimit = prefs.getTimeUnit("jacore.pool.low.latency")
-    lazy val lowPriorityPoolExecutionLimit = prefs.getTimeUnit("jacore.pool.low.execution")
+    lazy val lowPriorityPoolLatencyLimit = prefs.getTimeValue("jacore.pool.low.latency")
+    lazy val lowPriorityPoolExecutionLimit = prefs.getTimeValue("jacore.pool.low.execution")
 
     lazy val normalPriorityPoolThreads = prefs.getInt("jacore.pool.normal.threads")
-    lazy val normalPriorityPoolLatencyLimit = prefs.getTimeUnit("jacore.pool.normal.latency")
-    lazy val normalPriorityPoolExecutionLimit = prefs.getTimeUnit("jacore.pool.normal.execution")
+    lazy val normalPriorityPoolLatencyLimit = prefs.getTimeValue("jacore.pool.normal.latency")
+    lazy val normalPriorityPoolExecutionLimit = prefs.getTimeValue("jacore.pool.normal.execution")
 
     lazy val hiPriorityPoolThreads = prefs.getInt("jacore.pool.hi.threads")
-    lazy val hiPriorityPoolLatencyLimit = prefs.getTimeUnit("jacore.pool.hi.latency")
-    lazy val hiPriorityPoolExecutionLimit = prefs.getTimeUnit("jacore.pool.hi.execution")
+    lazy val hiPriorityPoolLatencyLimit = prefs.getTimeValue("jacore.pool.hi.latency")
+    lazy val hiPriorityPoolExecutionLimit = prefs.getTimeValue("jacore.pool.hi.execution")
 
-    lazy val schedulerLatencyLimit = prefs.getTimeUnit("jacore.scheduler.latency")
-    lazy val schedulerDrift = prefs.getTimeUnit("jacore.scheduler.drift")
+    lazy val schedulerLatencyLimit = prefs.getTimeValue("jacore.scheduler.latency")
+    lazy val schedulerDrift = prefs.getTimeValue("jacore.scheduler.drift")
 
     lazy val daemonStatusJmxName = prefs.getString("jacore.status.jmx.name")
-    lazy val daemonStatusUpdateInterval = prefs.getTimeUnit("jacore.status.update.interval")
+    lazy val daemonStatusUpdateInterval = prefs.getTimeValue("jacore.status.update.interval")
     lazy val daemonStatusFile = prefs.getString("jacore.status.file")
 
-    lazy val qosSkipFirst = prefs.getTimeUnit ("jacore.qos.skip.first")
+    lazy val qosSkipFirst = prefs.getTimeValue ("jacore.qos.skip.first")
 
     lazy val threadPriorityChangerImplClass : Class[T] forSome {type T <: ThreadPriorityChanger} =
                     classOf[DummyThreadPriorityChanger]
@@ -74,23 +74,23 @@ class Module extends AbstractModule with Logging {
 
         //  - - - - - - - - - - -  Named - - - - - - - - - -  - - - -
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.qos.skip.first"))
               .toInstance (qosSkipFirst)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.scheduler.latency"))
               .toInstance (schedulerLatencyLimit)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.scheduler.drift"))
               .toInstance (schedulerDrift)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.monitoring.interval"))
               .toInstance (monitoringInterval)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.status.update.interval"))
               .toInstance (daemonStatusUpdateInterval)
 
@@ -108,11 +108,11 @@ class Module extends AbstractModule with Logging {
               .annotatedWith (Names.named ("jacore.pool.hi.threads"))
               .toInstance (hiPriorityPoolThreads)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.pool.hi.latency"))
               .toInstance (hiPriorityPoolLatencyLimit)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.pool.hi.execution"))
               .toInstance (hiPriorityPoolExecutionLimit)
 
@@ -123,11 +123,11 @@ class Module extends AbstractModule with Logging {
               .annotatedWith (Names.named ("jacore.pool.normal.threads"))
               .toInstance (normalPriorityPoolThreads)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.pool.normal.latency"))
               .toInstance (normalPriorityPoolLatencyLimit)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.pool.normal.execution"))
               .toInstance (normalPriorityPoolExecutionLimit)
 
@@ -138,11 +138,11 @@ class Module extends AbstractModule with Logging {
               .annotatedWith (Names.named ("jacore.pool.low.threads"))
               .toInstance (lowPriorityPoolThreads)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.pool.low.latency"))
               .toInstance (lowPriorityPoolLatencyLimit)
 
-        bind (classOf[TimeUnit])
+        bind (classOf[TimeValue])
               .annotatedWith (Names.named ("jacore.pool.low.execution"))
               .toInstance (lowPriorityPoolExecutionLimit)
 

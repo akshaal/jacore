@@ -8,24 +8,24 @@
 package info.akshaal.jacore
 package utils
 
-final class TimeUnit (nano : Long) extends NotNull
+final class TimeValue (nano : Long) extends NotNull
 {
     @inline
     def asNanoseconds       = nano
 
-    lazy val asMicroseconds = nano / TimeUnit.nsInUs
-    lazy val asMilliseconds = nano / TimeUnit.nsInMs
-    lazy val asSeconds      = nano / TimeUnit.nsInSec
-    lazy val asMinutes      = nano / TimeUnit.nsInMin
-    lazy val asHours        = nano / TimeUnit.nsInHour
-    lazy val asDays         = nano / TimeUnit.nsInDay
+    lazy val asMicroseconds = nano / TimeValue.nsInUs
+    lazy val asMilliseconds = nano / TimeValue.nsInMs
+    lazy val asSeconds      = nano / TimeValue.nsInSec
+    lazy val asMinutes      = nano / TimeValue.nsInMin
+    lazy val asHours        = nano / TimeValue.nsInHour
+    lazy val asDays         = nano / TimeValue.nsInDay
 
     override lazy val toString = {
         // Split into components
         var cur = nano
         var comps : List[String] = Nil
 
-        for ((name : String, value : Long) <- TimeUnit.units) {
+        for ((name : String, value : Long) <- TimeValue.units) {
             val div = cur / value
             cur = cur % value
 
@@ -38,30 +38,30 @@ final class TimeUnit (nano : Long) extends NotNull
         if (comps == Nil) "0ns" else comps.reverse.mkString(" ")
     }
 
-    def + (that : TimeUnit) = new TimeUnit (nano + that.asNanoseconds)
-    def - (that : TimeUnit) = new TimeUnit (nano - that.asNanoseconds)
-    def * (that : TimeUnit) = new TimeUnit (nano * that.asNanoseconds)
-    def * (that : Int) = new TimeUnit (nano * that.asInstanceOf[Long])
-    def / (that : TimeUnit) = new TimeUnit (nano / that.asNanoseconds)
-    def / (that : Int) = new TimeUnit (nano / that.asInstanceOf[Long])
+    def + (that : TimeValue) = new TimeValue (nano + that.asNanoseconds)
+    def - (that : TimeValue) = new TimeValue (nano - that.asNanoseconds)
+    def * (that : TimeValue) = new TimeValue (nano * that.asNanoseconds)
+    def * (that : Int) = new TimeValue (nano * that.asInstanceOf[Long])
+    def / (that : TimeValue) = new TimeValue (nano / that.asNanoseconds)
+    def / (that : Int) = new TimeValue (nano / that.asInstanceOf[Long])
 
     override def equals (that : Any) = that match {
-        case thatTimeUnit : TimeUnit => nano == thatTimeUnit.asNanoseconds
+        case thatTimeValue : TimeValue => nano == thatTimeValue.asNanoseconds
     }
 
     override def hashCode : Int = nano.asInstanceOf[Int]
 
-    def compare (that: TimeUnit) : Int =
+    def compare (that: TimeValue) : Int =
         this.asNanoseconds compare that.asNanoseconds
 
-    def equals (that: TimeUnit) : Boolean = compare(that) == 0
-    def <= (that: TimeUnit)     : Boolean = compare(that) <= 0
-    def >= (that: TimeUnit)     : Boolean = compare(that) >= 0
-    def <  (that: TimeUnit)     : Boolean = compare(that) < 0
-    def >  (that: TimeUnit)     : Boolean = compare(that) > 0
+    def equals (that: TimeValue) : Boolean = compare(that) == 0
+    def <= (that: TimeValue)     : Boolean = compare(that) <= 0
+    def >= (that: TimeValue)     : Boolean = compare(that) >= 0
+    def <  (that: TimeValue)     : Boolean = compare(that) < 0
+    def >  (that: TimeValue)     : Boolean = compare(that) > 0
 }
 
-private[jacore] object TimeUnit {
+private[jacore] object TimeValue {
     private[utils] val nsInUs   = 1000L
     private[utils] val nsInMs   = 1000000L
     private[utils] val nsInSec  = 1000000000L
@@ -81,15 +81,15 @@ private[jacore] object TimeUnit {
     /**
      * Parse string ot time unit.
      */
-    def parse (str : String) : TimeUnit = TimeUnitParser.parse (str)
+    def parse (str : String) : TimeValue = TimeValueParser.parse (str)
 
     import scala.util.parsing.combinator._
 
     /**
      * Parser
      */
-    private object TimeUnitParser extends JavaTokenParsers {
-        def parse (str : String) : TimeUnit =
+    private object TimeValueParser extends JavaTokenParsers {
+        def parse (str : String) : TimeValue =
             parseAll (expr, str) match {
                case Success (l, _) => l
 
@@ -102,12 +102,12 @@ private[jacore] object TimeUnit {
                               "Error while parsing time: " + str + ": " + m)
             }
 
-        def expr : Parser[TimeUnit] =
-            timeUnit ~ rep(timeUnit) ^^ {
+        def expr : Parser[TimeValue] =
+            timeValue ~ rep(timeValue) ^^ {
                 case u1 ~ l => l.foldLeft (u1) {_ + _}
             }
 
-        def timeUnit : Parser[TimeUnit] = (
+        def timeValue : Parser[TimeValue] = (
               decimalNumber <~ "seconds"      ^^ (_.toLong.seconds)
             | decimalNumber <~ "milliseconds" ^^ (_.toLong.milliseconds)
             | decimalNumber <~ "nanoseconds"  ^^ (_.toLong.nanoseconds)

@@ -26,8 +26,8 @@ final class Prefs (file : String) {
             new IllegalArgumentException (file + ": Property " + name + " is required")
         }
 
-    final def getTimeUnit (name : String) : TimeUnit =
-        TimeUnit.parse (getString(name))
+    final def getTimeValue (name : String) : TimeValue =
+        TimeValue.parse (getString(name))
 
     final def getInt (name : String) : Int =
         Integer.valueOf(getString (name)).intValue

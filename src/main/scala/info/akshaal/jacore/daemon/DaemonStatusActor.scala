@@ -24,7 +24,7 @@ private[jacore] class DaemonStatusActor @Inject() (
                  normalPriorityActorEnv : NormalPriorityActorEnv,
                  daemonStatus : DaemonStatus,
                  textFile : TextFile,
-                 @Named("jacore.status.update.interval") interval : TimeUnit,
+                 @Named("jacore.status.update.interval") interval : TimeValue,
                  @Named("jacore.status.file") statusFileName : String)
             extends Actor (actorEnv = normalPriorityActorEnv)
 {

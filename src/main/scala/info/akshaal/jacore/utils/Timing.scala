@@ -16,7 +16,7 @@ private[utils] abstract class AbstractTiming
     /**
      * Get average timing.
      */
-    def average : TimeUnit
+    def average : TimeValue
 
     /**
      * Measure time passed since <code>startNano<code> til now.
@@ -43,7 +43,7 @@ private[utils] abstract class AbstractTiming
 /**
  * Not thread safe version of class to track of execution performance.
  */
-private[jacore] final class Timing (limit : TimeUnit, daemonStatus : DaemonStatus)
+private[jacore] final class Timing (limit : TimeValue, daemonStatus : DaemonStatus)
                         extends AbstractTiming with NotNull
 {
     private[this] val valuesCount = 100
@@ -65,14 +65,14 @@ private[jacore] final class Timing (limit : TimeUnit, daemonStatus : DaemonStatu
         }
     }
     
-    override def average : TimeUnit = frame.average.nanoseconds
+    override def average : TimeValue = frame.average.nanoseconds
 }
 
 /**
  * Helper to measure time. This is a thread safe version which doesn't use synchronization.
  * This is done by having Frame object for each thread. This may be innacurate.
  */
-private[jacore] final class ThreadSafeTiming (limit : TimeUnit,
+private[jacore] final class ThreadSafeTiming (limit : TimeValue,
                                               daemonStatus : DaemonStatus,
                                               maxThreads : Int)
                         extends AbstractTiming with NotNull
@@ -118,7 +118,7 @@ private[jacore] final class ThreadSafeTiming (limit : TimeUnit,
         }
     }
     
-    override def average : TimeUnit = {
+    override def average : TimeValue = {
         var totalSum = 0L
         var totalCount = 0L
 

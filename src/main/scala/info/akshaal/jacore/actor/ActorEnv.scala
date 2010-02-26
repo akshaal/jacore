@@ -11,7 +11,7 @@ package actor
 import com.google.inject.{Inject, Singleton}
 
 import utils.{LowPriorityPool, NormalPriorityPool, HiPriorityPool,
-              Pool, TimeUnit}
+              Pool, TimeValue}
 import scheduler.Scheduler
 
 /**

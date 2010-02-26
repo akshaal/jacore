@@ -15,8 +15,8 @@ import daemon.DaemonStatus
 @Singleton
 final class HiPriorityPool @Inject()
                (@Named("jacore.pool.hi.threads") threads : Int,
-                @Named("jacore.pool.hi.latency") latencyLimit : TimeUnit,
-                @Named("jacore.pool.hi.execution") executionLimit : TimeUnit,
+                @Named("jacore.pool.hi.latency") latencyLimit : TimeValue,
+                @Named("jacore.pool.hi.execution") executionLimit : TimeValue,
                 daemonStatus : DaemonStatus,
                 threadPriorityChanger : ThreadPriorityChanger)
       extends Pool (name = "HiPriorityPool",
@@ -33,8 +33,8 @@ final class HiPriorityPool @Inject()
 @Singleton
 final class NormalPriorityPool @Inject()
                (@Named("jacore.pool.normal.threads") threads : Int,
-                @Named("jacore.pool.normal.latency") latencyLimit : TimeUnit,
-                @Named("jacore.pool.normal.execution") executionLimit : TimeUnit,
+                @Named("jacore.pool.normal.latency") latencyLimit : TimeValue,
+                @Named("jacore.pool.normal.execution") executionLimit : TimeValue,
                 daemonStatus : DaemonStatus,
                 threadPriorityChanger : ThreadPriorityChanger)
           extends Pool (name = "NormalPriorityPool",
@@ -51,8 +51,8 @@ final class NormalPriorityPool @Inject()
 @Singleton
 final class LowPriorityPool @Inject()
                (@Named("jacore.pool.low.threads") threads : Int,
-                @Named("jacore.pool.low.latency") latencyLimit : TimeUnit,
-                @Named("jacore.pool.low.execution") executionLimit : TimeUnit,
+                @Named("jacore.pool.low.latency") latencyLimit : TimeValue,
+                @Named("jacore.pool.low.execution") executionLimit : TimeValue,
                 daemonStatus : DaemonStatus,
                 threadPriorityChanger : ThreadPriorityChanger)
           extends Pool (name = "LowPriorityPool",
@@ -69,8 +69,8 @@ final class LowPriorityPool @Inject()
 abstract sealed class Pool (name : String,
                             priority : ThreadPriorityChanger.Priority,
                             threads : Int,
-                            latencyLimit : TimeUnit,
-                            executionLimit : TimeUnit,
+                            latencyLimit : TimeValue,
+                            executionLimit : TimeValue,
                             daemonStatus : DaemonStatus,
                             threadPriorityChanger : ThreadPriorityChanger)
 {

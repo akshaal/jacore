@@ -22,7 +22,7 @@ trait ActorSchedule {
     this : Actor =>
 
     private val scheduleControls = new WeakHashMap [ScheduleControl, Null]
-    private val recurrentSchedules = new ListBuffer [(Any, TimeUnit)]
+    private val recurrentSchedules = new ListBuffer [(Any, TimeValue)]
 
     /**
      * Schedule to be used by this actor.
@@ -31,8 +31,8 @@ trait ActorSchedule {
         def in (number : Long)      = new ScheduleWhen (number, ScheduleIn)
         def every (number : Long)   = new ScheduleWhen (number, ScheduleEvery)
 
-        def in (time : TimeUnit)    = new ScheduleWhat (time, ScheduleIn)
-        def every (time : TimeUnit) = new ScheduleWhat (time, ScheduleEvery)
+        def in (time : TimeValue)    = new ScheduleWhat (time, ScheduleIn)
+        def every (time : TimeValue) = new ScheduleWhat (time, ScheduleEvery)
     }
 
     protected final class ScheduleWhen (number : Long, option : ScheduleOption) extends NotNull {
@@ -44,7 +44,7 @@ trait ActorSchedule {
         def hours        = new ScheduleWhat (number.hours, option)
     }
 
-    protected final class ScheduleWhat (when : TimeUnit, option : ScheduleOption) extends NotNull {
+    protected final class ScheduleWhat (when : TimeValue, option : ScheduleOption) extends NotNull {
         def payload (payload : Any) : Unit =
             option match {
                 case ScheduleIn =>

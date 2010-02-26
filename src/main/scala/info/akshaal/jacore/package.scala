@@ -17,11 +17,12 @@ import scala.collection.mutable.ListBuffer
 import java.util.concurrent.{ExecutorService, Callable, Future}
 
 import jacore.logger.Logger
+import jacore.utils.TimeValueFromNumberCreator
 
 package object jacore {
     // Make timeunit visible
-    type TimeUnit = utils.TimeUnit
-    val TimeUnit = utils.TimeUnit
+    type TimeValue = utils.TimeValue
+    val TimeValue = utils.TimeValue
 
     // Make results visible
     type Result [A] = utils.Result [A]
@@ -218,46 +219,19 @@ package object jacore {
     // Time
 
     /**
-     * Converts Long to TimeUnitFromNumberCreator
+     * Converts Long to TimeValueFromNumberCreator
      */
     @inline
-    implicit def long2TimeUnitFromNumberCreator (x : Long) =
-        new TimeUnitFromNumberCreator (x)
+    implicit def long2TimeValueFromNumberCreator (x : Long) =
+        new TimeValueFromNumberCreator (x)
 
     /**
-     * Converts Int to TimeUnitFromLongCreator
+     * Converts Int to TimeValueFromLongCreator
      */
     @inline
-    implicit def int2TimeUnitFromNumberCreator (x : Int) =
-        new TimeUnitFromNumberCreator (x)
+    implicit def int2TimeValueFromNumberCreator (x : Int) =
+        new TimeValueFromNumberCreator (x)
 
     @inline
-    implicit def string2TimeUnit (x : String) = TimeUnit.parse (x)
-
-    /**
-     * Wrapper for Long that makes it possible to convert
-     * it to TimeUnit object.
-     */
-    final class TimeUnitFromNumberCreator (x : Long) extends NotNull {
-        @inline
-        def nanoseconds  = mk (x)
-
-        @inline
-        def microseconds = mk (x * 1000L)
-
-        @inline
-        def milliseconds = mk (x * 1000L * 1000L)
-
-        @inline
-        def seconds      = mk (x * 1000L * 1000L * 1000L)
-
-        @inline
-        def minutes      = mk (x * 1000L * 1000L * 1000L * 60L)
-
-        @inline
-        def hours        = mk (x * 1000L * 1000L * 1000L * 60L * 60L)
-
-        @inline
-        def mk (nano : Long) = new TimeUnit (nano)
-    }
+    implicit def string2TimeValue (x : String) = TimeValue.parse (x)
 }

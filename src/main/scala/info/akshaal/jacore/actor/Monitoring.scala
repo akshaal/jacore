@@ -23,14 +23,14 @@ private[actor] case object Pong extends NotNull
  */
 private[jacore] final class MonitoringActor @Inject() (
                      normalPriorityActorEnv : NormalPriorityActorEnv,
-                     @Named("jacore.monitoring.interval") interval : TimeUnit,
+                     @Named("jacore.monitoring.interval") interval : TimeValue,
                      daemonStatus : DaemonStatus)
             extends Actor (actorEnv = normalPriorityActorEnv)
             with UnfixedScheduling
 {
     private val currentActors : Set[Actor] = new HashSet[Actor]
     private var monitoringActors : Set[Actor] = new HashSet[Actor]
-    private var pingSentAt : TimeUnit = 0.nanoseconds
+    private var pingSentAt : TimeValue = 0.nanoseconds
 
     schedule every interval executionOf monitor ()
 

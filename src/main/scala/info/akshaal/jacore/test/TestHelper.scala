@@ -30,7 +30,7 @@ trait TestHelper {
     /**
      * How much time we wait for a message to arrive to actor before timing out.
      */
-    val timeout : TimeUnit
+    val timeout : TimeValue
 
     /**
      * Injector to use for tests.
@@ -196,7 +196,7 @@ trait TestHelper {
      */
     trait SpecWithAddons extends Specification {
         protected implicit val jacoreLogger : Logger = Logger.get (this)
-        protected val timeoutForOneExample : TimeUnit = 5 minutes
+        protected val timeoutForOneExample : TimeValue = 5 minutes
         private val runningExamples : Map[Example, TimerTask] = new HashMap
 
         override def beforeExample (ex: Examples) = {

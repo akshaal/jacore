@@ -15,7 +15,7 @@ import utils.ThreadUtils
 @Singleton
 final class DaemonStatus @Inject() (
                  @Named ("jacore.status.jmx.name") val jmxObjectName : String,
-                 @Named ("jacore.qos.skip.first") val qosSkipFirst : TimeUnit)
+                 @Named ("jacore.qos.skip.first") val qosSkipFirst : TimeValue)
               extends DummyLogging with SimpleJmx
 {
     @volatile

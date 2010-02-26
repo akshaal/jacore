@@ -8,8 +8,8 @@ package unit.utils
 
 import unit.UnitTestHelper._
 
-class TimeUnitTest extends JacoreSpecWithJUnit ("TimeUnit class specification") {
-    "TimeUnit" should {
+class TimeValueTest extends JacoreSpecWithJUnit ("TimeValue class specification") {
+    "TimeValue" should {
         "allow conversions to nanoseconds" in {
             10.nanoseconds.asNanoseconds   must_==  10L
             11.microseconds.asNanoseconds  must_==  11L * 1000L
