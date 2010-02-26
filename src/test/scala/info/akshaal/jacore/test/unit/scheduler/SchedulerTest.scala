@@ -11,6 +11,7 @@ import java.util.Random
 
 import unit.UnitTestHelper._
 import scheduler.{TimeOut, UnfixedScheduling}
+import utils.SimpleFunction0
 
 class SchedulerTest extends JacoreSpecWithJUnit ("Scheduler specification") {
     import SchedulerTest._
@@ -47,6 +48,18 @@ class SchedulerTest extends JacoreSpecWithJUnit ("Scheduler specification") {
 
         "provide recurrent scheduling of code blocks" in {
             withStartedActor [RecurrentCodeTestActor] (actor => {
+                Thread.sleep (400)
+
+                actor.invocations must beIn (6 to 10)
+
+                Thread.sleep (400)
+
+                actor.invocations must beIn (14 to 18)
+            })
+        }
+
+        "provide recurrent scheduling of simple functions" in {
+            withStartedActor [RecurrentSimpleFunctionTestActor] (actor => {
                 Thread.sleep (400)
 
                 actor.invocations must beIn (6 to 10)
@@ -215,6 +228,17 @@ object SchedulerTest {
         schedule every 50.milliseconds executionOf {
             debug ("Triggered")
             invocations += 1
+        }
+    }
+
+    class RecurrentSimpleFunctionTestActor extends TestActor {
+        var invocations = 0
+
+        schedule every 50.milliseconds applicationOf new SimpleFunction0[Unit] {
+            override def apply () = {
+                debug ("Triggered")
+                invocations += 1
+            }
         }
     }
 

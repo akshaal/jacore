@@ -13,6 +13,7 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConversions._
 
 import scheduler.ScheduleControl
+import utils.SimpleFunction0
 
 /**
  * Scheduling for actor.
@@ -61,6 +62,9 @@ trait ActorSchedule {
 
         def executionOf (code : => Unit) : Unit =
             payload (ScheduledCode (() => code))
+
+        def applicationOf (func : SimpleFunction0[Unit]) : Unit =
+            payload (ScheduledCode (() => func.apply()))
     }
 
     /**
