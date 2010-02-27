@@ -26,8 +26,10 @@ class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class
 
         "support frames with size 1" in {
             val frame = new DoubleValueFrame (1)
-            frame.average must_== 0.0d
+            frame.average.isNaN mustBe true
             frame.full must_== false
+            frame.current.isNaN mustBe true
+            frame.oldest.isNaN mustBe true
 
             frame.put (1.0d)
             frame.average must_== 1.0d
@@ -55,8 +57,10 @@ class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class
 
         "support frames with size 2" in {
             val frame = new DoubleValueFrame (2)
-            frame.average must_== 0.0d
+            frame.average.isNaN mustBe true
             frame.full must_== false
+            frame.current.isNaN mustBe true
+            frame.oldest.isNaN mustBe true
 
             frame.put (1.0d)
             frame.average must_== 1.0d
@@ -85,8 +89,10 @@ class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class
 
         "support frames with size 3" in {
             val frame = new DoubleValueFrame (3)
-            frame.average must_== 0.0d
+            frame.average.isNaN mustBe true
             frame.full must_== false
+            frame.current.isNaN mustBe true
+            frame.oldest.isNaN mustBe true
 
             frame.put (1.0d)
             frame.average must_== 1.0d

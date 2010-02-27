@@ -27,6 +27,8 @@ class LongValuesFrameTest extends JacoreSpecWithJUnit ("LongValueFrame class spe
             val frame = new LongValueFrame (1)
             frame.average must_== 0
             frame.full must_== false
+            frame.current must_== 0
+            frame.oldest must_== 0
 
             frame.put (1)
             frame.average must_== 1

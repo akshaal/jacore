@@ -66,7 +66,7 @@ final class LongValueFrame (maximum : Int) extends NotNull {
     /**
      * Current (last inserted value).
      */
-    def current : Long = array (pos)
+    def current : Long = if (count > 0) array (pos) else 0
 
     /**
      * Oldest value.
@@ -75,6 +75,10 @@ final class LongValueFrame (maximum : Int) extends NotNull {
         if (full && pos != maximum - 1) {
             array (pos + 1)
         } else {
-            array (0)
+            if (count > 0) {
+                array (0)
+            } else {
+                0L
+            }
         }
 }

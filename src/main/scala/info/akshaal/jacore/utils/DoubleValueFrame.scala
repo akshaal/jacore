@@ -45,7 +45,7 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
      * @return the average
      */
     def average () : Double = {
-        if (count == 0) 0d else sum / count
+        if (count == 0) Double.NaN else sum / count
     }
 
     /**
@@ -66,7 +66,7 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
     /**
      * Current (last inserted value).
      */
-    def current : Double = array (pos)
+    def current : Double = if (count > 0) array (pos) else Double.NaN
 
     /**
      * Oldest value.
@@ -75,6 +75,10 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
         if (full && pos != maximum - 1) {
             array (pos + 1)
         } else {
-            array (0)
+            if (count > 0) {
+                array (0)
+            } else {
+                Double.NaN
+            }
         }
 }
