@@ -101,8 +101,8 @@ private[actor] object ActorClassScanner extends Logging {
                 badMethod ("must not be static")
             }
 
-            if (Modifier.isPrivate (modifiers)) {
-                badMethod ("must not be private")
+            if (!Modifier.isPublic (modifiers)) {
+                badMethod ("must be public")
             }
 
             // Check return type: must be void

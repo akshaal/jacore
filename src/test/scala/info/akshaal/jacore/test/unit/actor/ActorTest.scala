@@ -14,7 +14,7 @@ import com.google.inject.{ProvisionException, Inject}
 
 import unit.UnitTestHelper._
 import annotation.{CallByMessage, Act, ExtractBy}
-import actor.MessageExtractor
+import actor.{MessageExtractor, Actor}
 
 class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito {
     import ActorTest._
@@ -120,14 +120,8 @@ class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito
             })
         }
 
-        "work with protected methods annotated with @Act" in {
-            withStartedActor [AdoptedProtectedTestActor] (actor => {
-                actor.intReceived  must beFalse
-
-                actor.waitForMessageAfter {actor ! 123}
-
-                actor.intReceived  must beTrue
-            })
+        "reject protected methods annotated with @Act" in {
+            mustBeInvalidActor [somepkg.AdoptedProtectedTestActor]
         }
 
         "support inheritance" in {
@@ -277,7 +271,7 @@ class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito
             })
         }
 
-        def mustBeInvalidActor[T <: TestActor](implicit clazz : ClassManifest[T]) : Unit = {
+        def mustBeInvalidActor[T <: Actor](implicit clazz : ClassManifest[T]) : Unit = {
             withStartedActor [T] (actor => ()) (clazz) must throwA[ProvisionException]
         }
 
@@ -774,10 +768,7 @@ object ActorTest {
         }
     }
 
-    class AdoptedProtectedTestActor extends ProtectedTestActor (TestModule.hiPriorityActorEnv)
-                                    with Waitable
-
-    class InheritanceTestActor extends ProtectedTestActor (TestModule.hiPriorityActorEnv)
+    class InheritanceTestActor extends PublicTestActor (TestModule.hiPriorityActorEnv)
                                with Waitable
     {
         var strReceived = false
@@ -789,7 +780,7 @@ object ActorTest {
     }
 
     class InheritanceWithOverrideTestActor
-                                extends ProtectedTestActor (TestModule.hiPriorityActorEnv)
+                                extends PublicTestActor (TestModule.hiPriorityActorEnv)
                                 with Waitable
     {
         var strReceived = false
@@ -993,4 +984,11 @@ object ActorTest {
     class BadExtractor2 (s : String) extends MessageExtractor[String, String] {
         override def extractFrom (msg : String) = msg
     }
+}
+
+// This class must be in a difference package, because otherwise protected method
+// can be accessed by rule of the-same-package. And then protected modifier test will be useless
+package somepkg {
+    class AdoptedProtectedTestActor extends ProtectedTestActor (TestModule.hiPriorityActorEnv)
+                                    with Waitable
 }
