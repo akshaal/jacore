@@ -74,6 +74,7 @@ private[jacore] final class Timing (limit : TimeValue, daemonStatus : DaemonStat
  */
 private[jacore] final class ThreadSafeTiming (limit : TimeValue,
                                               daemonStatus : DaemonStatus,
+                                              currentThreadNumber : ThreadLocal [java.lang.Integer],
                                               maxThreads : Int)
                         extends AbstractTiming with NotNull
 {
@@ -85,17 +86,12 @@ private[jacore] final class ThreadSafeTiming (limit : TimeValue,
     // Current free frame slot
     private[this] val threadFrameLastIndex = new AtomicInteger (-1)
 
-    // Number of frame of the currently running thread
-    private[this] val threadFrameNumber = new ThreadLocal [Int] {
-        protected override def initialValue : Int = threadFrameLastIndex.incrementAndGet
-    }
-
     // Current thread frame
     private[this] val threadFrame = new ThreadLocal [LongValueFrame] {
         protected override def initialValue : LongValueFrame = {
             val frame = new LongValueFrame (valuesCount)
 
-            frames.set (threadFrameNumber.get, frame)
+            frames.set (currentThreadNumber.get.asInstanceOf [Int], frame)
 
             frame
         }
@@ -122,7 +118,7 @@ private[jacore] final class ThreadSafeTiming (limit : TimeValue,
         var totalSum = 0L
         var totalCount = 0L
 
-        for (i <- 0 to threadFrameLastIndex.get) {
+        for (i <- 0 to maxThreads) {
             val frame = frames.get (i)
             if (frame != null) {
                 // Because these can be changed concurrently and not atomically

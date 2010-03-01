@@ -6,9 +6,6 @@
 package info.akshaal.jacore
 package utils
 
-import java.text.DateFormat
-import java.util.Date
-
 import collection.immutable.{List, Nil}
 import scala.collection.JavaConversions._
 import scala.collection.mutable.Map
@@ -31,8 +28,6 @@ object ThreadUtils extends DummyLogging {
             threadDumpList = (name + ":\n    " + stack + "\n") :: threadDumpList
         }
 
-        val dt = DateFormat.getDateTimeInstance (DateFormat.FULL, DateFormat.FULL)
-                           .format (new Date)
-        error (dt + " ::: " + message + ":\n" + threadDumpList.mkString ("\n"))
+        error (message + ":\n" + threadDumpList.mkString ("\n"))
     }
 }

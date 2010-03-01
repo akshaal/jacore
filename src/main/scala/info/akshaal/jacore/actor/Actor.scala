@@ -106,19 +106,20 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
 
         // This runner will be executed by executor when time has come
         // to process the message
-        val runner = mkRunnable {
-            runTimingFinisher ("[latency] Actor started for message: " + msg)
+        val runner =
+            mkRunnable {
+                runTimingFinisher ("[latency] Actor started for message: " + msg)
 
-            val executeTimingFinisher = actorEnv.pool.executionTiming.createFinisher
+                val executeTimingFinisher = actorEnv.pool.executionTiming.createFinisher
 
-            // Execute
-            logIgnoredException ("Error processing message: " + msg) {
-                invokeAct (msg, sentFrom)
+                // Execute
+                logIgnoredException ("Error processing message: " + msg) {
+                    invokeAct (msg, sentFrom)
+                }
+
+                // Show complete latency
+                executeTimingFinisher ("[execution] Actor completed for message: " + msg)
             }
-
-            // Show complete latency
-            executeTimingFinisher ("[execution] Actor completed for message: " + msg)
-        }
 
         fiber.execute (runner)
     }
@@ -129,7 +130,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
     @inline
     private[this] def invokeAct (msg : Any, sentFrom : Option[Actor]) = {
         sender = sentFrom
-
+        
         var userMessage = true
         try {
             msg match {

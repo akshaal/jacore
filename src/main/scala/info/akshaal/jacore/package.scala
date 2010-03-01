@@ -9,12 +9,14 @@ package info.akshaal
 
 import java.io.{IOException, Closeable, File, BufferedReader, InputStreamReader, FileInputStream}
 import java.lang.{Iterable => JavaIterable}
+import java.text.DateFormat
+import java.util.concurrent.{ExecutorService, Callable, Future}
+import java.util.Date
 
 import com.google.inject.{Injector, Inject => GuiceInject, Singleton => GuiceSingleton}
 import com.google.inject.name.{Named => GuiceNamed}
 
 import scala.collection.mutable.ListBuffer
-import java.util.concurrent.{ExecutorService, Callable, Future}
 
 import jacore.logger.Logger
 import jacore.utils.TimeValueFromNumberCreator
@@ -217,6 +219,10 @@ package object jacore {
 
     // /////////////////////////////////////////////////////////////////////
     // Time
+
+    def formattedCurrentTime () : String = {
+        DateFormat.getDateTimeInstance (DateFormat.FULL, DateFormat.FULL).format (new Date)
+    }
 
     /**
      * Converts Long to TimeValueFromNumberCreator

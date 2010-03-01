@@ -150,13 +150,16 @@ class DummyLogger extends Logger {
     override def debug (str : String) = ()
     
     @inline
-    override def info (str : String)  = println ("INFO: " + str)
+    override def info (str : String)  =
+            println (formattedCurrentTime + " ::: INFO: " + str)
 
     @inline
-    override def warn (str : String)  = System.err.println ("WARN: " + str)
+    override def warn (str : String)  =
+            System.err.println (formattedCurrentTime + " ::: WARN: " + str)
 
     @inline
-    override def error (str : String) = System.err.println ("ERROR: " + str)
+    override def error (str : String) =
+            System.err.println (formattedCurrentTime + " ::: ERROR: " + str)
 
     // Log with exception
 
