@@ -94,9 +94,9 @@ class SchedulerTest extends JacoreSpecWithJUnit ("Scheduler specification") {
 
         "provide cancelation of one time scheduling" in {
             withStartedActor [OneTimeTestActor] (actor => {
-                val control = TestModule.scheduler.in (actor, 123, 130.milliseconds)
+                val control = TestModule.scheduler.in (actor, 123, 300.milliseconds)
 
-                Thread.sleep (30)
+                Thread.sleep (100)
 
                 actor.executed   must_==  0
                 control.cancel ()
