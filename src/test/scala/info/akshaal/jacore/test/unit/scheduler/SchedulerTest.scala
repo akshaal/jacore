@@ -123,54 +123,48 @@ class SchedulerTest extends JacoreSpecWithJUnit ("Scheduler specification") {
         }
 
         "work properly with negative hashcode" in {
-            1 to 3 foreach (_ =>
-                withNotStartedActor [RecurrentCodeWithNegativeHashcodeTestActor] (actor => {
-                    val started = System.currentTimeMillis
+            withNotStartedActor [RecurrentCodeWithNegativeHashcodeTestActor] (actor => {
+                val started = System.currentTimeMillis
 
-                    actor.waitForMessageAfter {actor.start}
-                    actor.invocations  must_==  1
+                actor.waitForMessageAfter {actor.start}
+                actor.invocations  must_==  1
 
-                    actor.waitForMessageAfter {}
-                    actor.invocations  must_==  2
+                actor.waitForMessageAfter {}
+                actor.invocations  must_==  2
 
-                    val lasted = System.currentTimeMillis - started
-                    lasted  must beIn (140 to 460)
-                })
-            )
+                val lasted = System.currentTimeMillis - started
+                lasted  must beIn (360 to 960)
+            })
         }
 
         "work properly with min hashcode" in {
-            1 to 3 foreach (_ =>
-                withNotStartedActor [RecurrentCodeWithMinHashcodeTestActor] (actor => {
-                    val started = System.currentTimeMillis
+            withNotStartedActor [RecurrentCodeWithMinHashcodeTestActor] (actor => {
+                val started = System.currentTimeMillis
 
-                    actor.waitForMessageAfter {actor.start}
-                    actor.invocations  must_==  1
+                actor.waitForMessageAfter {actor.start}
+                actor.invocations  must_==  1
 
-                    actor.waitForMessageAfter {}
-                    actor.invocations  must_==  2
+                actor.waitForMessageAfter {}
+                actor.invocations  must_==  2
 
-                    val lasted = System.currentTimeMillis - started
-                    lasted  must beIn (140 to 460)
-                })
-            )
+                val lasted = System.currentTimeMillis - started
+                lasted  must beIn (360 to 960)
+            })
         }
 
         "work properly with max hashcode" in {
-            1 to 3 foreach (_ =>
-                withNotStartedActor [RecurrentCodeWithMaxHashcodeTestActor] (actor => {
-                    val started = System.currentTimeMillis
+            withNotStartedActor [RecurrentCodeWithMaxHashcodeTestActor] (actor => {
+                val started = System.currentTimeMillis
 
-                    actor.waitForMessageAfter {actor.start}
-                    actor.invocations  must_==  1
+                actor.waitForMessageAfter {actor.start}
+                actor.invocations  must_==  1
 
-                    actor.waitForMessageAfter {}
-                    actor.invocations  must_==  2
+                actor.waitForMessageAfter {}
+                actor.invocations  must_==  2
 
-                    val lasted = System.currentTimeMillis - started
-                    lasted  must beIn (140 to 460)
-                })
-            )
+                val lasted = System.currentTimeMillis - started
+                lasted  must beIn (360 to 960)
+            })
         }
     }
 }
@@ -243,7 +237,7 @@ object SchedulerTest {
     }
 
     class RecurrentCodeWithNegativeHashcodeTestActor extends TestActor with UnfixedScheduling {
-        schedule every 200.milliseconds payload "Hi"
+        schedule every 400.milliseconds payload "Hi"
 
         var invocations = 0
 
@@ -258,7 +252,7 @@ object SchedulerTest {
     }
 
     class RecurrentCodeWithMinHashcodeTestActor extends TestActor with UnfixedScheduling {
-        schedule every 200.milliseconds payload "Hi"
+        schedule every 400.milliseconds payload "Hi"
 
         var invocations = 0
 
@@ -273,9 +267,9 @@ object SchedulerTest {
     }
 
     class RecurrentCodeWithMaxHashcodeTestActor extends TestActor with UnfixedScheduling {
-        schedule every 200.milliseconds payload "Hi"
-
         var invocations = 0
+        schedule every 400.milliseconds payload "Hi"
+
 
         override def act () = {
             case TimeOut (x : String) => {
