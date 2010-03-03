@@ -125,7 +125,8 @@ abstract sealed class Pool (name : String,
                                 threads,
                                 0L,
                                 TimeUnit.MILLISECONDS,
-                                new LinkedBlockingQueue[Runnable]) {
+                                new LinkedBlockingQueue[Runnable],
+                                threadFactory) {
             protected override def afterExecute (runnable : Runnable, throwable : Throwable) = {
                 if (throwable != null) {
                     releaseCurrentThreadNumber ()
