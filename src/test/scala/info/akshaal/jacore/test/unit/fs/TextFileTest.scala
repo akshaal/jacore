@@ -255,9 +255,9 @@ object TextFileTest {
         var content : String = null
 
         override def act () = {
-            case msg @ (file : File, payl, size : Option[Int]) =>
+            case msg @ (file : File, payl, size) =>
                 debug ("Received message: " + msg)
-                TestModule.textFile.opReadFile (file, size) runMatchingResultAsy {
+                TestModule.textFile.opReadFile (file, size.asInstanceOf[Option[Int]]) runMatchingResultAsy {
                     case Success (cont) =>
                         done = done + 1
                         this.payload = payl

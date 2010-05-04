@@ -87,7 +87,7 @@ private[scheduler] final class SchedulerThread
     private def processFromHead () : Unit = {
         // Get item from head
         val item = synchronized { queue.poll }
-        if (item.cancelled) {
+        if (item.getControl.cancelled) {
             return
         }
 

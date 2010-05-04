@@ -15,6 +15,9 @@ import actor.Actor
  */
 final class ScheduleControl {
     @volatile
+    private[scheduler] var cancelled = false
+
+    @volatile
     private[scheduler] var currentSchedule : Option [Schedule] = None
 
     /**
@@ -24,7 +27,7 @@ final class ScheduleControl {
         currentSchedule match {
             case None => ()
             case Some (schedule) =>
-                schedule.cancelled = true
+                cancelled = true
                 currentSchedule = None
         }
     }
@@ -39,14 +42,13 @@ private[scheduler] abstract sealed class Schedule (val actor : Actor,
                                                    control : ScheduleControl)
                             extends Comparable[Schedule] with NotNull
 {
-    @volatile
-    var cancelled = false
-
     control.currentSchedule = Some (this)
 
     def nextSchedule () : Option[Schedule]
 
     override def compareTo (that : Schedule) = nanoTime compare that.nanoTime
+
+    def getControl : ScheduleControl = control
 }
 
 /**
@@ -90,10 +92,6 @@ final private[scheduler] class RecurrentSchedule (actor : Actor,
                                    nanoTime + period,
                                    period,
                                    control)
-
-        if (cancelled) {
-            newSchedule.cancelled = true
-        }
 
         Some (newSchedule)
     }

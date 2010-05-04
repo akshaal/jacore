@@ -45,19 +45,24 @@ trait ActorSchedule {
     }
 
     protected final class ScheduleWhat (when : TimeValue, option : ScheduleOption) extends NotNull {
-        def payload (payload : Any) : Unit =
+        def payload (payload : Any) : ScheduleControl =
             option match {
                 case ScheduleIn =>
                     val control = actorEnv.scheduler.in (ActorSchedule.this, payload, when)
                     scheduleControls.put (control, null)
+                    control
 
                 case ScheduleEvery =>
+                    recurrentSchedules += ((payload, when))
+                    
                     if (actorStarted.get) {
                         val control =
                             actorEnv.scheduler.every (ActorSchedule.this, payload, when)
                         scheduleControls.put (control, null)
+                        control
+                    } else {
+                        null
                     }
-                    recurrentSchedules += ((payload, when))
             }
 
         def executionOf (code : => Unit) : Unit =
