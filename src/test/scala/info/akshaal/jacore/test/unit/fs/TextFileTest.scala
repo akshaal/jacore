@@ -128,7 +128,7 @@ class TextFileTest extends JacoreSpecWithJUnit ("TextFile specification") {
                 actor.excs     must_==  0
 
                 writeLine (file, "Hi")
-                actor.waitForMessageBatchesAfter (2) {actor ! (file, "1x")}
+                actor.waitForMessageBatchesAfter (2) {actor ! (file, "1x", Some(1024))}
 
                 actor.payload  must_==  "1x"
                 actor.done     must_==  1
@@ -136,7 +136,7 @@ class TextFileTest extends JacoreSpecWithJUnit ("TextFile specification") {
                 actor.content  must_==  "Hi"
 
                 writeLine (file, "Bye")
-                actor.waitForMessageBatchesAfter (2) {actor ! (file, "2x")}
+                actor.waitForMessageBatchesAfter (2) {actor ! (file, "2x", None)}
 
                 actor.payload  must_==  "2x"
                 actor.done     must_==  2
@@ -144,7 +144,7 @@ class TextFileTest extends JacoreSpecWithJUnit ("TextFile specification") {
                 actor.content  must_==  "Bye"
 
                 actor.waitForMessageBatchesAfter (2) {
-                    actor ! (new File ("/ook/ooook/ooooooook"), "3x")
+                    actor ! (new File ("/ook/ooook/ooooooook"), "3x", None)
                 }
 
                 actor.payload  must_==  "3x"
@@ -255,9 +255,9 @@ object TextFileTest {
         var content : String = null
 
         override def act () = {
-            case msg @ (file : File, payl) =>
+            case msg @ (file : File, payl, size : Option[Int]) =>
                 debug ("Received message: " + msg)
-                TestModule.textFile.opReadFile (file) runMatchingResultAsy {
+                TestModule.textFile.opReadFile (file, size) runMatchingResultAsy {
                     case Success (cont) =>
                         done = done + 1
                         this.payload = payl

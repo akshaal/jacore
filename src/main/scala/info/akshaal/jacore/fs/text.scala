@@ -299,6 +299,7 @@ private[jacore] class TextFileActor @Inject() (
                                 ignored : Object) : Unit = {
             try {
                 buf.rewind ()
+                buf.limit (bytes.asInstanceOf[Int])
 
                 val content : String = decoder.decode (buf).toString
                 whenDone (content)
