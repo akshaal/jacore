@@ -34,7 +34,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
      * when it is started/stopped.
      */
     private[this] final val matcherDefinitionsForSubscribe =
-                                    actMethodDescs.filter(_.subscribe).map (_.matcherDefinition)
+                       actMethodDescs.filter(_.subscribe).map (_.matcherDefinition)
 
     /**
      * Method dispatcher. Forwards message processing request to
@@ -81,6 +81,13 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
      */
     protected final def manage (actor : Actor) : Unit = {
         managed = actor :: managed
+    }
+
+    /**
+     * Subscribe to the message of the given type.
+     */
+    protected final def subscribe [T] (implicit m : ClassManifest[T]) : Unit = {
+        broadcaster.subscribe (this, m.erasure)
     }
 
     /**

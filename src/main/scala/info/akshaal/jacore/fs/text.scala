@@ -76,15 +76,16 @@ trait TextFile {
      *
      * @param file file to read from
      * @param payload payload to passed back in messsage when reading is done
+     * @param size if size is not given, then the whole file is requested for read
      */
-    def readFileAsy (file : File, payload : Any) : Unit
+    def readFileAsy (file : File, payload : Any, size : Option[Int] = None) : Unit
 
     /**
      * Open file and initiate reading from the file.
      * 
      * @param file file to read from
      */
-    def opReadFile (file : File) : Operation.WithResult [String]
+    def opReadFile (file : File, size : Option[Int] = None) : Operation.WithResult [String]
 }
 
 // ///////////////////////////////////////////////////////////////////////
@@ -157,7 +158,7 @@ private[jacore] class TextFileActor @Inject() (
         }
     }
 
-    override def readFileAsy (file : File, payload : Any) : Unit =
+    override def readFileAsy (file : File, payload : Any, size : Option[Int] = None) : Unit =
     {
         postponed {
             val currentSender = sender
@@ -175,14 +176,16 @@ private[jacore] class TextFileActor @Inject() (
                         actor ! (ReadFileFailed (file, exc, payload))
                 }
 
-            doReadFile (file, whenDone, whenException)
+            doReadFile (file, size, whenDone, whenException)
         }
     }
 
-    override def opReadFile (file : File) : Operation.WithResult [String] = {
+    override def opReadFile (file : File, size : Option[Int] = None) : Operation.WithResult [String] =
+    {
         new AbstractOperation [Result[String]] {
             override def processRequest () {
                 doReadFile (file,
+                            size,
                             cont => yieldResult (Success [String] (cont)),
                             exc => yieldResult (Failure [String] (exc)))
             }
@@ -190,14 +193,16 @@ private[jacore] class TextFileActor @Inject() (
     }
 
     private def doReadFile (file : File,
-                             whenDone : String => Unit,
-                             whenException : Throwable => Unit) : Unit =
+                            sizeOption : Option[Int],
+                            whenDone : String => Unit,
+                            whenException : Throwable => Unit) : Unit =
     {
         var handler = new ReadCompletionHandler (whenDone, whenException)
 
         try {
             val ch = AsynchronousFileChannel.open (file.toPath, READ)
-            val buf = ByteBuffer.allocate (ch.size.asInstanceOf[Int])
+            val size = sizeOption.getOrElse (ch.size.asInstanceOf[Int])
+            val buf = ByteBuffer.allocate (size)
             handler.setChannelAndBuffer (ch, buf)
 
             ch.read (buf, 0, null, handler)
