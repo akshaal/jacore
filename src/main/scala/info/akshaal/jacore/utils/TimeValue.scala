@@ -86,6 +86,9 @@ private[jacore] object TimeValue {
                   ("us", nsInUs),
                   ("ns", 1L))
 
+    val MaxValue = new TimeValue (Long.MaxValue)
+    val MinValue = new TimeValue (Long.MinValue)
+
     /**
      * Parse string ot time unit.
      */
