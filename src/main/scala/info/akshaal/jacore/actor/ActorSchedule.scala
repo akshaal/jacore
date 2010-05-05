@@ -65,10 +65,10 @@ trait ActorSchedule {
                     }
             }
 
-        def executionOf (code : => Unit) : Unit =
+        def executionOf (code : => Unit) : ScheduleControl =
             payload (ScheduledCode (() => code))
 
-        def applicationOf (func : SimpleFunction0[Unit]) : Unit =
+        def applicationOf (func : SimpleFunction0[Unit]) : ScheduleControl =
             payload (ScheduledCode (() => func.apply()))
     }
 
