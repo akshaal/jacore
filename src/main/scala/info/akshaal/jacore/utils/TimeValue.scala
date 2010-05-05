@@ -59,6 +59,14 @@ final class TimeValue (nano : Long) extends NotNull
     def >= (that: TimeValue)     : Boolean = compare(that) >= 0
     def <  (that: TimeValue)     : Boolean = compare(that) < 0
     def >  (that: TimeValue)     : Boolean = compare(that) > 0
+
+    def min (that: TimeValue) : TimeValue = {
+        if (nano < that.asNanoseconds) this else that
+    }
+
+    def max (that: TimeValue) : TimeValue = {
+        if (nano > that.asNanoseconds) this else that
+    }
 }
 
 private[jacore] object TimeValue {
