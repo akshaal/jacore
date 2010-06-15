@@ -44,6 +44,7 @@ final class TimeValue (nano : Long) extends NotNull
     def * (that : Int) = new TimeValue (nano * that.asInstanceOf[Long])
     def / (that : TimeValue) = new TimeValue (nano / that.asNanoseconds)
     def / (that : Int) = new TimeValue (nano / that.asInstanceOf[Long])
+    def unary_-() = new TimeValue (-nano)
 
     override def equals (that : Any) = that match {
         case thatTimeValue : TimeValue => nano == thatTimeValue.asNanoseconds

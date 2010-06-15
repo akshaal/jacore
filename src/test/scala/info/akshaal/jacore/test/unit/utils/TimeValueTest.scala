@@ -46,6 +46,12 @@ class TimeValueTest extends JacoreSpecWithJUnit ("TimeValue class specification"
             (1 hours) min (11 hours)   must_== (1 hours)
         }
 
+        "have unary - operator" in {
+            -(1 minutes)  must_==  ((-1) minutes)
+            -(15 hours)  must_==  ((-15) hours)
+            -(6 seconds)  must_==  ((-6) seconds)
+        }
+
         "have meaningful toString method" in {
             "2days 23hours 1mins 45secs 15ms 10us 100ns"  must_==
                 (48.hours + 23.hours + 1.minutes + 45.seconds
