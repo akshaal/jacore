@@ -10,12 +10,12 @@ package utils
 
 /**
  * Frame of values with maximum fixed number of elements.
- * Frame maintains sum of elements.
+ * Frame maintains sum of elements. None values are supported.
  */
-final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
+final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
     require (maximum > 0, "maximum must be positive number")
 
-    private val array = new Array[Double] (maximum)
+    private val array = new Array[Option[Double]] (maximum)
     private var pos = -1
     private var count = 0
     private var sum = 0d
@@ -25,39 +25,43 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
      * Add value.
      * @param value value
      */
-    def put (value : Double) = {
+    def put (option : Option[Double]) = {
         pos += 1
         
         if (count < maximum) {
             count += 1
-            if (value.isNaN) {
-                nans += 1
-            } else {
-                sum += value
+
+            option match {
+                case None         => nans += 1
+                case Some (value) => sum += value
             }
             
-            array (pos) = value
+            array (pos) = option
         } else {
             if (pos == maximum) {
                 pos = 0;
             }
 
-            val old_slot_val = array(pos)
-            if (value.isNaN) {
-                if (!old_slot_val.isNaN) {
-                    sum -= old_slot_val
-                    nans += 1
-                    array (pos) = value
-                }
-            } else {
-                if (old_slot_val.isNaN) {
-                    sum += value
-                    nans -= 1                    
-                } else {
-                    sum += value - old_slot_val
-                }
-                
-                array (pos) = value
+            val old_slot_option = array(pos)
+            option match {
+                case None =>
+                    for (old_slot_val <- old_slot_option) {
+                        sum -= old_slot_val
+                        nans += 1
+                        array (pos) = option
+                    }
+
+                case Some (value) =>
+                    old_slot_option match {
+                        case None =>
+                            sum += value
+                            nans -= 1
+
+                        case Some (old_slot_val) =>
+                            sum += value - old_slot_val
+                    }
+
+                    array (pos) = option
             }
         }
     }
@@ -65,13 +69,13 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
    /**
      * @return the average
      */
-    def average () : Double = {
+    def average () : Option[Double] = {
         val real_numbers = count - nans
 
         if (real_numbers == 0) {
-            Double.NaN
+            None
         } else {
-            sum / real_numbers
+            Some (sum / real_numbers)
         }
     }
 
@@ -83,13 +87,13 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
     /**
      * Returns current sum.
      */
-    def currentSum : Double = {
+    def currentSum : Option[Double] = {
         val real_numbers = count - nans
 
         if (real_numbers == 0) {
-            Double.NaN
+            None
         } else {
-            sum
+            Some (sum)
         }
     }
 
@@ -101,19 +105,19 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
     /**
      * Current (last inserted value).
      */
-    def current : Double = if (count > 0) array (pos) else Double.NaN
+    def current : Option[Double] = if (count > 0) array (pos) else None
 
     /**
      * Oldest value.
      */
-    def oldest : Double =
+    def oldest : Option[Double] =
         if (full && pos != maximum - 1) {
             array (pos + 1)
         } else {
             if (count > 0) {
                 array (0)
             } else {
-                Double.NaN
+                None
             }
         }
 }
