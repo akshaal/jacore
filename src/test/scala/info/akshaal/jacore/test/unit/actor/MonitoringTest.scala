@@ -37,7 +37,7 @@ class MonitoringTest extends JacoreSpecWithJUnit ("Monitoring specification") {
                 srv.getAttribute (statusObj, "dying")             must_==  false
                 srv.getAttribute (statusObj, "shuttingDown")      must_==  false
 
-                Thread.sleep (MonitoringTestModule.monitoringInterval.asMilliseconds * 4)
+                Thread.sleep (MonitoringTestModule.monitoringInterval.asMilliseconds * 5)
 
                 MonitoringTestModule.daemonStatus.isDying         must beTrue
                 MonitoringTestModule.daemonStatus.isShuttingDown  must beTrue

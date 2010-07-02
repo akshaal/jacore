@@ -30,7 +30,7 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
         
         if (count < maximum) {
             count += 1
-            if (value.isNaN) {
+            if (value != value) {
                 nans += 1
             } else {
                 sum += value
@@ -43,14 +43,14 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
             }
 
             val old_slot_val = array(pos)
-            if (value.isNaN) {
-                if (!old_slot_val.isNaN) {
+            if (value != value) {
+                if (old_slot_val == old_slot_val) {
                     sum -= old_slot_val
                     nans += 1
                     array (pos) = value
                 }
             } else {
-                if (old_slot_val.isNaN) {
+                if (old_slot_val != old_slot_val) {
                     sum += value
                     nans -= 1                    
                 } else {
