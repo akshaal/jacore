@@ -10,6 +10,7 @@ import java.util.{HashMap => JavaHashMap}
 import java.net.URL
 import java.io.InputStreamReader
 import javax.sql.DataSource
+import java.sql.{CallableStatement, PreparedStatement, ResultSet}
 
 import org.apache.ibatis.datasource.pooled.PooledDataSourceFactory
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory
@@ -19,6 +20,7 @@ import org.apache.ibatis.session.{SqlSessionFactory, SqlSessionFactoryBuilder}
 import org.apache.ibatis.builder.xml.XMLMapperBuilder
 import org.apache.ibatis.io.Resources
 import org.apache.ibatis.parsing.XNode
+import org.apache.ibatis.`type`.{TypeHandler, JdbcType}
 
 /**
  * Helper methods for work with iBatis.
@@ -114,6 +116,33 @@ object IbatisUtils {
 
                 mapperBuilder.parse ()
             }
+        }
+
+        /**
+         * Setup type handler for scala enumeration.
+         */
+        def addTypeHandler [T <: JacoreEnum] (enum : T, clazz : Class[_ <: T#Value]) : Unit = {
+            val registry = configuration.getTypeHandlerRegistry
+
+            val typeHandler = new TypeHandler () {
+                 override def setParameter (ps : PreparedStatement,
+                                            i : Int,
+                                            parameter : java.lang.Object,
+                                            jdbcType : JdbcType) : Unit =
+                 {
+                     ps.setInt (i, parameter.asInstanceOf[Enumeration#Value].id)
+                 }
+
+                 override def getResult (rs : ResultSet, columnName : String) : java.lang.Object = {
+                     enum (rs.getInt(columnName))
+                 }
+
+                 override def getResult (cs : CallableStatement, columnIndex : Int) : java.lang.Object = {
+                     enum (cs.getInt(columnIndex))
+                 }
+            }
+
+            registry.register (clazz, typeHandler)
         }
     }
 }

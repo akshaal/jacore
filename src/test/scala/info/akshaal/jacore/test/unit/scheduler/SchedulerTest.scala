@@ -248,7 +248,7 @@ object SchedulerTest {
             }
         }
 
-        override val hashCode = -1 * Math.abs (new Random ().nextInt)
+        override val hashCode = -1 * new Random ().nextInt.abs
     }
 
     class RecurrentCodeWithMinHashcodeTestActor extends TestActor with UnfixedScheduling {

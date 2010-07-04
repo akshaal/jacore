@@ -44,7 +44,7 @@ private[utils] abstract class AbstractTiming
  * Not thread safe version of class to track of execution performance.
  */
 private[jacore] final class Timing (limit : TimeValue, daemonStatus : DaemonStatus)
-                        extends AbstractTiming with NotNull
+                        extends AbstractTiming
 {
     private[this] val valuesCount = 100
     private[this] val frame = new LongValueFrame (valuesCount)
@@ -76,7 +76,7 @@ private[jacore] final class ThreadSafeTiming (limit : TimeValue,
                                               daemonStatus : DaemonStatus,
                                               currentThreadNumber : ThreadLocal [java.lang.Integer],
                                               maxThreads : Int)
-                        extends AbstractTiming with NotNull
+                        extends AbstractTiming
 {
     private[this] val valuesCount = 100
 
@@ -131,4 +131,3 @@ private[jacore] final class ThreadSafeTiming (limit : TimeValue,
         if (totalCount == 0L) 0.nanoseconds else (totalSum / totalCount).nanoseconds
     }
 }
-
