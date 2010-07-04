@@ -130,7 +130,7 @@ object IbatisUtils {
                                             parameter : java.lang.Object,
                                             jdbcType : JdbcType) : Unit =
                  {
-                     ps.setInt (i, parameter.asInstanceOf[Enumeration#Value].id)
+                     ps.setInt (i, parameter.asInstanceOf[T#Value].id)
                  }
 
                  override def getResult (rs : ResultSet, columnName : String) : java.lang.Object = {
