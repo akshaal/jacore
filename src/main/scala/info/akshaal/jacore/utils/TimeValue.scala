@@ -46,8 +46,16 @@ final class TimeValue (nano : Long) extends NotNull
     def / (that : Int) = new TimeValue (nano / that.asInstanceOf[Long])
     def unary_-() = new TimeValue (-nano)
 
+    /**
+     * Rerturns true if other object can be equal to this one.
+     */
+    def canEqual (other : Any) : Boolean = other.isInstanceOf [TimeValue]
+
     override def equals (that : Any) = that match {
-        case thatTimeValue : TimeValue => nano == thatTimeValue.asNanoseconds
+        case thatTimeValue : TimeValue =>
+            canEqual (that) && nano == thatTimeValue.asNanoseconds
+
+        case _ => false
     }
 
     override def hashCode : Int = nano.asInstanceOf[Int]
@@ -55,7 +63,6 @@ final class TimeValue (nano : Long) extends NotNull
     def compare (that: TimeValue) : Int =
         this.asNanoseconds compare that.asNanoseconds
 
-    def equals (that: TimeValue) : Boolean = compare(that) == 0
     def <= (that: TimeValue)     : Boolean = compare(that) <= 0
     def >= (that: TimeValue)     : Boolean = compare(that) >= 0
     def <  (that: TimeValue)     : Boolean = compare(that) < 0

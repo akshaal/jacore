@@ -95,5 +95,9 @@ class TimeValueTest extends JacoreSpecWithJUnit ("TimeValue class specification"
         "not parse broken strings" in {
             "30 secons 1 milliseconds".asNanoseconds must throwA[IllegalArgumentException]
         }
+
+        "compare to null" in {
+            (5.seconds == null) must beFalse
+        }
     }
 }
