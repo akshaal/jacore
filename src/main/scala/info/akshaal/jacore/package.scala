@@ -33,6 +33,9 @@ package object jacore {
     val Success = utils.Success
     val Failure = utils.Failure
 
+    // Make jacore Enumeration visible
+    type JacoreEnum = utils.JacoreEnum
+
     // File conversion
     @inline
     implicit def string2file (absolutePath : String) : File = new File (absolutePath)

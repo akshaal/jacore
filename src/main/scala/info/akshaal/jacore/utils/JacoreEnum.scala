@@ -131,34 +131,6 @@ abstract class JacoreEnum(initial: Int, names: String*) {
    */
   final def withName(s: String): Value = values.find(_.toString == s).get
 
-  /** Creates a fresh value, part of this enumeration. */
-  protected final def Value: Value = Value(nextId)      
-  
-  /** Creates a fresh value, part of this enumeration, identified by the integer
-   *  <code>i</code>.
-   *
-   *  @param i An integer that identifies this value at run-time. It must be
-   *           unique amongst all values of the enumeration.
-   *  @return  ..
-   */
-  protected final def Value(i: Int): Value = Value(i, nextNameOrElse(null))
-  
-  /** Creates a fresh value, part of this enumeration, called <code>name</code>.
-   *
-   *  @param name A human-readable name for that value.
-   */
-  protected final def Value(name: String): Value = Value(nextId, name)
-  
-  /** Creates a fresh value, part of this enumeration, called <code>name</code>
-   *  and identified by the integer <code>i</code>.
-   *
-   * @param i    An integer that identifies this value at run-time. It must be
-   *             unique amongst all values of the enumeration.
-   * @param name A human-readable name for that value.
-   * @return     ..
-   */
-  protected final def Value(i: Int, name: String): Value = new Val(i, name)
-
   private def populateNameMap() {
     // The list of possible Value methods: 0-args which return a conforming type
     val methods = getClass.getMethods filter (m => m.getParameterTypes.isEmpty && classOf[Value].isAssignableFrom(m.getReturnType))
@@ -169,7 +141,7 @@ abstract class JacoreEnum(initial: Int, names: String*) {
       val value = m.invoke(this).asInstanceOf[Value]
       // verify that outer points to the correct JacoreEnum: ticket #3616.
       if (value.outerEnum eq thisenum) {
-        val id = Int.unbox(classOf[Val] getMethod "id" invoke value)
+        val id = Int.unbox(classOf[Value] getMethod "id" invoke value)
         nmap += ((id, name))
       }
     }
@@ -185,9 +157,36 @@ abstract class JacoreEnum(initial: Int, names: String*) {
   /** The type of the enumerated values. */
   @serializable
   @SerialVersionUID(7091335633555234129L)
-  protected[jacore] abstract class Value extends Ordered[Value] {
-    /** the id and bit location of this enumeration value */
-    def id: Int
+  protected[jacore] class Value (i: Int = nextId,
+                                 name: String = nextNameOrElse(null))
+                    extends Ordered[Value]
+  {
+    def this(i: Int)        = this(i, nextNameOrElse(i.toString))
+    def this(name: String)  = this(nextId, name)
+    def this()              = this(nextId)
+
+    assert(!vmap.isDefinedAt(i), "Duplicate id: " + i)
+
+    vmap(i) = this
+    vsetDefined = false
+
+    nextId = i + 1
+
+    if (nextId > topId) topId = nextId
+
+    def id = i
+
+    override def toString() =
+      if (name != null) name
+      else try thisenum.nameOf(i)
+      catch { case _: NoSuchElementException => "<Invalid enum: no field for #" + i + ">" }
+
+    protected def readResolve(): AnyRef = {
+      val enum = thisenum.readResolve().asInstanceOf[JacoreEnum]
+      if (enum.vmap == null) this
+      else enum.vmap(i)
+    }
+
     /** a marker so we can tell whose values belong to whom come reflective-naming time */
     private[JacoreEnum] val outerEnum = thisenum
 
@@ -196,24 +195,8 @@ abstract class JacoreEnum(initial: Int, names: String*) {
       case that: JacoreEnum#Value  => (outerEnum eq that.outerEnum) && (id == that.id)
       case _                        => false
     }
-    override def hashCode: Int = id.##
 
-    /** this enumeration value as an <code>Int</code> bit mask.
-     *  @throws IllegalArgumentException if <code>id</code> is greater than 31
-     */
-    @deprecated("mask32 will be removed")
-    def mask32: Int = {
-      if (id >= 32) throw new IllegalArgumentException
-      1  << id
-    }
-    /** this enumeration value as a <code>Long</code> bit mask. 
-     *  @throws IllegalArgumentException if <code>id</code> is greater than 63
-     */
-    @deprecated("mask64 will be removed")
-    def mask64: Long = {
-      if (id >= 64) throw new IllegalArgumentException
-      1L << id
-    }
+    override def hashCode: Int = id.##
   }
   
   /** A class for sets of values
@@ -227,36 +210,6 @@ abstract class JacoreEnum(initial: Int, names: String*) {
     def - (value: Value) = new ValueSet(ids - value.id)
     def iterator = ids.iterator map thisenum.apply
     override def stringPrefix = thisenum + ".ValueSet"
-  }
-
-  /** A class implementing the <a href="Enumeration.Value.html"
-   *  target="contentFrame"><code>Value</code></a> type. This class can be
-   *  overridden to change the enumeration's naming and integer identification
-   *  behaviour.
-   */
-  @serializable
-  @SerialVersionUID(0 - 3501153230598116017L)
-  protected class Val(i: Int, name: String) extends Value {
-    def this(i: Int)        = this(i, nextNameOrElse(i.toString))
-    def this(name: String)  = this(nextId, name)
-    def this()              = this(nextId)
-
-    assert(!vmap.isDefinedAt(i), "Duplicate id: " + i)
-    vmap(i) = this
-    vsetDefined = false
-    nextId = i + 1
-    if (nextId > topId) topId = nextId
-    def id = i
-    override def toString() =
-      if (name != null) name
-      else try thisenum.nameOf(i)
-      catch { case _: NoSuchElementException => "<Invalid enum: no field for #" + i + ">" }
-
-    protected def readResolve(): AnyRef = {
-      val enum = thisenum.readResolve().asInstanceOf[JacoreEnum]
-      if (enum.vmap == null) this
-      else enum.vmap(i)
-    }
   }
 
   /** A factory object for value sets */
@@ -277,48 +230,4 @@ abstract class JacoreEnum(initial: Int, names: String*) {
         def apply() = newBuilder 
       }
   }
-  
-  /** The name of this enumeration. */
-  @deprecated("use toString instead") def name = toString
-
-  @deprecated("use withName instead")
-  def valueOf(s: String) = values.find(_.toString == s)
-
-  /** A new iterator over all values of this enumeration. */
-  @deprecated("use values.iterator instead")
-  final def iterator: Iterator[Value] = values.iterator
-  
-  /** Apply a function f to all values of this enumeration. */
-  @deprecated("use values.foreach instead")
-  def foreach(f: Value => Unit): Unit = this.iterator foreach f
-  
-  /** Apply a predicate p to all values of this enumeration and return
-    * true, iff the predicate yields true for all values. 
-   */
-  @deprecated("use values.forall instead")
-  def forall(p: Value => Boolean): Boolean = this.iterator forall p
-  
-  /** Apply a predicate p to all values of this enumeration and return
-    * true, iff there is at least one value for which p yields true.
-    */
-  @deprecated("use values.exists instead")
-  def exists(p: Value => Boolean): Boolean = this.iterator exists p
-  
-  /** Returns an iterator resulting from applying the given function f to each
-    * value of this enumeration.
-    */
-  @deprecated("use values.map instead")
-  def map[B](f: Value => B): Iterator[B] = this.iterator map f
-  
-  /** Applies the given function f to each value of this enumeration, then
-    * concatenates the results. 
-    */
-  @deprecated("use values.flatMap instead")
-  def flatMap[B](f: Value => Iterator[B]): Iterator[B] = this.iterator flatMap f
-    
-  /** Returns all values of this enumeration that satisfy the predicate p.
-    * The order of values is preserved. 
-    */
-  @deprecated("use values.filter instead")
-  def filter(p: Value => Boolean): Iterator[Value] = this.iterator filter p
 }
