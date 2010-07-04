@@ -15,6 +15,9 @@ private[logger] trait AbstractLogging {
     def info (str : String)  = logger.info (str)
     def warn (str : String)  = logger.warn (str)
     def error (str : String) = logger.error (str)
+    def businessLogicInfo (str : String) = logger.businessLogicInfo (str)
+    def businessLogicWarning (str : String) = logger.businessLogicWarning (str)
+    def businessLogicProblem (str : String) = logger.businessLogicProblem (str)
 
     // Log with exception
 

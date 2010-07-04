@@ -27,6 +27,20 @@ class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
             T must not be null
         }
 
+        "have support for business logic logging" in {
+            object T extends Logging {
+                logger.businessLogicInfo ("Business Logic Info level")
+                logger.businessLogicWarning ("Business Logic Warning level")
+                logger.businessLogicProblem ("Business Logic Problem level")
+
+                businessLogicInfo ("2 Business Logic Info level")
+                businessLogicWarning ("2 Business Logic Warning level")
+                businessLogicProblem ("2 Business Logic Problem level")
+            }
+
+            T must not be null
+        }
+
         "provide Logger methods as mixins" in {
             object T extends Logging {
                 debug ("2 Debug level")

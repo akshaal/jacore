@@ -12,6 +12,9 @@ sealed abstract class Logger extends NotNull {
     def info (str : String) : Unit
     def warn (str : String) : Unit
     def error (str : String) : Unit
+    def businessLogicInfo (str : String) : Unit
+    def businessLogicWarning (str : String) : Unit
+    def businessLogicProblem (str : String) : Unit
 
     def debug (str : String, e : Throwable) : Unit
     def info (str : String, e : Throwable) : Unit
@@ -38,10 +41,14 @@ sealed abstract class Logger extends NotNull {
  * Logger instantiation helper.
  */
 final object Logger {
+    private[this] val BusinessLogicSuffix = ".BUSINESS_LOGIC"
     private[this] val EnhancedClass = """^(.*)\$\$EnhancerByGuice\$\$[0-9a-fA-F]+?$""".r
 
+    def isBusinessLogicFQCN (fqcn : String) : Boolean = fqcn.endsWith (BusinessLogicSuffix)
+
     def get (name : String): Logger =
-         new DefaultLogger (LoggerFactory.getLogger (name))
+         new DefaultLogger (LoggerFactory.getLogger (name),
+                            LoggerFactory.getLogger (name + BusinessLogicSuffix))
 
     def get (any : AnyRef): Logger = get (loggerNameForClass (any.getClass.getName))
 
@@ -65,7 +72,7 @@ final object Logger {
 /**
  * Default logger.
  */
-final class DefaultLogger (slfLogger : SlfLogger) extends Logger {
+final class DefaultLogger (slfLogger : SlfLogger, businessSlfLogger : SlfLogger) extends Logger {
     @inline
     override def debug (str : String) = slfLogger.debug (str)
 
@@ -77,7 +84,16 @@ final class DefaultLogger (slfLogger : SlfLogger) extends Logger {
 
     @inline
     override def error (str : String) = slfLogger.error (str)
-    
+
+    @inline
+    def businessLogicInfo (str : String) = businessSlfLogger.info (str)
+
+    @inline
+    def businessLogicWarning (str : String) = businessSlfLogger.warn (str)
+
+    @inline
+    def businessLogicProblem (str : String) = businessSlfLogger.error (str)
+
     // Log with exception
     
     @inline
@@ -160,6 +176,18 @@ class DummyLogger extends Logger {
     @inline
     override def error (str : String) =
             System.err.println (formattedCurrentTime + " ::: ERROR: " + str)
+
+    @inline
+    def businessLogicInfo (str : String) =
+        println (formattedCurrentTime + " ::: BUSINESS LOGIC INFO: " + str)
+
+    @inline
+    def businessLogicWarning (str : String) =
+        println (formattedCurrentTime + " ::: BUSINESS LOGIC WARNING: " + str)
+
+    @inline
+    def businessLogicProblem (str : String) =
+        println (formattedCurrentTime + " ::: BUSINESS LOGIC PROBLEM: " + str)
 
     // Log with exception
 
