@@ -6,32 +6,17 @@
 package info.akshaal.jacore
 package test
 
-import java.util.{Timer, TimerTask}
-import java.util.concurrent.{CountDownLatch, TimeUnit => JavaTimeUnit}
 import java.io.File
-
-import scala.collection.mutable.{Map, HashMap}
 
 import com.google.inject.Injector
 
-import org.specs.{SpecificationWithJUnit, Specification}
-import org.specs.specification.{Example, Examples}
-
 import actor.Actor
-import utils.{GuiceUtils, ThreadUtils}
-import logger.Logger
+import utils.GuiceUtils
 
 /**
  * Helper methods for convenient testing of actors and stuff depending on actors.
  */
 trait TestHelper {
-    private val testGuardingTimer = new Timer ("Test guarding timer")
-
-    /**
-     * How much time we wait for a message to arrive to actor before timing out.
-     */
-    val timeout : TimeValue
-
     /**
      * Injector to use for tests.
      */
@@ -131,131 +116,5 @@ trait TestHelper {
                 f (actor1, actor2)
             }) (clazzB)
         }) (clazzA)
-    }
-
-    /**
-     * Thrown if time is occured.
-     */
-    class MessageTimeout extends RuntimeException ("Tinmeout while waiting for a message")
-
-    /**
-     * Makes it possible to wait a momment when messages are processed by actor.
-     */
-    trait Waitable extends Actor {
-        private var messageLatch : CountDownLatch = null
-
-        /**
-         * Execute the given code and wait for a message to be processed by actor. If
-         * message is not received within some timeout interval, then MessageTimeout exception
-         * will be thrown.
-         * @param count number of batches to wait
-         * @param f code to execute before waiting for a message on actor
-         */
-        def waitForMessageBatchesAfter (count : Int) (f : => Any) : Unit = {
-            messageLatch = new CountDownLatch (count)
-
-            debug ("Executing message trigger before waiting for message(s)")
-
-            f
-
-            debug ("Waiting for " + count + " message(s)")
-            if (!messageLatch.await (timeout.asMilliseconds, JavaTimeUnit.MILLISECONDS)) {
-                throw new MessageTimeout
-            }
-        }
-
-        /**
-         * Execute the given code and wait for a message to be processed by actor. If
-         * message is not received within some timeout interval, then MessageTimeout
-         * exception will be thrown.
-         * @param f code to execute before waiting for a message on actor
-         */
-        def waitForMessageAfter (f : => Any) : Unit = {
-            waitForMessageBatchesAfter (1) {f}
-        }
-
-        protected override def afterActs () : Unit = {
-            try {
-                super.afterActs
-            } finally {
-                if (messageLatch != null) {
-                    messageLatch.countDown ()
-                }
-            }
-        }
-    }
-
-    /**
-     * Specification with additional features to be tested specs framework runned by junit.
-     */
-    class JacoreSpecWithJUnit (name : String) extends SpecificationWithJUnit (name)
-                                                 with SpecWithAddons
-
-    /**
-     * Support for logging and timeouts in specification.
-     */
-    trait SpecWithAddons extends Specification {
-        protected implicit val jacoreLogger : Logger = Logger.get (this)
-        protected val timeoutForOneExample : TimeValue = 5 minutes
-        private val runningExamples : Map[Example, TimerTask] = new HashMap
-
-        override def beforeExample (ex: Examples) = {
-            ex match {
-                case example : Example =>
-                    beforeOneExample (example)
-                    super.beforeExample (ex)
-
-                case other =>
-                    super.beforeExample (other)
-            }
-        }
-
-        override def afterExample (ex: Examples) = {
-            ex match {
-                case example : Example =>
-                    afterOneExample (example)
-                    super.afterExample (ex)
-
-                case other =>
-                    super.afterExample (other)
-            }
-        }
-
-        /**
-         * Called right before an example is executed.
-         */
-        def beforeOneExample (example : Example) : Unit = {
-            jacoreLogger.debugLazy ("== == == About to run example: " + example.description)
-
-            val thread = Thread.currentThread
-            val task =
-                new TimerTask () {
-                    override def run () : Unit = {
-                        ThreadUtils.dumpThreads (
-                            "#=#=#=#=#=#=#=# Dumping threads before killing not responding test")
-
-                        try {
-                            thread.interrupt ()
-                        } catch {
-                            case t : Throwable => ()
-                        }
-                    }
-                }
-
-            runningExamples (example) = task
-            testGuardingTimer.schedule (task, timeoutForOneExample.asMilliseconds)
-        }
-
-        /**
-         * Called right after an example is executed.
-         */
-        def afterOneExample (example : Example) : Unit = {
-            jacoreLogger.debugLazy ("== == == Example execution finished: " + example.description)
-
-            for (task <- runningExamples.get (example)) {
-                task.cancel ()
-                runningExamples.remove (example)
-            }
-        }
     }
 }
