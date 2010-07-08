@@ -1,4 +1,4 @@
-/** Akshaal (C) 2009. GNU GPL. http://akshaal.info */
+/** Akshaal (C) 2009-2010. GNU GPL. http://akshaal.info */
 
 package info.akshaal.jacore
 package utils

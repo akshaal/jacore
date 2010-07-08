@@ -1,9 +1,4 @@
-/*
- * Module.scala
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+/** Akshaal (C) 2009-2010. GNU GPL. http://akshaal.info */
 
 package info.akshaal.jacore
 package module
