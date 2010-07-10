@@ -173,6 +173,26 @@ package object jacore {
     }
 
     // /////////////////////////////////////////////////////////////////////
+    // Rich string
+
+    final class RichJacoreString (str : String) {
+        @inline
+        def withMessage (optionThrowable : Option[_ <: Throwable]) : String = {
+            optionThrowable match {
+                case None => str
+                case Some (exc) => withMessage (exc)
+            }
+        }
+
+        @inline
+        def withMessage (throwable : Throwable) : String = {
+            str + ": " + throwable.getMessage
+        }
+    }
+
+    implicit def string2RichString (str : String) : RichJacoreString = new RichJacoreString (str)
+
+    // /////////////////////////////////////////////////////////////////////
     // Concurrent
 
     final class RichExecutorService (executorService : ExecutorService) {

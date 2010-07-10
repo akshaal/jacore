@@ -8,4 +8,4 @@ package info.akshaal.jacore.utils
 abstract sealed class Result [A]
 
 case class Success [A] (payload : A) extends Result [A]
-case class Failure [A] (exception : Throwable) extends Result [A]
+case class Failure [A] (msg : String, exception : Option[Throwable] = None) extends Result [A]

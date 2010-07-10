@@ -6,7 +6,7 @@ package daemon
 import java.io.File
 
 import actor.{Actor, NormalPriorityActorEnv}
-import fs.text.{TextFile, WriteFileDone, WriteFileFailed}
+import fs.text.TextFile
 
 /**
  * Actor that periodicly updates a file with a current status of daemon.
@@ -46,9 +46,12 @@ private[jacore] class DaemonStatusActor @Inject() (
 
         // TODO: Save to temp file. Rename after save. This will help avoid "empty" files.
         textFile.opWriteFile (statusFile, content) runMatchingResultAsy {
-            case Success (_) => debug ("Status file has been updated")
-            case Failure (exc) => error ("Failed to write status into the file: " + statusFile,
-                                         exc)
+            case Success (_) =>
+                debug ("Status file has been updated")
+
+            case Failure (msg, exc) =>
+                error (("Failed to write status into the file: " + statusFile).withMessage(exc),
+                       exc.orNull)
         }
     }
 }
