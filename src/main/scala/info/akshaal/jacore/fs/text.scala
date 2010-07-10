@@ -6,6 +6,7 @@ package text
 
 import java.nio.channels.AsynchronousFileChannel
 import java.io.{File, IOException}
+import java.nio.charset.CharacterCodingException
 import java.nio.file.StandardOpenOption.{READ, WRITE, CREATE, TRUNCATE_EXISTING}
 import java.nio.{ByteBuffer, CharBuffer}
 import java.nio.channels.CompletionHandler
@@ -156,7 +157,7 @@ private[jacore] class TextFileActor @Inject() (
         override def failed (exc : Throwable, ignored : Object) : Unit = {
             closeChannelAfter {
                 val optExc = if (isUseless (exc)) None else Some(exc)
-                yieldResult (Failure [Unit] (exc.getMessage, optExc))
+                yieldResult (Failure [Unit] ("Unable to write into the file", optExc))
             }
         }
 
@@ -203,8 +204,13 @@ private[jacore] class TextFileActor @Inject() (
                 buf.rewind ()
                 buf.limit (bytes.asInstanceOf[Int])
 
-                val content : String = decoder.decode (buf).toString
-                yieldResult (Success (content))
+                try {
+                    val content : String = decoder.decode (buf).toString
+                    yieldResult (Success (content))
+                } catch {
+                    case exc : CharacterCodingException =>
+                        yieldResult (Failure [String] ("Unable to decode string from file", None))
+                }
             }
         }
 
@@ -214,7 +220,7 @@ private[jacore] class TextFileActor @Inject() (
         override def failed (exc : Throwable, ignored : Object) : Unit = {
             closeChannelAfter {
                 val optExc = if (isUseless (exc)) None else Some(exc)
-                yieldResult (Failure [String] (exc.getMessage, optExc))
+                yieldResult (Failure [String] ("Unable to read from the file", optExc))
             }
         }
 

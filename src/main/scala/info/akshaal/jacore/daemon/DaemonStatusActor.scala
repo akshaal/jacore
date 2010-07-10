@@ -50,7 +50,7 @@ private[jacore] class DaemonStatusActor @Inject() (
                 debug ("Status file has been updated")
 
             case Failure (msg, exc) =>
-                error (("Failed to write status into the file: " + statusFile).withMessage(exc),
+                error ("Failed to write status into the file" +:+ statusFile +:+ exc,
                        exc.orNull)
         }
     }

@@ -177,16 +177,21 @@ package object jacore {
 
     final class RichJacoreString (str : String) {
         @inline
-        def withMessage (optionThrowable : Option[_ <: Throwable]) : String = {
+        def +:+ (optionThrowable : Option[_ <: Throwable]) : String = {
             optionThrowable match {
                 case None => str
-                case Some (exc) => withMessage (exc)
+                case Some (exc) => +:+ (exc)
             }
         }
 
         @inline
-        def withMessage (throwable : Throwable) : String = {
+        def +:+ (throwable : Throwable) : String = {
             str + ": " + throwable.getMessage
+        }
+
+        @inline
+        def +:+ (other : Any) : String = {
+            str + ": " + other
         }
     }
 
