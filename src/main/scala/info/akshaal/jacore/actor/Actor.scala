@@ -117,17 +117,17 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
         // to process the message
         val runner =
             mkRunnable {
-                runTimingFinisher ("[latency] Actor started for message: " + msg)
+                runTimingFinisher ("[latency] Actor started for message" +:+ msg)
 
                 val executeTimingFinisher = actorEnv.pool.executionTiming.createFinisher
 
                 // Execute
-                logIgnoredException ("Error processing message: " + msg) {
+                logIgnoredException ("Error processing message" +:+ msg) {
                     invokeAct (msg, sentFrom)
                 }
 
                 // Show complete latency
-                executeTimingFinisher ("[execution] Actor completed for message: " + msg)
+                executeTimingFinisher ("[execution] Actor completed for message" +:+ msg)
             }
 
         fiber.execute (runner)
@@ -163,7 +163,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
 
                 case other =>
                     userMessage = false
-                    warn ("Ignored message: " + msg)
+                    warn ("Ignored message" +:+ msg)
             }
         } finally {
             afterActsNeeded = afterActsNeeded || userMessage

@@ -87,7 +87,7 @@ private[scheduler] final class SchedulerThread
         }
 
         // Measure latency
-        latencyTiming.finishedButExpected (item.nanoTime, "Event triggered: " + item)
+        latencyTiming.finishedButExpected (item.nanoTime, "Event triggered" +:+ item)
 
         // Send message to actor
         item.actor ! (TimeOut (item.payload))

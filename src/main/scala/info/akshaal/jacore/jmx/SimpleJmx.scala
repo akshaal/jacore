@@ -135,8 +135,7 @@ trait SimpleJmx {
                     case (None, None) =>
                         throw new IllegalArgumentException (
                             "Either getter or setter (or both)"
-                            + " must be defined for jmx attribute: "
-                            + jmxAttr.name)
+                            + " must be defined for jmx attribute" +:+ jmxAttr.name)
                 }
 
             new MBeanAttributeInfo (/* name      = */ jmxAttr.name,

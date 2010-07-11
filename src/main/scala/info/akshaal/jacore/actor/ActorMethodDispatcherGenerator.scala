@@ -114,7 +114,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
         val sortedMethods = methods.toArray
         Arrays.sort (sortedMethods, ActMethodDescComparator)
 
-        debugLazy (actor.getClass.getName + ": act methods '"
+        debugLazy (actor.getClass.getName +:+ "act methods '"
                    + (methods.map (_.name).mkString (", "))
                    + "' sorted to '"
                    + (sortedMethods.map (_.name).mkString (", "))

@@ -109,7 +109,7 @@ object TextFileTest {
 
         override def act () = {
             case msg @ (file : File, content : String, payl : Any) =>
-                debug ("Received message: " + msg)
+                debug ("Received message" +:+ msg)
                 
                 TestModule.textFile.opWriteFile (file, content) runMatchingResultAsy {
                     case Success (_) =>
@@ -131,7 +131,7 @@ object TextFileTest {
 
         override def act () = {
             case msg @ (file : File, payl, size) =>
-                debug ("Received message: " + msg)
+                debug ("Received message" +:+ msg)
                 TestModule.textFile.opReadFile (file, size.asInstanceOf[Option[Int]]) runMatchingResultAsy {
                     case Success (cont) =>
                         done = done + 1

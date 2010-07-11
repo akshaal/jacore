@@ -172,7 +172,7 @@ object SchedulerTest {
 
         override def act () = {
             case TimeOut (x : Int) => {
-                debug ("Received [Int] message: " + x)
+                debug ("Received [Int] message" +:+ x)
                 executed += 1
             }
         }
@@ -183,7 +183,7 @@ object SchedulerTest {
 
         override def act () = {
             case TimeOut (x : Int) => {
-                debug ("Received [Int] message: " + x)
+                debug ("Received [Int] message" +:+ x)
                 executed += 1
             }
         }
@@ -196,7 +196,7 @@ object SchedulerTest {
 
         override def act () = {
             case TimeOut (x : String) => {
-                debug ("Received message: " + x)
+                debug ("Received message" +:+ x)
                 invocations += 1
             }
         }
@@ -207,7 +207,7 @@ object SchedulerTest {
 
         override def act () = {
             case TimeOut (x : String) => {
-                debug ("Received message: " + x)
+                debug ("Received message" +:+ x)
                 invocations += 1
             }
         }
@@ -240,7 +240,7 @@ object SchedulerTest {
 
         override def act () = {
             case TimeOut (x : String) => {
-                debug ("Received message: " + x + ", actor's hashCode=" + hashCode)
+                debug ("Received message" +:+ x + ", actor's hashCode=" + hashCode)
                 invocations += 1
             }
         }
@@ -255,7 +255,7 @@ object SchedulerTest {
 
         override def act () = {
             case TimeOut (x : String) => {
-                debug ("Received message: " + x + ", actor's hashCode=" + hashCode)
+                debug ("Received message" +:+ x + ", actor's hashCode=" + hashCode)
                 invocations += 1
             }
         }
@@ -270,7 +270,7 @@ object SchedulerTest {
 
         override def act () = {
             case TimeOut (x : String) => {
-                debug ("Received message: " + x + ", actor's hashCode=" + hashCode)
+                debug ("Received message" +:+ x + ", actor's hashCode=" + hashCode)
                 invocations += 1
             }
         }

@@ -103,18 +103,14 @@ package object jacore {
             code (inputStream.asInstanceOf[I])
         } catch {
             case ex : IOException =>
-                throw new IOException ("Error during access to input stream: "
-                                       + ex.getMessage,
-                                       ex)
+                throw new IOException ("Error during access to input stream" +:+ ex, ex)
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close ()
                 } catch {
                     case ex : IOException =>
-                        throw new IOException ("Error closing input stream: "
-                                               + ": " + ex.getMessage,
-                                               ex)
+                        throw new IOException ("Error closing input stream" +:+ ex, ex)
                 }
             }
         }

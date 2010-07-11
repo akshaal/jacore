@@ -49,7 +49,7 @@ trait JacoreSpecAddons extends Specification {
      * Called right before an example is executed.
      */
     def beforeOneExample (example : Example) : Unit = {
-        jacoreLogger.debugLazy ("== == == About to run example: " + example.description)
+        jacoreLogger.debugLazy ("== == == About to run example" +:+ example.description)
 
         val thread = Thread.currentThread
         val task =
@@ -74,7 +74,7 @@ trait JacoreSpecAddons extends Specification {
      * Called right after an example is executed.
      */
     def afterOneExample (example : Example) : Unit = {
-        jacoreLogger.debugLazy ("== == == Example execution finished: " + example.description)
+        jacoreLogger.debugLazy ("== == == Example execution finished" +:+ example.description)
 
         for (task <- runningExamples.get (example)) {
             task.cancel ()

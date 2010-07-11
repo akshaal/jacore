@@ -72,7 +72,7 @@ private[jacore] final class MonitoringActor @Inject() (
         } else {
             val diff = System.nanoTime.nanoseconds - pingSentAt
 
-            error ("There are actors not responding: " + notResponding + ": for " + diff)
+            error ("There are actors not responding" +:+ notResponding +:+ "for " + diff)
             daemonStatus.die
         }
 

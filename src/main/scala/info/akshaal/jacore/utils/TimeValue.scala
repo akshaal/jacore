@@ -109,11 +109,11 @@ private[jacore] object TimeValue {
 
                case Failure (m, _) =>
                    throw new IllegalArgumentException (
-                              "Failed to parse time: " + str + ": " + m)
+                              "Failed to parse time" +:+ str +:+ m)
 
                case Error (m, _)   =>
                    throw new IllegalArgumentException (
-                              "Error while parsing time: " + str + ": " + m)
+                              "Error while parsing time" +:+ str +:+ m)
             }
 
         def expr : Parser[TimeValue] =

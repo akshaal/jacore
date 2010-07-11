@@ -165,7 +165,7 @@ abstract class JacoreEnum(initial: Int, names: String*) {
     def this(name: String)  = this(nextId, name)
     def this()              = this(nextId)
 
-    assert(!vmap.isDefinedAt(i), "Duplicate id: " + i)
+    assert(!vmap.isDefinedAt(i), "Duplicate id" +:+ i)
 
     vmap(i) = this
     vsetDefined = false

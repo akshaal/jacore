@@ -129,7 +129,7 @@ object GuiceUtils {
                         }
                     } catch {
                         case exc : ConfigurationException =>
-                            debugLazy ("Ignored: " + exc.getMessage, exc)
+                            debugLazy ("Ignored" +:+ exc, exc)
                     }
                 }
             }

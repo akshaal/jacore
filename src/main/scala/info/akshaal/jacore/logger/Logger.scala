@@ -169,27 +169,27 @@ class DummyLogger extends Logger {
     
     @inline
     override def info (str : String)  =
-            println (formattedCurrentTime + " ::: INFO: " + str)
+            println (formattedCurrentTime + " ::: INFO" +:+ str)
 
     @inline
     override def warn (str : String)  =
-            System.err.println (formattedCurrentTime + " ::: WARN: " + str)
+            System.err.println (formattedCurrentTime + " ::: WARN" +:+ str)
 
     @inline
     override def error (str : String) =
-            System.err.println (formattedCurrentTime + " ::: ERROR: " + str)
+            System.err.println (formattedCurrentTime + " ::: ERROR" +:+ str)
 
     @inline
     def businessLogicInfo (str : String) =
-        println (formattedCurrentTime + " ::: BUSINESS LOGIC INFO: " + str)
+        println (formattedCurrentTime + " ::: BUSINESS LOGIC INFO" +:+ str)
 
     @inline
     def businessLogicWarning (str : String) =
-        println (formattedCurrentTime + " ::: BUSINESS LOGIC WARNING: " + str)
+        println (formattedCurrentTime + " ::: BUSINESS LOGIC WARNING" +:+ str)
 
     @inline
     def businessLogicProblem (str : String) =
-        println (formattedCurrentTime + " ::: BUSINESS LOGIC PROBLEM: " + str)
+        println (formattedCurrentTime + " ::: BUSINESS LOGIC PROBLEM" +:+ str)
 
     // Log with exception
 
@@ -265,7 +265,7 @@ object DummyLogger extends DummyLogger
  * QuickDebugLogger. The same as DummyLogger, but debug message are not suppresesd.
  */
 class QuickDebugLogger extends DummyLogger {
-    override def debug (str : String) = println ("DEBUG: " + str)
+    override def debug (str : String) = println ("DEBUG" +:+ str)
 
     override def debug (str : String, e : Throwable) = {
         debug (str)

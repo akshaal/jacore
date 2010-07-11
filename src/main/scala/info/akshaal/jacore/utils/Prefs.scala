@@ -10,7 +10,7 @@ final class Prefs (file : String) {
 
     withCloseableIO {
         throwIfNull (this.getClass.getClassLoader.getResourceAsStream (file)) {
-            new IllegalArgumentException ("Failed to find preferences: " + file)
+            new IllegalArgumentException ("Failed to find preferences" +:+ file)
         }
     } {
         properties.load (_)
@@ -18,7 +18,7 @@ final class Prefs (file : String) {
 
     final def getString (name : String) : String =
         throwIfNull (properties.getProperty (name)) {
-            new IllegalArgumentException (file + ": Property " + name + " is required")
+            new IllegalArgumentException (file +:+ "Property " + name + " is required")
         }
 
     final def getTimeValue (name : String) : TimeValue =

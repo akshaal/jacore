@@ -49,7 +49,7 @@ object ResourceUtils {
         } else if (isJarUrl (url)) {
             findJarResources (buf, url, pred)
         } else {
-            throw new IllegalArgumentException ("Unsupported URL: " + url)
+            throw new IllegalArgumentException ("Unsupported URL" +:+ url)
         }
     }
 
@@ -117,8 +117,7 @@ object ResourceUtils {
                 }
 
             case conn =>
-                throw new UnrecoverableError ("Unknown connection opened for url: "
-                                              + url + ": " + conn)
+                throw new UnrecoverableError ("Unknown connection opened for url" +:+ url +:+ conn)
         }
 
         if (!dir && pred (url)) {

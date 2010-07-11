@@ -33,7 +33,7 @@ private[actor] object ActorClassScanner extends Logging {
         val actorClass = actor.getClass
 
         def badClass (str : String) : Nothing = {
-            throw new UnrecoverableError ("Actor class " + actorClass.getName + ": " + str)
+            throw new UnrecoverableError ("Actor class " + actorClass.getName +:+ str)
         }
 
         // Check methods and collect information
@@ -144,8 +144,8 @@ private[actor] object ActorClassScanner extends Logging {
                     case 1 => {
                         val extractor = argExtractors(0).get
                         if (!classOf[MessageExtractor[_, _]].isAssignableFrom(extractor)) {
-                            badMethod ("has an extractor not implementing MessageExtractor interface: "
-                                       + extractor)
+                            badMethod ("has an extractor not implementing MessageExtractor interface"
+                                       +:+ extractor)
                         }
 
                         Some (extractor).asInstanceOf[OptionalMessageExtractorClass]
@@ -195,8 +195,8 @@ private[actor] object ActorClassScanner extends Logging {
                 } catch {
                     case ex : NoSuchMethodException =>
                             badMethod ("uses an extractor without or inaccesible"
-                                       + " default constructor: "
-                                       + extractor)
+                                       + " default constructor"
+                                       +:+ extractor)
                 }
 
                 // Extract must not have overloaded method extractFrom
@@ -204,8 +204,8 @@ private[actor] object ActorClassScanner extends Logging {
                         extractor.getMethods
                                  .filter (m => m.getName == "extractFrom" && !m.isSynthetic)
                 if (extractingMethods.length > 1) {
-                    badMethod ("uses an extractor with overloaded extractFrom method: "
-                               + extractor)
+                    badMethod ("uses an extractor with overloaded extractFrom method"
+                               +:+ extractor)
                 }
 
                 // Check that extractor can handle messages that this method receives
@@ -257,8 +257,8 @@ private[actor] object ActorClassScanner extends Logging {
         // Sanity checks on class level
         for ((_, methodGroup) <- methods.groupBy (_.matcherDefinition)) {
             if (methodGroup.length > 1) {
-                badClass ("More than one mathod match the same messages: "
-                          + methodGroup.map(_.name).mkString(" "))
+                badClass ("More than one mathod match the same messages"
+                          +:+ methodGroup.map(_.name).mkString(" "))
             }
         }
 

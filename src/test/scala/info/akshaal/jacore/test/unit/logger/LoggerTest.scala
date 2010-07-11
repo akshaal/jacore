@@ -59,7 +59,7 @@ class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
     }
  
     private def sideEffect (str : String) = {
-        logger.debug ("Computing argument for lazy log message: " + str)
+        logger.debug ("Computing argument for lazy log message" +:+ str)
         str
     }
 }
