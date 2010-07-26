@@ -44,18 +44,18 @@ class JmsSenderActorTest extends JacoreSpecWithJUnit ("AbstractJmsSenderActor sp
 
                 actor.waitForMessageAfter {actor.start}
 
-                (connection.createSession (false, Session.AUTO_ACKNOWLEDGE) on connection)  then
-                (session.createProducer (MockHelper.destination)            on session)     then
-                (session.createObjectMessage ("one")                        on session)     then
-                (producer.send (msg1)                                       on producer)    then
-                (session.createObjectMessage ("two")                        on session)     then
-                (producer.send (msg2)                                       on producer)    then
-                (session.createObjectMessage ("3")                          on session)     then
-                (producer.send (msg3)                                       on producer)    then
-                (producer.close ()                                          on producer)    then
-                (session.close ()                                   on session) were calledInOrder
+                there was one(connection).createSession (false, Session.AUTO_ACKNOWLEDGE)  then
+                          one(session).createProducer (MockHelper.destination)             then
+                          one(session).createObjectMessage ("one")                         then
+                          one(producer).send (msg1)                                        then
+                          one(session).createObjectMessage ("two")                         then
+                          one(producer).send (msg2)                                        then
+                          one(session).createObjectMessage ("3")                           then
+                          one(producer).send (msg3)                                        then
+                          one(producer).close ()                                           then
+                          one(session).close ()     orderedBy (connection, session, producer)
 
-                connection.close was notCalled
+                there was no(connection).close()
             })
         }
 
@@ -78,14 +78,14 @@ class JmsSenderActorTest extends JacoreSpecWithJUnit ("AbstractJmsSenderActor sp
 
                 actor.waitForMessageAfter {actor.start}
 
-                (connection.createSession (false, Session.AUTO_ACKNOWLEDGE) on connection)  then
-                (session.createProducer (MockHelper.destination)            on session)     then
-                (session.createObjectMessage ("one")                        on session)     then
-                (producer.send (msg1)                                       on producer)    then
-                (producer.close ()                                          on producer)    then
-                (session.close ()                                   on session) were calledInOrder
+                there was one(connection).createSession (false, Session.AUTO_ACKNOWLEDGE)  then
+                          one(session).createProducer (MockHelper.destination)             then
+                          one(session).createObjectMessage ("one")                         then
+                          one(producer).send (msg1)                                        then
+                          one(producer).close ()                                           then
+                          one(session).close ()    orderedBy (connection, session, producer)
 
-                connection.close was notCalled
+                there was no(connection).close()
             })
         }
     }

@@ -50,13 +50,13 @@ class JmsReceiverActorTest extends JacoreSpecWithJUnit ("AbstractJmsReceiverActo
                 
                 actor.stop ()
 
-                (connection.createSession (false, Session.AUTO_ACKNOWLEDGE) on connection)  then
-                (session.createConsumer (MockHelper.destination)            on session)     then
-                (consumer.setMessageListener(messageListener)               on consumer)    then
-                (consumer.close ()                                          on consumer)    then
-                (session.close ()                                   on session) were calledInOrder
+                there was one(connection).createSession (false, Session.AUTO_ACKNOWLEDGE)   then
+                          one(session).createConsumer (MockHelper.destination)              then
+                          one(consumer).setMessageListener (messageListener)                then
+                          one(consumer).close ()                                            then
+                          one(session).close ()   orderedBy (connection, session, consumer)
 
-                connection.close was notCalled
+                there was no(connection).close()
 
                 actor.msgs  must_==  List (msg3, msg2, msg1)
             })
@@ -82,13 +82,13 @@ class JmsReceiverActorTest extends JacoreSpecWithJUnit ("AbstractJmsReceiverActo
                 actor.start ()
                 actor.stop () must throwA[JMSException] 
 
-                (connection.createSession (false, Session.AUTO_ACKNOWLEDGE) on connection)  then
-                (session.createConsumer (MockHelper.destination)            on session)     then
-                (consumer.setMessageListener(messageListener)               on consumer)    then
-                (consumer.close ()                                          on consumer)    then
-                (session.close ()                                   on session) were calledInOrder
+                there was one(connection).createSession (false, Session.AUTO_ACKNOWLEDGE)   then
+                          one(session).createConsumer (MockHelper.destination)              then
+                          one(consumer).setMessageListener(messageListener)                 then
+                          one(consumer).close ()                                            then
+                          one(session).close ()  orderedBy (connection, session, consumer)
 
-                connection.close was notCalled
+                there was no(connection).close()
             })
         }
     }

@@ -32,12 +32,12 @@ class IbatisTest extends JacoreSpecWithJUnit ("iBatis support specification") wi
 
                 actor.waitForMessageAfter {actor.start}
 
-                (client.openSession (ExecutorType.BATCH, true)      on client)   then
-                (session.insert ("testInsert", "Hello")             on session)  then
-                (session.insert ("testInsert", "Actor")             on session)  then
-                (session.insert ("testInsert", "Bye")               on session)  then
-                (session.commit ()                                  on session)  then
-                (session.close ()                                   on session)  were calledInOrder
+                there was one(client).openSession (ExecutorType.BATCH, true)  then
+                          one(session).insert ("testInsert", "Hello")         then
+                          one(session).insert ("testInsert", "Actor")         then
+                          one(session).insert ("testInsert", "Bye")           then
+                          one(session).commit ()                              then
+                          one(session).close () orderedBy (client, session)
             })
         }
 
@@ -56,10 +56,10 @@ class IbatisTest extends JacoreSpecWithJUnit ("iBatis support specification") wi
 
                 actor.waitForMessageAfter {actor.start}
 
-                (client.openSession (ExecutorType.BATCH, true)      on client)   then
-                (session.insert ("testInsert", "Hello")             on session)  then
-                (session.commit ()                                  on session)  then
-                (session.close ()                                   on session)  were calledInOrder
+                there was one(client).openSession (ExecutorType.BATCH, true)  then
+                          one(session).insert ("testInsert", "Hello")         then
+                          one(session).commit ()                              then
+                          one(session).close ()       orderedBy (client, session)
             })
         }
     }
