@@ -9,6 +9,8 @@
 
     <!-- = = = = = = = = = = = = Default properties = = = = = = = = = = -->
     <properties>
+        <custom.build.directory>${basedir}/target</custom.build.directory>
+
         <!-- Versions -->
         <scala.version>2.8.0</scala.version>
         <jetlang.version>0.2.0</jetlang.version>
@@ -169,6 +171,8 @@
     <!-- = = = = = = = = = = = = = = Build = = = = = = = = = = = = = = = -->
 
     <build>
+        <directory>${custom.build.directory}</directory>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -206,8 +210,8 @@
 		<artifactId>maven-surefire-plugin</artifactId>
 		<configuration>
 		    <argLine>
-                        -Dcglib.debugLocation=${basedir}/target/cglib \
-                        -Djacore.module.debug.dir=${basedir}/target/jacore
+                        -Dcglib.debugLocation=${project.build.directory}/cglib \
+                        -Djacore.module.debug.dir=${project.build.directory}/jacore
                     </argLine>
 		</configuration>
 	    </plugin>
@@ -253,36 +257,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Eclipse -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>                
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <downloadJavadocs>true</downloadJavadocs>
-                    <buildOutputDirectory>
-                        .eclipse/build
-                    </buildOutputDirectory>
-
-                    <excludes>
-                        <exclude>org.scala-lang:scala-library</exclude>
-                    </excludes>
-                    
-                    <classpathContainers>
-                        <classpathContainer>ch.epfl.lamp.sdt.launching.SCALA_CONTAINER</classpathContainer>
-                    </classpathContainers>
-                    
-                    <projectnatures>
-                        <java.lang.String>ch.epfl.lamp.sdt.core.scalanature</java.lang.String>
-                        <java.lang.String>org.eclipse.jdt.core.javanature</java.lang.String>
-                    </projectnatures>
-                    
-                    <buildcommands>
-                        <java.lang.String>ch.epfl.lamp.sdt.core.scalabuilder</java.lang.String>
-                    </buildcommands>
-                </configuration>
-            </plugin>            
         </plugins>
     </build>
 </project>

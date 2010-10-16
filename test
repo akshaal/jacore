@@ -1,9 +1,11 @@
 #!/bin/sh
 
-rm -rf target/jacore
-rm -f target/test-log4j.log
-rm -rf target/cglib
+bdir=`mvn help:evaluate -Dexpression=project.build.directory | grep -v '[INFO]'`
+
+rm -rf ${bdir}/jacore
+rm -f ${bdir}/test-log4j.log
+rm -rf ${bdir}/cglib
 
 j7 mvn -o test "$@" || exit
 
-dot -T png target/jacore/test-module.dot > target/jacore/test-module.png
+dot -T png ${bdir}/jacore/test-module.dot > ${bdir}/jacore/test-module.png
