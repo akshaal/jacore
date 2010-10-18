@@ -2,11 +2,11 @@
 
 package info.akshaal.jacore
 package test
-package unit.utils
+package unit.utils.frame
 
 import unit.UnitTestHelper._
 
-import utils.OptionDoubleValueFrame
+import utils.frame.OptionDoubleValueFrame
 
 /**
  * Test Double Value Frame.

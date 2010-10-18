@@ -2,6 +2,7 @@
 
 package info.akshaal.jacore
 package utils
+package io
 
 import java.util.{HashMap => JavaHashMap}
 import java.net.URL

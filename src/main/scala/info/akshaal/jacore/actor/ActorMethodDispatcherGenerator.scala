@@ -4,7 +4,7 @@ package info.akshaal.jacore
 package actor
 
 import logger.Logging
-import utils.ClassUtils
+import utils.io.ClassUtils
 
 import org.objectweb.asm.{ClassVisitor, MethodVisitor, Opcodes, Type, Label, ClassWriter}
 import net.sf.cglib.core.{ReflectUtils, DefaultNamingPolicy, DefaultGeneratorStrategy,

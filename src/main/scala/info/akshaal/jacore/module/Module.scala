@@ -13,7 +13,7 @@ import fs.text.{TextFile, TextFileActor}
 import scheduler.{Scheduler, SchedulerImpl}
 import annotation.CallByMessage
 import logger.Logging
-import utils.Prefs
+import utils.io.Prefs
 
 /**
  * This module is supposed to help instantiate all classes needed for jacore

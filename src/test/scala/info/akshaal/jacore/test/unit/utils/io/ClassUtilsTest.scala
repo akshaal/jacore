@@ -2,11 +2,11 @@
 
 package info.akshaal.jacore
 package test
-package unit.utils
+package unit.utils.io
 
 import unit.UnitTestHelper._
 
-import utils.ClassUtils._
+import utils.io.ClassUtils._
 
 /**
  * Test Long Value Frame.
@@ -41,7 +41,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
 
     "ClassUtils.findResources" should {
         "find resources of file package" in {
-            val urls = findResources ("info.akshaal.jacore.test.unit.utils.findclasses",
+            val urls = findResources ("info.akshaal.jacore.test.unit.utils.io.findclasses",
                                       this.getClass.getClassLoader,
                                       _ => true)
 
@@ -59,7 +59,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
 
     "ClassUtils.findClasses" should {
         "find classes of file package" in {
-            val classes = findClasses ("info.akshaal.jacore.test.unit.utils.findclasses",
+            val classes = findClasses ("info.akshaal.jacore.test.unit.utils.io.findclasses",
                                        this.getClass.getClassLoader,
                                        _ => true)
 
@@ -71,7 +71,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
         }
 
         "find classes of file package filtering results" in {
-            val classes = findClasses ("info.akshaal.jacore.test.unit.utils.findclasses",
+            val classes = findClasses ("info.akshaal.jacore.test.unit.utils.io.findclasses",
                                        this.getClass.getClassLoader,
                                        classOf[findclasses.B].isAssignableFrom (_))
 

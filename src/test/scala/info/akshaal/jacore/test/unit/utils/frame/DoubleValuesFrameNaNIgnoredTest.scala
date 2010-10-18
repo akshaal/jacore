@@ -2,28 +2,28 @@
 
 package info.akshaal.jacore
 package test
-package unit.utils
+package unit.utils.frame
 
 import unit.UnitTestHelper._
 
-import utils.DoubleValueFrame
+import utils.frame.DoubleValueFrameNaNIgnored
 
 /**
  * Test Double Value Frame.
  */
-class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class specification")
+class DoubleValuesFrameNaNIgnoredTest extends JacoreSpecWithJUnit ("DoubleValueFrameNaNIgnored class specification")
 {
-    "DoubleValueFrame" should {
+    "DoubleValueFrameNaNIgnored" should {
         "fail with zero width" in {
-            new DoubleValueFrame (0) must throwA[IllegalArgumentException]
+            new DoubleValueFrameNaNIgnored (0) must throwA[IllegalArgumentException]
         }
 
         "fail with negative width" in {
-            new DoubleValueFrame (-1) must throwA[IllegalArgumentException]
+            new DoubleValueFrameNaNIgnored (-1) must throwA[IllegalArgumentException]
         }
 
         "support frames with size 1" in {
-            val frame = new DoubleValueFrame (1)
+            val frame = new DoubleValueFrameNaNIgnored (1)
             frame.average.isNaN mustBe true
             frame.full must_== false
             frame.current.isNaN mustBe true
@@ -51,10 +51,15 @@ class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class
             frame.average must_== 3.0d
             frame.current must_== 3.0d
             frame.oldest must_== 3.0d
+
+            frame.put (Double.NaN)
+            frame.average.isNaN must_== true
+            frame.current.isNaN must_== true
+            frame.oldest.isNaN must_== true
         }
 
         "support frames with size 2" in {
-            val frame = new DoubleValueFrame (2)
+            val frame = new DoubleValueFrameNaNIgnored (2)
             frame.average.isNaN mustBe true
             frame.full must_== false
             frame.current.isNaN mustBe true
@@ -83,10 +88,40 @@ class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class
             frame.full must_== true
             frame.current must_== 3.0d
             frame.oldest must_== 2.0d
+
+            frame.put (Double.NaN)
+            frame.average must_== 3.0d
+            frame.full must_== true
+            frame.current.isNaN must_== true
+            frame.oldest must_== 3.0d
+
+            frame.put (Double.NaN)
+            frame.full must_== true
+            frame.average.isNaN must_== true
+            frame.current.isNaN must_== true
+            frame.oldest.isNaN must_== true
+
+            frame.put (Double.NaN)
+            frame.full must_== true
+            frame.average.isNaN must_== true
+            frame.current.isNaN must_== true
+            frame.oldest.isNaN must_== true
+
+            frame.put (4.0d)
+            frame.average must_== 4.0d
+            frame.full must_== true
+            frame.current must_== 4.0d
+            frame.oldest.isNaN must_== true
+
+            frame.put (2.0d)
+            frame.average must_== 3.0d
+            frame.full must_== true
+            frame.current must_== 2.0d
+            frame.oldest must_== 4.0d
         }
 
         "support frames with size 3" in {
-            val frame = new DoubleValueFrame (3)
+            val frame = new DoubleValueFrameNaNIgnored (3)
             frame.average.isNaN mustBe true
             frame.full must_== false
             frame.current.isNaN mustBe true
@@ -115,6 +150,12 @@ class DoubleValuesFrameTest extends JacoreSpecWithJUnit ("DoubleValueFrame class
             frame.full must_== true
             frame.current must_== 3.0d
             frame.oldest must_== 1.0d
+
+            frame.put (Double.NaN)
+            frame.average must_== 5.0d / 2.0d
+            frame.full must_== true
+            frame.current.isNaN must_== true
+            frame.oldest must_== 2.0d
         }
     }
 }

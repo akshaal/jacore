@@ -2,19 +2,19 @@
 
 package info.akshaal.jacore
 package utils
+package frame
 
 /**
  * Frame of values with maximum fixed number of elements.
  * Frame maintains sum of elements.
  */
-final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
+final class DoubleValueFrame (maximum : Int) extends NotNull {
     require (maximum > 0, "maximum must be positive number")
 
     private val array = new Array[Double] (maximum)
     private var pos = -1
     private var count = 0
     private var sum = 0d
-    private var nans = 0
 
     /**
      * Add value.
@@ -23,51 +23,25 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
     def put (value : Double) = {
         pos += 1
         
+        if (pos == maximum) {
+            pos = 0;
+        }
+
         if (count < maximum) {
             count += 1
-            if (value != value) {
-                nans += 1
-            } else {
-                sum += value
-            }
-            
-            array (pos) = value
+            sum += value
         } else {
-            if (pos == maximum) {
-                pos = 0;
-            }
-
-            val old_slot_val = array(pos)
-            if (value != value) {
-                if (old_slot_val == old_slot_val) {
-                    sum -= old_slot_val
-                    nans += 1
-                    array (pos) = value
-                }
-            } else {
-                if (old_slot_val != old_slot_val) {
-                    sum += value
-                    nans -= 1                    
-                } else {
-                    sum += value - old_slot_val
-                }
-                
-                array (pos) = value
-            }
+            sum += value - array(pos)
         }
+
+        array (pos) = value
     }
 
    /**
      * @return the average
      */
     def average () : Double = {
-        val real_numbers = count - nans
-
-        if (real_numbers == 0) {
-            Double.NaN
-        } else {
-            sum / real_numbers
-        }
+        if (count == 0) Double.NaN else sum / count
     }
 
     /**
@@ -78,15 +52,7 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
     /**
      * Returns current sum.
      */
-    def currentSum : Double = {
-        val real_numbers = count - nans
-
-        if (real_numbers == 0) {
-            Double.NaN
-        } else {
-            sum
-        }
-    }
+    def currentSum : Double = sum
 
     /**
      * Returns true if full.

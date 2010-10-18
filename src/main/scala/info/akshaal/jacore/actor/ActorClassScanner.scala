@@ -9,7 +9,7 @@ import org.objectweb.asm.Type
 
 import logger.Logging
 import annotation.{Act, ExtractBy}
-import utils.ClassUtils
+import utils.io.ClassUtils
 
 /**
  * The sole role of this class is to scan Actor classes for methods annotated with @Act

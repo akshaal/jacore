@@ -2,6 +2,7 @@
 
 package info.akshaal.jacore
 package utils
+package frame
 
 // We use custom double2Double method, so the default one must be hidden
 import Predef.{require, double2Double => _}

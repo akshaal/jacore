@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicReferenceArray}
 
 import logger.Logger
 import daemon.DaemonStatus
+import utils.frame.LongValueFrame
 
 /**
  * Abstract support for classes that makes it possible to measure time latencies.

@@ -2,24 +2,25 @@
 
 package info.akshaal.jacore
 package utils
+package frame
 
 /**
  * Frame of values with maximum fixed number of elements.
  * Frame maintains sum of elements.
  */
-final class DoubleValueFrame (maximum : Int) extends NotNull {
+final class LongValueFrame (maximum : Int) extends NotNull {
     require (maximum > 0, "maximum must be positive number")
 
-    private val array = new Array[Double] (maximum)
+    private val array = new Array[Long] (maximum)
     private var pos = -1
     private var count = 0
-    private var sum = 0d
+    private var sum = 0L
 
     /**
      * Add value.
      * @param value value
      */
-    def put (value : Double) = {
+    def put (value : Long) = {
         pos += 1
         
         if (pos == maximum) {
@@ -39,8 +40,8 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
    /**
      * @return the average
      */
-    def average () : Double = {
-        if (count == 0) Double.NaN else sum / count
+    def average () : Long = {
+        if (count == 0) 0L else sum / count
     }
 
     /**
@@ -51,7 +52,7 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
     /**
      * Returns current sum.
      */
-    def currentSum : Double = sum
+    def currentSum : Long = sum
 
     /**
      * Returns true if full.
@@ -61,19 +62,19 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
     /**
      * Current (last inserted value).
      */
-    def current : Double = if (count > 0) array (pos) else Double.NaN
+    def current : Long = if (count > 0) array (pos) else 0
 
     /**
      * Oldest value.
      */
-    def oldest : Double =
+    def oldest : Long =
         if (full && pos != maximum - 1) {
             array (pos + 1)
         } else {
             if (count > 0) {
                 array (0)
             } else {
-                Double.NaN
+                0L
             }
         }
 }

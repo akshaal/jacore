@@ -2,15 +2,16 @@
 
 package info.akshaal.jacore
 package utils
+package frame
 
 /**
  * Frame of values with maximum fixed number of elements.
- * Frame maintains sum of elements. None values are supported.
+ * Frame maintains sum of elements.
  */
-final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
+final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
     require (maximum > 0, "maximum must be positive number")
 
-    private val array = new Array[Option[Double]] (maximum)
+    private val array = new Array[Double] (maximum)
     private var pos = -1
     private var count = 0
     private var sum = 0d
@@ -20,43 +21,39 @@ final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
      * Add value.
      * @param value value
      */
-    def put (option : Option[Double]) = {
+    def put (value : Double) = {
         pos += 1
         
         if (count < maximum) {
             count += 1
-
-            option match {
-                case None         => nans += 1
-                case Some (value) => sum += value
+            if (value != value) {
+                nans += 1
+            } else {
+                sum += value
             }
             
-            array (pos) = option
+            array (pos) = value
         } else {
             if (pos == maximum) {
                 pos = 0;
             }
 
-            val old_slot_option = array(pos)
-            option match {
-                case None =>
-                    for (old_slot_val <- old_slot_option) {
-                        sum -= old_slot_val
-                        nans += 1
-                        array (pos) = option
-                    }
-
-                case Some (value) =>
-                    old_slot_option match {
-                        case None =>
-                            sum += value
-                            nans -= 1
-
-                        case Some (old_slot_val) =>
-                            sum += value - old_slot_val
-                    }
-
-                    array (pos) = option
+            val old_slot_val = array(pos)
+            if (value != value) {
+                if (old_slot_val == old_slot_val) {
+                    sum -= old_slot_val
+                    nans += 1
+                    array (pos) = value
+                }
+            } else {
+                if (old_slot_val != old_slot_val) {
+                    sum += value
+                    nans -= 1                    
+                } else {
+                    sum += value - old_slot_val
+                }
+                
+                array (pos) = value
             }
         }
     }
@@ -64,13 +61,13 @@ final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
    /**
      * @return the average
      */
-    def average () : Option[Double] = {
+    def average () : Double = {
         val real_numbers = count - nans
 
         if (real_numbers == 0) {
-            None
+            Double.NaN
         } else {
-            Some (sum / real_numbers)
+            sum / real_numbers
         }
     }
 
@@ -82,13 +79,13 @@ final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
     /**
      * Returns current sum.
      */
-    def currentSum : Option[Double] = {
+    def currentSum : Double = {
         val real_numbers = count - nans
 
         if (real_numbers == 0) {
-            None
+            Double.NaN
         } else {
-            Some (sum)
+            sum
         }
     }
 
@@ -100,19 +97,19 @@ final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
     /**
      * Current (last inserted value).
      */
-    def current : Option[Double] = if (count > 0) array (pos) else None
+    def current : Double = if (count > 0) array (pos) else Double.NaN
 
     /**
      * Oldest value.
      */
-    def oldest : Option[Double] =
+    def oldest : Double =
         if (full && pos != maximum - 1) {
             array (pos + 1)
         } else {
             if (count > 0) {
                 array (0)
             } else {
-                None
+                Double.NaN
             }
         }
 }
