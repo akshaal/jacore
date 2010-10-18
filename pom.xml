@@ -5,7 +5,7 @@
     <artifactId>jacore</artifactId>
     <packaging>jar</packaging>
     <version>1.33-SNAPSHOT</version>
-    <name>jacore</name>
+    <name>Jacore - core for repid development</name>
 
     <!-- = = = = = = = = = = = = Default properties = = = = = = = = = = -->
     <properties>
