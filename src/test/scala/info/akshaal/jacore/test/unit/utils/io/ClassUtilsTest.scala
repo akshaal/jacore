@@ -42,7 +42,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
     "ClassUtils.findResources" should {
         "find resources of file package" in {
             val urls = findResources ("info.akshaal.jacore.test.unit.utils.io.findclasses",
-                                      this.getClass.getClassLoader,
+                                      defaultClassLoader,
                                       _ => true)
 
             urls.size  must beGreaterThan (3)
@@ -50,7 +50,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
 
         "find resources of jar package" in {
             val urls = findResources ("com.google.inject.name",
-                                      this.getClass.getClassLoader,
+                                      defaultClassLoader,
                                       _ => true)
 
             urls.size  must beGreaterThan (3)
@@ -60,7 +60,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
     "ClassUtils.findClasses" should {
         "find classes of file package" in {
             val classes = findClasses ("info.akshaal.jacore.test.unit.utils.io.findclasses",
-                                       this.getClass.getClassLoader,
+                                       defaultClassLoader,
                                        _ => true)
 
             classes  must contain (classOf[findclasses.B])
@@ -72,7 +72,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
 
         "find classes of file package filtering results" in {
             val classes = findClasses ("info.akshaal.jacore.test.unit.utils.io.findclasses",
-                                       this.getClass.getClassLoader,
+                                       defaultClassLoader,
                                        classOf[findclasses.B].isAssignableFrom (_))
 
             classes  must contain (classOf[findclasses.B])
@@ -83,7 +83,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
 
         "find classes of jar package" in {
             val classes = findClasses ("com.google.inject.name",
-                                       this.getClass.getClassLoader,
+                                       defaultClassLoader,
                                        _ => true)
 
             classes  must contain (classOf[com.google.inject.name.Named])

@@ -100,7 +100,7 @@ object IbatisUtils {
          */
         def parseMapperXmlsInPackages (packages : String*) : Unit = {
             val sqlFragments = new JavaHashMap [String, XNode]
-            val loader = Thread.currentThread.getContextClassLoader
+            val loader = defaultClassLoader
             val xmlPred = (_ : URL).getPath.endsWith (".xml")
 
             for (pkg <- packages; url <- ClassUtils.findResources (pkg, loader, xmlPred)) {

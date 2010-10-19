@@ -10,7 +10,7 @@ final class Prefs (file : String) {
     final val properties = new Properties ()
 
     withCloseableIO {
-        throwIfNull (this.getClass.getClassLoader.getResourceAsStream (file)) {
+        throwIfNull (defaultClassLoader.getResourceAsStream (file)) {
             new IllegalArgumentException ("Failed to find preferences" +:+ file)
         }
     } {

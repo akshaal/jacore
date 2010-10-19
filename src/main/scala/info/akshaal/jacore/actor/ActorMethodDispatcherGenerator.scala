@@ -312,8 +312,7 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
     /**
      * {InheritedDoc}
      */
-    override protected def getDefaultClassLoader () : ClassLoader =
-                actor.getClass.getClassLoader
+    override protected def getDefaultClassLoader () : ClassLoader = defaultClassLoader
 
     /**
      * {InheritedDoc}

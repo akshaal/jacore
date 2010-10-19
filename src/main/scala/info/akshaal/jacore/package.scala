@@ -16,6 +16,9 @@ import scala.collection.mutable.ListBuffer
 import jacore.logger.Logger
 import jacore.utils.TimeValueFromNumberCreator
 
+/**
+ * Package object that contains most useful and common functions.
+ */
 package object jacore {
     // Make timeunit visible
     type TimeValue = utils.TimeValue
@@ -31,9 +34,10 @@ package object jacore {
     // Make jacore Enumeration visible
     type JacoreEnum = utils.JacoreEnum
 
-    // File conversion
-    @inline
-    implicit def string2file (absolutePath : String) : File = new File (absolutePath)
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // Collections
 
     /**
      * Create list repeating code n times.
@@ -52,17 +56,21 @@ package object jacore {
     }
 
     /**
-     * Create object of interface Runnable which will execute the given
-     * block of code.
+     * Iterate over java iterable. It is compiled to very efficient code.
      */
     @inline
-    def mkRunnable (code : => Unit) = {
-        new Runnable () {
-            def run () {
-                code
-            }
+    def iterateOverJavaIterable[T] (c : JavaIterable[T]) (f : T => Unit) {
+        val it = c.iterator
+
+        while (it.hasNext) {
+            f (it.next)
         }
     }
+
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // Nulls
 
     /**
      * Convert possible null value using code provided.
@@ -89,6 +97,39 @@ package object jacore {
             ref
         }
     }
+
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // Exceptions
+
+    /**
+     * Execute block of code and print a message if block of code throws
+     * an exception.
+     *
+     * @param message message to be loggen upon exception
+     * @param code code to try to run
+     * @param logger logger to use for logging
+     */
+    @inline
+    def logIgnoredException (message : => String) (code : => Unit) (implicit logger : Logger) =
+    {
+        try {
+            code
+        } catch {
+            case ex: Exception =>
+                logger.error (message, ex)
+        }
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // IO
+
+    // File conversion
+    @inline
+    implicit def string2file (absolutePath : String) : File = new File (absolutePath)
 
     /**
      * Execute code with closeable IO.
@@ -141,33 +182,8 @@ package object jacore {
         )
     }
 
-    /**
-     * Execute block of code and print a message if block of code throws
-     * an exception.
-     */
-    @inline
-    def logIgnoredException (message : => String) (code : => Unit) (implicit logger : Logger) =
-    {
-        try {
-            code
-        } catch {
-            case ex: Exception =>
-                logger.error (message, ex)
-        }
-    }
-
-    /**
-     * Iterate over java iterable. It is compiled to very efficient code.
-     */
-    @inline
-    def iterateOverJavaIterable[T] (c : JavaIterable[T]) (f : T => Unit) {
-        val it = c.iterator
-
-        while (it.hasNext) {
-            f (it.next)
-        }
-    }
-
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////////////
     // Rich string
 
@@ -194,8 +210,15 @@ package object jacore {
     implicit def string2RichString (str : String) : RichJacoreString = new RichJacoreString (str)
 
     // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
     // Concurrent
 
+    /**
+     * Wrapper class for ExecutorService. This class provides additional convenient methods.
+     * 
+     * @param executorService executor service instance to wrap
+     */
     final class RichExecutorService (executorService : ExecutorService) {
         @inline
         def submit [A] (code : => A) : Future [A] = {
@@ -205,11 +228,56 @@ package object jacore {
         }
     }
 
+    /**
+     * Implicit method to implicitly construct RichExecutorService out of ExecutorService.
+     * 
+     * @param executorService executor service to wrap
+     * @return wrapped executor service
+     */
     @inline
     implicit def executorService2RichExecutorService (executorService : ExecutorService) : RichExecutorService = {
         new RichExecutorService (executorService)
     }
 
+    /**
+     * Create object of interface Runnable which will execute the given block of code.
+     *
+     * @param code code to be executed by run method of returned Runnable object.
+     * @return runnable object that will invoke the given code upon execution of run method
+     */
+    @inline
+    def mkRunnable (code : => Unit) : Runnable = {
+        new Runnable () {
+            def run () {
+                code
+            }
+        }
+    }
+
+    /**
+     * Returns class loader, either thread's class loader or a classloader used to load
+     * this class.
+     *
+     * @return class loader, never null
+     */
+    def defaultClassLoader : ClassLoader = {
+        var classLoader : ClassLoader = null
+
+        try {
+            classLoader = currentThread.getContextClassLoader
+        } catch {
+            case _ => ()
+        }
+
+        if (classLoader == null) {
+            this.getClass.getClassLoader
+        } else {
+            classLoader
+        }
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////////////
     // Rich stuff for Guice
 
@@ -236,6 +304,8 @@ package object jacore {
         new RichInjector (injector)
     }
 
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////////////
     // Time
 

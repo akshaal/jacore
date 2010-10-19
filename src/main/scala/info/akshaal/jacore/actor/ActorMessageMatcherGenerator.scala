@@ -192,8 +192,7 @@ private[actor] class ActorMessageMatcherGenerator (matcherDefinition : MessageMa
     /**
      * {InheritedDoc}
      */
-    override protected def getDefaultClassLoader () : ClassLoader =
-                matcherDefinition.getClass.getClassLoader
+    override protected def getDefaultClassLoader () : ClassLoader = defaultClassLoader
 
     /**
      * {InheritedDoc}
