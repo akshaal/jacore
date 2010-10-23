@@ -179,6 +179,13 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
     protected def afterActs () = {}
 
     /**
+     * Called right before actor is started. Can be used to initialize actor before actor
+     * is started. This is different from initializing in constructor, because helps
+     * to avoid problems with order of initialization of variables/traits/classes and so on.
+     */
+    protected def beforeStart () = {}
+
+    /**
      * This method is called by actor executor when the last message of batch is processed
      * and it is time to execute 'afterActs' method.
      */
@@ -209,6 +216,8 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
             debug ("Actor is already started")
             return false
         }
+
+        beforeStart ()
 
         // Subscribe first. This is very first thing to do before publish any event.
         if (!matcherDefinitionsForSubscribe.isEmpty) {
