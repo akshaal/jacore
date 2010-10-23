@@ -51,31 +51,25 @@ abstract class AbstractJmsReceiverActor[T] (lowPriorityActorEnv : LowPriorityAct
     }
 
     /**
-     * Start message consumer.
+     * Inits message consumer. Called from start() method to initialize actor before starting it.
      */
-    override def start () : Boolean = {
-        if (super.start ()) {
-            session = createSession
-            messageConsumer = createMessageConsumer (session)
+    protected override def beforeStart () : Unit = {
+        session = createSession
+        messageConsumer = createMessageConsumer (session)
 
-            messageConsumer.setMessageListener (new MessageListener () {
-                override def onMessage (message : Message) : Unit = {
-                    val convertedMessage = convertMessage (message)
+        messageConsumer.setMessageListener (new MessageListener () {
+            override def onMessage (message : Message) : Unit = {
+                val convertedMessage = convertMessage (message)
 
-                    if (convertedMessage == null) {
-                        debugLazy ("Message skipped because converted returned null" +:+ message)
-                    } else {
-                        postponed {
-                            handleMessage (convertedMessage)
-                        }
+                if (convertedMessage == null) {
+                    debugLazy ("Message skipped because converted returned null" +:+ message)
+                } else {
+                    postponed {
+                        handleMessage (convertedMessage)
                     }
                 }
-            })
-
-            return true
-        } else {
-            return false
-        }
+            }
+        })
     }
 
     /**

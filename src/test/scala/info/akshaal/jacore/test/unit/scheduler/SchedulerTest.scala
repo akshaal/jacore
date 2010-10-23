@@ -77,7 +77,7 @@ class SchedulerTest extends JacoreSpecWithJUnit ("Scheduler specification") {
                 actor.executed   must_==  0
                 actor2.executed  must_==  0
 
-                Thread.sleep (60)
+                Thread.sleep (80)
 
                 actor.executed   must_==  0
                 actor2.executed  must_==  1
