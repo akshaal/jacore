@@ -1,6 +1,6 @@
 #!/bin/sh
 
-bdir=`mvn help:evaluate -Dexpression=project.build.directory | grep -v '[INFO]'`
+bdir=`mvn help:evaluate -o -Dexpression=project.build.directory | grep -v '[INFO]'`
 
 rm -rf ${bdir}/jacore
 rm -f ${bdir}/test-log4j.log
