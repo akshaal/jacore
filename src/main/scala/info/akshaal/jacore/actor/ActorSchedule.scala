@@ -51,8 +51,7 @@ trait ActorSchedule {
                     recurrentSchedules += ((payload, when))
                     
                     if (actorStarted.get) {
-                        val control =
-                            actorEnv.scheduler.every (ActorSchedule.this, payload, when)
+                        val control = actorEnv.scheduler.every (ActorSchedule.this, payload, when)
                         scheduleControls.put (control, null)
                         control
                     } else {

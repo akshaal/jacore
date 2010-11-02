@@ -14,6 +14,8 @@ trait ActorDelegation {
     this : Actor =>
 
     // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
     // Postpone support
 
     /**
@@ -31,6 +33,8 @@ trait ActorDelegation {
     protected case class PostponedBlock (code : () => Unit)
 
     // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
     // Operation
 
     import Operation._
@@ -41,7 +45,6 @@ trait ActorDelegation {
      * along with the result matching function to an actor's method which will generate
      * some kind of result. The <code>ResultMatchApplier</code> submits execution of the
      * result matching function to the actor it belongs to.
-     * 
      */
     protected implicit val _ =
         new ResultApplier {
@@ -56,6 +59,7 @@ trait ActorDelegation {
      * Represents an operation which produce a result of type <code>A</code>.
      * Operation code is supposed to be defined in <code>processRequest</code> method.
      *
+     * @tparam A type of result
      */
     protected abstract class AbstractOperation [A] extends WithComplexResult [A]
     {
@@ -68,6 +72,8 @@ trait ActorDelegation {
          * If the method is called first time, then code passed as argument is postponed
          * to be executed by actor as a message.
          * If the method is called the second time, then UnrecoverableError is casted.
+         *
+         * @param code code to run once
          */
         private[this] def onceAndPostponed (code : => Unit) : Unit = {
             if (started.compareAndSet (false, true)) {
@@ -98,6 +104,8 @@ trait ActorDelegation {
         /**
          * Run operation. Result of operation will be provided in the future object
          * when operation is done.
+         *
+         * @return future object that can be used to get result of operation
          */
         override final def runWithFutureAsy () : Future [A] = {
             val future = new SettableFuture [A]
@@ -128,6 +136,11 @@ trait ActorDelegation {
     }
 }
 
+// ////////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////////
+// Operation object. This must be located in the same file as ActorDelegation trait.
+
 object Operation {
     /**
      * Applier of operation results to result matchers.
@@ -145,6 +158,8 @@ object Operation {
 
     /**
      * Encapsulate asyncronous operation with some result of complex type.
+     *
+     * @tparam A type of result
      */
     sealed trait WithComplexResult [A] {
         /**
@@ -185,6 +200,7 @@ object Operation {
     {
         /**
          * Set the result of computation.
+         *
          * @param result result
          */
         override def set (result : A) : Unit = {
