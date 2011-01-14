@@ -46,7 +46,7 @@ trait ActorDelegation {
      * some kind of result. The <code>ResultMatchApplier</code> submits execution of the
      * result matching function to the actor it belongs to.
      */
-    protected implicit val _ =
+    protected implicit val thisActorResultApplier =
         new ResultApplier {
             def apply [A] (resultMatch : A => Unit, result : A) : Unit = {
                 postponed {
@@ -147,9 +147,9 @@ object Operation {
      */
     sealed trait ResultApplier {
         // NOTE: This trait is sealed because we want only one implementation. Only code
-        // from this file is trusted because the whole idea is not let allow execution arbitrary
+        // from this file is trusted because the whole idea is to prohibit execution of arbitrary
         // code in context of arbitrary actor. This is what can happen if a new implementation
-        // of this class are allowed. That is why we don't alow it. The only implementation
+        // of this class are allowed. That is why we don't allow it. The only implementation
         // is in Actor class and it is only available from inside the Actor class. So any
         // actor can use only its implementation and no one elses.
 

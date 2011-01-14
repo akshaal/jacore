@@ -72,7 +72,7 @@ private[scheduler] final class SchedulerThread
             val delay = item.nanoTime - System.nanoTime
 
             if (delay < schedulerDriftNanos) {
-                locked { processFromHead }
+                processFromHead
             } else {
                 locked { condition.awaitNanos (delay) }
             }
@@ -99,6 +99,9 @@ private[scheduler] final class SchedulerThread
         }
     }
 
+    /**
+     * Lock for code to protect access to the 'condition' value.
+     */
     @inline
     private def locked[T] (code : => T) : T = {
         lock.lock

@@ -9,7 +9,7 @@ package actor
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Extended operations for actors.
+ * Extended operations support for actors.
  */
 trait ActorExtendedOperations {
     this : Actor =>
@@ -48,7 +48,8 @@ trait ActorExtendedOperations {
          * @param matcher function that will receive result by applier when operation is over
          */
         def runMatchingResultAsy (retries : Retries, filter : ResultFilter [A])
-                                 (matcher : FilteredResult [A] => Unit) : Unit =
+                                 (matcher : FilteredResult [A] => Unit)
+                                 (implicit resultApplier : Operation.ResultApplier) : Unit =
         {
             if (started.compareAndSet (false, true)) {
                 var retriesLeft = retries
@@ -56,12 +57,12 @@ trait ActorExtendedOperations {
                 def internalMatcher (result : A) : Unit = {
                     filter (result) match {
                         case ResultAccepted =>
-                            matcher (AcceptedResult (result))
+                            resultApplier (matcher, AcceptedResult (result))
 
                         case ResultRejected =>
                             retriesLeft match {
                                 case Nil =>
-                                    matcher (RejectedResult)
+                                    resultApplier (matcher, RejectedResult)
 
                                 case time :: newRetriesLeft =>
                                     retriesLeft = newRetriesLeft
@@ -74,7 +75,7 @@ trait ActorExtendedOperations {
                 }
 
                 def doTry () : Unit = {
-                    newOperation () runMatchingResultAsy internalMatcher
+                    newOperation ().runMatchingResultAsy (internalMatcher) (thisActorResultApplier)
                 }
 
                 doTry ()
