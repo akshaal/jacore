@@ -4,7 +4,7 @@
     <groupId>info.akshaal.jacore</groupId>
     <artifactId>jacore</artifactId>
     <packaging>jar</packaging>
-    <version>1.35</version>
+    <version>1.36-SNAPSHOT</version>
     <name>Jacore - core for repid development</name>
 
     <!-- = = = = = = = = = = = = Default properties = = = = = = = = = = -->
