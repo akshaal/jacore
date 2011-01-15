@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>${project.build.directory}/test-log4j.log</file>
+    <append>false</append>
+
+    <encoder>
+        <pattern>%d %-5p [%c] \(%t\) {%marker} %m%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="java.sql" level="INFO" />
+
+  <logger name="com.ibatis" level="INFO" />
+
+  <logger name="info.akshaal" level="TRACE" />
+  
+  <root level="INFO">
+     <appender-ref ref="FILE" />
+  </root>
+</configuration>

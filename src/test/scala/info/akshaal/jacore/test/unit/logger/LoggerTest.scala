@@ -22,6 +22,16 @@ class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
                 logger.infoLazy (sideEffect ("info lazy"))
                 logger.warnLazy (sideEffect ("warn lazy"))
                 logger.errorLazy (sideEffect ("error lazy"))
+
+                logger.debug ("Debug level", group = true)
+                logger.info ("Info level", group = true)
+                logger.warn ("Warn level", group = true)
+                logger.error ("Error level", group = true)
+
+                logger.debugLazy (sideEffect ("debug lazy"), group = true)
+                logger.infoLazy (sideEffect ("info lazy"), group = true)
+                logger.warnLazy (sideEffect ("warn lazy"), group = true)
+                logger.errorLazy (sideEffect ("error lazy"), group = true)
             }
             
             T must not be null
@@ -36,6 +46,14 @@ class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
                 businessLogicInfo ("2 Business Logic Info level")
                 businessLogicWarning ("2 Business Logic Warning level")
                 businessLogicProblem ("2 Business Logic Problem level")
+
+                logger.businessLogicInfo ("Business Logic Info level", group = true)
+                logger.businessLogicWarning ("Business Logic Warning level", group = true)
+                logger.businessLogicProblem ("Business Logic Problem level", group = true)
+
+                businessLogicInfo ("2 Business Logic Info level", group = true)
+                businessLogicWarning ("2 Business Logic Warning level", group = true)
+                businessLogicProblem ("2 Business Logic Problem level", group = true)
             }
 
             T must not be null
@@ -52,6 +70,16 @@ class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
                 infoLazy (sideEffect ("2 info lazy"))
                 warnLazy (sideEffect ("2 warn lazy"))
                 errorLazy (sideEffect ("2 error lazy"))
+
+                debug ("2 Debug level", group = true)
+                info ("2 Info level", group = true)
+                warn ("2 Warn level", group = true)
+                error ("2 Error level", group = true)
+
+                debugLazy (sideEffect ("2 debug lazy"), group = true)
+                infoLazy (sideEffect ("2 info lazy"), group = true)
+                warnLazy (sideEffect ("2 warn lazy"), group = true)
+                errorLazy (sideEffect ("2 error lazy"), group = true)
             }
             
             T must not be null
