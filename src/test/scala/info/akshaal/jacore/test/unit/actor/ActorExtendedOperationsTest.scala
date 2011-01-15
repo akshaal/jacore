@@ -19,7 +19,7 @@ class ActorExtendedOperationsTest extends JacoreSpecWithJUnit ("ActorExtendedOpe
                 unreliableActor.forceFailure = true
                 restartingActor.filteredOuts = Nil
                 restartingActor.isFailure (unreliableActor).runWithFutureAsy.get must_== rejected
-                (System.currentTimeMillis - rejectionStarted) must beIn (680 to 1000)
+                (System.currentTimeMillis - rejectionStarted) must beIn (680 to 1200)
                 restartingActor.filteredOuts  must_==  List (failure, failure, failure)
 
                 // Test for last hope (all failures, except the last one)
