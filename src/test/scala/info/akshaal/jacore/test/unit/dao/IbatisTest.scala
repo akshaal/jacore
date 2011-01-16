@@ -68,11 +68,11 @@ class IbatisTest extends JacoreSpecWithJUnit ("iBatis support specification") wi
 object IbatisTest {
     var mockedSqlSessionFactoryForInserter : SqlSessionFactory = null
 
-    class InserterTestActor extends AbstractIbatisDataInserterActor[String] (
+    class InserterTestActor extends {
+        // Early initialization
+        protected override val insertStatementId = "testInsert"
+    } with AbstractIbatisDataInserterActor[String] (
                                  lowPriorityActorEnv = TestModule.lowPriorityActorEnv,
                                  sqlSessionFactory = mockedSqlSessionFactoryForInserter)
                             with Waitable
-    {
-        protected override val insertStatementId = "testInsert"
-    }
 }

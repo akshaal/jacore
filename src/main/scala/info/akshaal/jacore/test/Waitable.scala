@@ -10,9 +10,11 @@ import actor.Actor
 /**
  * Makes it possible to wait a momment when messages are processed by actor.
  */
-trait Waitable extends Actor {
-    private var messageLatch : CountDownLatch = null
+trait Waitable extends {
+    // This is initialized before superclass is called
 
+    private var messageLatch : CountDownLatch = null
+} with Actor {
     /**
      * How much time we wait for a message to arrive to actor before timing out.
      */
