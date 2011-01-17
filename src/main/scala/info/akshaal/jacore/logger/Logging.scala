@@ -16,66 +16,66 @@ private[logger] trait AbstractLogging {
     // Business logic logging -  - - -  -- - - - - - - - - - - -  - - - - - - - - - -
 
     @inline
-    def businessLogicInfo (str : String, group : Boolean = false) : Unit =
+    protected final def businessLogicInfo (str : String, group : Boolean = false) : Unit =
         logger.businessLogicInfo (str, group = group)
 
     @inline
-    def businessLogicWarning (str : String, group : Boolean = false) : Unit =
+    protected final def businessLogicWarning (str : String, group : Boolean = false) : Unit =
         logger.businessLogicWarning (str, group = group)
 
     @inline
-    def businessLogicProblem (str : String, group : Boolean = false) : Unit =
+    protected final def businessLogicProblem (str : String, group : Boolean = false) : Unit =
         logger.businessLogicProblem (str, group = group)
 
     // Log with exception - - - - - - - - - - -- - - - - - - - - - - - - - - - -  -
 
     @inline
-    def debug (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def debug (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.debug (str, exc, group = group)
 
     @inline
-    def info (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def info (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.info (str, exc, group = group)
 
     @inline
-    def warn (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def warn (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.warn (str, exc, group = group)
 
     @inline
-    def error (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def error (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.error (str, exc, group = group)
 
     // Lazy log - - - - - - - - - - -- - - - - - - - - - - - - - - - -  - - - - -  -
 
     @inline
-    def debugLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def debugLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.debugLazy (obj, exc, group = group)
 
     @inline
-    def infoLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def infoLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.infoLazy (obj, exc, group = group)
 
     @inline
-    def warnLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def warnLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.warnLazy (obj, exc, group = group)
 
     @inline
-    def errorLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
+    protected final def errorLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         logger.errorLazy (obj, exc, group = group)
 
     // Levels - - - - - - - - - - -- - - - - - - - - - - - - - - - -  - - - - - - - -
 
     @inline
-    def isDebugEnabled : Boolean = logger.isDebugEnabled
+    protected final def isDebugEnabled : Boolean = logger.isDebugEnabled
 
     @inline
-    def isInfoEnabled : Boolean = logger.isInfoEnabled
+    protected final def isInfoEnabled : Boolean = logger.isInfoEnabled
 
     @inline
-    def isWarnEnabled : Boolean = logger.isWarnEnabled
+    protected final def isWarnEnabled : Boolean = logger.isWarnEnabled
 
     @inline
-    def isErrorEnabled : Boolean = logger.isErrorEnabled
+    protected final def isErrorEnabled : Boolean = logger.isErrorEnabled
 }
 
 
