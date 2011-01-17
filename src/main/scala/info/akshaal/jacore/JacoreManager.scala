@@ -1,4 +1,4 @@
-/** Akshaal (C) 2009-2010. GNU GPL. http://akshaal.info */
+/** Akshaal (C) 2009-2011. GNU GPL. http://akshaal.info */
 
 package info.akshaal.jacore
 
@@ -6,7 +6,7 @@ import java.lang.{Iterable => JavaIterable}
 
 import collection.JavaConversions._
 
-import fs.text.{TextFileActor}
+import io.fs.{TextFileServiceActor, FileServiceActor}
 import daemon.{DaemonStatusActor, DaemonStatus}
 import actor.{MonitoringActors, BroadcasterActor, Actor}
 import scheduler.SchedulerImpl
@@ -71,7 +71,8 @@ trait JacoreManager {
  */
 @Singleton
 private[jacore] final class JacoreManagerImpl @Inject() (
-                    textFileActor : TextFileActor,
+                    fileServiceActor : FileServiceActor,
+                    textFileServiceActor : TextFileServiceActor,
                     daemonStatusActor : DaemonStatusActor,
                     daemonStatus : DaemonStatus,
                     monitoringActors : MonitoringActors,
@@ -123,7 +124,8 @@ private[jacore] final class JacoreManagerImpl @Inject() (
         (   monitoringActors.monitoringActor1
          :: monitoringActors.monitoringActor2
          :: broadcasterActor
-         :: textFileActor
+         :: fileServiceActor
+         :: textFileServiceActor
          :: daemonStatusActor
          :: Nil)
 

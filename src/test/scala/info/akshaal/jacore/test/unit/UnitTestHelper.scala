@@ -9,7 +9,7 @@ import java.io.File
 import info.akshaal.jacore.actor.{Actor, HiPriorityActorEnv, LowPriorityActorEnv}
 import info.akshaal.jacore.module.Module
 import info.akshaal.jacore.scheduler.Scheduler
-import info.akshaal.jacore.fs.text.TextFile
+import info.akshaal.jacore.io.fs.TextFileService
 import info.akshaal.jacore.test.TestHelper
 import info.akshaal.jacore.test.Waitable
 import info.akshaal.jacore.JacoreManager
@@ -42,9 +42,9 @@ object UnitTestHelper extends TestHelper {
 
         jacoreManager.start
 
-        val hiPriorityActorEnv = injector.getInstanceOf[HiPriorityActorEnv]
-        val lowPriorityActorEnv = injector.getInstanceOf[LowPriorityActorEnv]
-        val scheduler = injector.getInstanceOf[Scheduler]
-        val textFile = injector.getInstanceOf[TextFile]
+        val hiPriorityActorEnv = injector.getInstanceOf [HiPriorityActorEnv]
+        val lowPriorityActorEnv = injector.getInstanceOf [LowPriorityActorEnv]
+        val scheduler = injector.getInstanceOf [Scheduler]
+        val textFileService = injector.getInstanceOf [TextFileService]
     }
 }

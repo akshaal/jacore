@@ -2,7 +2,7 @@
 
 package info.akshaal.jacore
 package test
-package unit.jms
+package unit.io.jms
 
 import org.specs.mock.{Mockito, MocksCreation}
 
@@ -10,7 +10,7 @@ import javax.jms.{Connection, Destination, ObjectMessage, Message,
                   MessageProducer, Session, JMSException}
 
 import unit.UnitTestHelper._
-import jms.AbstractJmsSenderActor
+import io.jms.AbstractJmsSenderActor
 
 class JmsSenderActorTest extends JacoreSpecWithJUnit ("AbstractJmsSenderActor specification")
                             with Mockito

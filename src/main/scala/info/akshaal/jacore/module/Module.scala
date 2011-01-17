@@ -9,7 +9,7 @@ import com.google.inject.name.Names
 
 import utils.{TimeValue, ThreadPriorityChanger, DummyThreadPriorityChanger}
 import actor.{CallByMessageMethodInterceptor, Actor, Broadcaster, BroadcasterActor}
-import fs.text.{TextFile, TextFileActor}
+import io.fs.{TextFileService, TextFileServiceActor, FileService, FileServiceActor}
 import scheduler.{Scheduler, SchedulerImpl}
 import annotation.CallByMessage
 import logger.Logging
@@ -156,7 +156,8 @@ class Module extends AbstractModule with Logging {
 
         // Internal implemntation bindings
         bind (classOf[Broadcaster]).to (classOf[BroadcasterActor])
-        bind (classOf[TextFile]).to (classOf[TextFileActor])
+        bind (classOf[FileService]).to (classOf[FileServiceActor])
+        bind (classOf[TextFileService]).to (classOf[TextFileServiceActor])
         bind (classOf[JacoreManager]).to (classOf[JacoreManagerImpl])
         bind (classOf[Scheduler]).to (classOf[SchedulerImpl])
 

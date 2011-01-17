@@ -6,7 +6,7 @@ package daemon
 import java.io.File
 
 import actor.{Actor, NormalPriorityActorEnv}
-import fs.text.TextFile
+import io.fs.TextFileService
 
 /**
  * Actor that periodicly updates a file with a current status of daemon.
@@ -16,7 +16,7 @@ import fs.text.TextFile
  *
  * @param normalPriorityActorEnv actor environment
  * @param daemonStatus daemon status that this actor reflects in file
- * @param textFile text file service
+ * @param textFileService text file service
  * @param interval interval between updates if negative or zero, then not updated
  * @param statusFileName name of status file
  */
@@ -24,7 +24,7 @@ import fs.text.TextFile
 private[jacore] class DaemonStatusActor @Inject() (
                  normalPriorityActorEnv : NormalPriorityActorEnv,
                  daemonStatus : DaemonStatus,
-                 textFile : TextFile,
+                 textFileService : TextFileService,
                  @Named("jacore.status.update.interval") interval : TimeValue,
                  @Named("jacore.status.file") statusFileName : String)
             extends Actor (actorEnv = normalPriorityActorEnv)
@@ -45,7 +45,7 @@ private[jacore] class DaemonStatusActor @Inject() (
         val content = curTime + " " + statusString
 
         // TODO: Save to temp file. Rename after save. This will help avoid "empty" files.
-        textFile.opWriteFile (statusFile, content) runMatchingResultAsy {
+        textFileService.writeFileOperation (statusFile, content) runMatchingResultAsy {
             case Success (_) =>
                 debug ("Status file has been updated")
 
