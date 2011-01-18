@@ -76,8 +76,6 @@ package object jacore {
      * Convert possible null value using code provided.
      * @param ref possibly null value
      * @param code run this code if ref is null
-     *
-     * TODO: This method must return NotNull instance
      */
     @inline
     def convertNull[T] (ref : T) (code : => T) : T = {
@@ -133,7 +131,6 @@ package object jacore {
 
     /**
      * Execute code with closeable IO.
-     * TODO: Code must be executed with NotNull argument
      */
     @inline
     def withCloseableIO[I <: Closeable, T] (createCode : => I) (code : I => T) : T = {

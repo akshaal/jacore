@@ -24,12 +24,6 @@ private[actor] object ActorClassScanner extends Logging {
      * @return method descriptions for annotated methods
      */
     def scan (actor : Actor) : Seq[ActMethodDesc] = {
-        // TODO: Implement cache
-
-        // TODO: It would be nice if we could detect CallByMessage annotation and
-        // test that they (method) confirm to requriements (not final and so on).
-        // Also, we must check if method was enchances or not!
-
         val actorClass = actor.getClass
 
         def badClass (str : String) : Nothing = {

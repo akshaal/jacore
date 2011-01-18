@@ -22,9 +22,6 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
                                                             with Logging
                                                             with NotNull
 {
-    // TODO: Split to traits: Transporting, Managing, Broadcasting,
-    //       Autosubscribing, ...
-
     /**
      * A set of descriptions for methods annotated with @Act annotation.
      * This is used to create a dispatcher and subscribe/unsubscribe actor to messages.

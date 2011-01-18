@@ -196,10 +196,7 @@ private[jacore] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
      */
     private def getCachedMatcher (matcherDefinition : MessageMatcherDefinition[_]) : MessageMatcher =
     {
-        // TODO: Implement cache
-
-        new ActorMessageMatcherGenerator (matcherDefinition)
-                    .create.asInstanceOf [MessageMatcher]
+        new ActorMessageMatcherGenerator (matcherDefinition).create ().asInstanceOf [MessageMatcher]
     }
 }
 

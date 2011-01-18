@@ -19,8 +19,6 @@ class MonitoringTest extends JacoreSpecWithJUnit ("Monitoring specification") {
     import unit.UnitTestHelper._
     import MonitoringTest._
 
-    // TODO: Need to suppress this terrible message shown in console
-
     "Monitoring" should {
         "detect not responding actors" in {
             val srv = ManagementFactory.getPlatformMBeanServer()
