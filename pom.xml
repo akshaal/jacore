@@ -25,6 +25,9 @@
         <mockito.version>1.8.5</mockito.version>
         <specs.version>1.6.7</specs.version>
         <jms.version>1.1</jms.version>
+        <h2.version>1.2.147</h2.version>
+        <commons-dbcp.version>1.4</commons-dbcp.version>
+        <commons-pool.version>1.5.5</commons-pool.version>
 
         <!-- Plugin versions -->
         <maven-scala-plugin.version>2.14.1</maven-scala-plugin.version>
@@ -130,12 +133,33 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>${commons-dbcp.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>${commons-pool.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
             <scope>test</scope>
         </dependency>
-        
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.jetlang</groupId>
             <artifactId>jetlang</artifactId>
