@@ -21,25 +21,25 @@ import utils.io.CustomLineWriter
 /**
  * Database managed by DBCP framework
  */
-class DbWithDbcpPool (url : String,
-                      username : String = null,
-                      password : String = null,
-                      driverClass : Option[String] = None,
-                      maxOpenConnections : Int = 4,
-                      minOpenConnections : Int = 1,
-                      poolPreparedStatements : Boolean = true,
-                      maxOpenPreparedStatements : Int = 100,
-                      validationQuery : Option[String] = None,
-                      validationQueryTimeout : TimeValue = 2 seconds,
-                      evictConnectionIdleFor : TimeValue = 5 minutes,
-                      maxWaitForConnection : TimeValue = 3 seconds,
-                      connectionInitSqls : List[String] = Nil,
-                      defaultReadonly : Boolean = false,
-                      defaultAutocommit : Boolean = true,
-                      defaultTransactionIsolation : Int = -1,
-                      logAbandoned : Boolean = true,
-                      removeAbandoned : Boolean = true,
-                      removeAbandonedTimeout : TimeValue = 15 minutes)
+class DbWithDbcpPool (val url : String,
+                      val username : String = null,
+                      val password : String = null,
+                      val driverClass : Option[String] = None,
+                      val maxOpenConnections : Int = 4,
+                      val minOpenConnections : Int = 1,
+                      val poolPreparedStatements : Boolean = true,
+                      val maxOpenPreparedStatements : Int = 100,
+                      val validationQuery : Option[String] = None,
+                      val validationQueryTimeout : TimeValue = 2 seconds,
+                      val evictConnectionIdleFor : TimeValue = 5 minutes,
+                      val maxWaitForConnection : TimeValue = 3 seconds,
+                      val connectionInitSqls : List[String] = Nil,
+                      val defaultReadonly : Boolean = false,
+                      val defaultAutocommit : Boolean = true,
+                      val defaultTransactionIsolation : Int = -1,
+                      val logAbandoned : Boolean = true,
+                      val removeAbandoned : Boolean = true,
+                      val removeAbandonedTimeout : TimeValue = 15 minutes)
                                     extends Db with Logging
 {
     require (removeAbandonedTimeout.asSeconds > 0, "removeAbandonedTimeout must be > 0 seconds")
@@ -64,6 +64,11 @@ class DbWithDbcpPool (url : String,
      * {InheritedDoc}
      */
     override def open () : Connection = poolingDataSource.getConnection ()
+
+    /**
+     * {InheritedDoc}
+     */
+    override def close () : Unit = connectionPool.close ()
 
     /**
      * Construct new poolable connection factory.

@@ -16,6 +16,11 @@ trait Db {
     def open () : Connection
 
     /**
+     * Close database (release all resources except open connections).
+     */
+    def close () : Unit
+
+    /**
      * Close database connection. Default implementation invokes close on 'connection'
      * object ignoring 'SQLException'.
      *
