@@ -156,4 +156,9 @@ class DbWithDbcpPool (url : String,
                                            /* maxWait         = */ 0,
                                            /* maxIdle per key = */ 1,
                                            maxOpenPreparedStatements)
+
+    /**
+     * {InheritedDoc}
+     */
+    override def toString = "DbWithDbcpPool(url='" + url + "')"
 }
