@@ -93,9 +93,8 @@ package object jacore {
      * @return 'ref' if it is not null, or value returned by 'code'
      */
     @inline
-    def convertNull[T] (ref : T) (code : => T) : T = {
+    def convertNull[T] (ref : T) (code : => T) : T =
         if (ref == null) code else ref.asInstanceOf[T]
-    }
 
     /**
      * Throws exception if value is null, otherwise returns value
@@ -106,13 +105,12 @@ package object jacore {
      * @return 'ref'
      */
     @inline
-    def throwIfNull[T] (ref : T) (thr : => Throwable) : T = {
+    def throwIfNull[T] (ref : T) (thr : => Throwable) : T =
         if (ref == null) {
             throw thr
         } else {
             ref
         }
-    }
 
 
     // /////////////////////////////////////////////////////////////////////
@@ -130,14 +128,12 @@ package object jacore {
      */
     @inline
     def logIgnoredException (message : => String) (code : => Unit) (implicit logger : Logger) : Unit =
-    {
         try {
             code
         } catch {
             case ex: Exception =>
                 logger.error (message, ex)
         }
-    }
 
 
     // /////////////////////////////////////////////////////////////////////
@@ -192,7 +188,7 @@ package object jacore {
      * @return read file as a string
      */
     @inline
-    def readFileLinesAsString (file : File, encoding : String) : String = {
+    def readFileLinesAsString (file : File, encoding : String) : String =
         withCloseableIO (new BufferedReader (
                             new InputStreamReader (
                                 new FileInputStream (file), encoding))) (
@@ -211,7 +207,6 @@ package object jacore {
                 buf.mkString ("\n")
             }
         )
-    }
 
     /**
      * Implicitly converts JdbcUrl values to String. This makes it possible
@@ -244,12 +239,11 @@ package object jacore {
          * @return this string or concatenation with ': ' and exception
          */
         @inline
-        def +:+ (optionThrowable : Option[_ <: Throwable]) : String = {
+        def +:+ (optionThrowable : Option[_ <: Throwable]) : String =
             optionThrowable match {
                 case None => str
                 case Some (exc) => +:+ (exc)
             }
-        }
 
         /**
          * Concatenate this string with ': ' and the message of the given throwable.
@@ -258,9 +252,7 @@ package object jacore {
          * @return result of concatenation
          */
         @inline
-        def +:+ (throwable : Throwable) : String = {
-            str + ": " + throwable.getMessage
-        }
+        def +:+ (throwable : Throwable) : String = str + ": " + throwable.getMessage
 
         /**
          * Concatenate this string with ': ' and some other value
@@ -269,9 +261,34 @@ package object jacore {
          * @return result of concatenation
          */
         @inline
-        def +:+ (other : Any) : String = {
-            str + ": " + other
-        }
+        def +:+ (other : Any) : String = str + ": " + other
+
+        /**
+         * Append optional value using provided value converter. If option is None
+         * then nothing is appended.
+         *
+         * @param <T> type of option we are going to append to string
+         * @param option optional value
+         * @param f function to apply to the value in option to construct appending suffix
+         * @return resulting string
+         */
+        def appendOptional [T] (option : Option [T]) (f : T => String) : String =
+            option match {
+                case None         => str
+                case Some (value) => str + f (value)
+            }
+
+        /**
+         * Append suffix if condition is true otherwise return original string.
+         *
+         * @param condition to test
+         * @param suffix suffix to append
+         */
+        def appendIf (condition : Boolean, suffix : String) : String =
+            if (condition)
+                str + suffix
+            else
+                str
     }
 
     /**
@@ -303,11 +320,10 @@ package object jacore {
          * @return Future that holds result of execution
          */
         @inline
-        def submit [A] (code : => A) : Future [A] = {
+        def submit [A] (code : => A) : Future [A] =
             executorService.submit (new Callable [A] {
                 override def call () : A = code
             })
-        }
     }
 
     /**
@@ -317,9 +333,8 @@ package object jacore {
      * @return wrapped executor service
      */
     @inline
-    implicit def executorService2RichExecutorService (executorService : ExecutorService) : RichExecutorService = {
+    implicit def executorService2RichExecutorService (executorService : ExecutorService) : RichExecutorService =
         new RichExecutorService (executorService)
-    }
 
     /**
      * Create object of interface Runnable which will execute the given block of code.
@@ -328,13 +343,12 @@ package object jacore {
      * @return runnable object that will invoke the given code upon execution of run method
      */
     @inline
-    def mkRunnable (code : => Unit) : Runnable = {
+    def mkRunnable (code : => Unit) : Runnable =
         new Runnable () {
             def run () {
                 code
             }
         }
-    }
 
     /**
      * Returns class loader, either thread's class loader or a classloader used to load
@@ -381,9 +395,8 @@ package object jacore {
          * @return instance of type 'T' create by guice
          */
         @inline
-        def getInstanceOf[T](implicit clazz : ClassManifest[T]) : T = {
+        def getInstanceOf[T](implicit clazz : ClassManifest[T]) : T =
             injector.getInstance (clazz.erasure).asInstanceOf[T]
-        }
     }
 
     /**
@@ -393,9 +406,8 @@ package object jacore {
      * @return rich injector
      */
     @inline
-    implicit def injector2richInjector (injector : Injector) : RichInjector = {
+    implicit def injector2richInjector (injector : Injector) : RichInjector =
         new RichInjector (injector)
-    }
 
 
     // /////////////////////////////////////////////////////////////////////
@@ -408,9 +420,8 @@ package object jacore {
      *
      * @return formatted current date and time
      */
-    def formattedCurrentTime () : String = {
+    def formattedCurrentTime () : String =
         DateFormat.getDateTimeInstance (DateFormat.FULL, DateFormat.FULL).format (new Date)
-    }
 
     /**
      * Converts Long to TimeValueFromNumberCreator
