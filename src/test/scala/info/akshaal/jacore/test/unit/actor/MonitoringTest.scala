@@ -32,7 +32,7 @@ class MonitoringTest extends JacoreSpecWithJUnit ("Monitoring specification") {
                 srv.getAttribute (statusObj, "dying")             must_==  false
                 srv.getAttribute (statusObj, "shuttingDown")      must_==  false
 
-                Thread.sleep (MonitoringTestModule.monitoringInterval.asMilliseconds * 5)
+                Thread.sleep (MonitoringTestModule.monitoringInterval.inMilliseconds * 5)
 
                 MonitoringTestModule.daemonStatus.isDying         must beTrue
                 MonitoringTestModule.daemonStatus.isShuttingDown  must beTrue
@@ -67,7 +67,7 @@ object MonitoringTest {
         override def act () = {
             case x => {
                 debug ("Starting to sleep")
-                Thread.sleep (MonitoringTestModule.monitoringInterval.asMilliseconds * 2)
+                Thread.sleep (MonitoringTestModule.monitoringInterval.inMilliseconds * 2)
                 debug ("We slept well")
             }
         }

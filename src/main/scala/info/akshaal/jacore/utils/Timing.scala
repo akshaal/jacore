@@ -60,7 +60,7 @@ private[jacore] final class Timing (limit : TimeValue, daemonStatus : DaemonStat
             frame.put (time)
 
             // Inform
-            if (time > limit.asNanoseconds) {
+            if (time > limit.inNanoseconds) {
                 logger.warn (message + ". Timing = " + time.nanoseconds)
             } else {
                 logger.debugLazy (message + ". Timing = " + time.nanoseconds)
@@ -109,7 +109,7 @@ private[jacore] final class ThreadSafeTiming (limit : TimeValue,
             frame.put (time)
 
             // Inform
-            if (time > limit.asNanoseconds) {
+            if (time > limit.inNanoseconds) {
                 logger.warn (message + ". Timing = " + time.nanoseconds)
             } else {
                 logger.debugLazy (message + ". Timing = " + time.nanoseconds)

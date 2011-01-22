@@ -45,7 +45,7 @@ final class DaemonStatus @Inject() (
     /**
      * After this nanoseconds (compered to System.nanoTime) it is allowed to do qos measurements
      */
-    private[this] val qosAllowedAfterNanos = (startedAt + qosSkipFirst).asNanoseconds
+    private[this] val qosAllowedAfterNanos = (startedAt + qosSkipFirst).inNanoseconds
 
     /**
      * Returns true if application is dying (feels bad).

@@ -36,7 +36,7 @@ private[scheduler] final class SchedulerThread
     private val queue = new PriorityQueue[Schedule]
 
     // Number of nanoseconds that must be ignored
-    private val schedulerDriftNanos = schedulerDrift.asNanoseconds
+    private val schedulerDriftNanos = schedulerDrift.inNanoseconds
 
     // Accounting of latencies
     val latencyTiming = new Timing (limit = latencyLimit, daemonStatus = daemonStatus)

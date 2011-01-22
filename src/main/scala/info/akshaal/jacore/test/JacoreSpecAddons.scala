@@ -67,7 +67,7 @@ trait JacoreSpecAddons extends Specification {
             }
 
         runningExamples (example) = task
-        testGuardingTimer.schedule (task, timeoutForOneExample.asMilliseconds)
+        testGuardingTimer.schedule (task, timeoutForOneExample.inMilliseconds)
     }
 
     /**

@@ -35,7 +35,7 @@ trait Waitable extends {
         f
 
         debug ("Waiting for " + count + " message(s)")
-        if (!messageLatch.await (timeout.asMilliseconds, JavaTimeUnit.MILLISECONDS)) {
+        if (!messageLatch.await (timeout.inMilliseconds, JavaTimeUnit.MILLISECONDS)) {
             throw new MessageTimeoutException
         }
     }

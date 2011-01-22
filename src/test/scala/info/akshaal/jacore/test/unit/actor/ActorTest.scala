@@ -371,7 +371,7 @@ class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito
                     }
 
                     for (actor <- List(actor1, actor2)) {
-                        actor.msgsLatch.await (actor.timeout.asMilliseconds,
+                        actor.msgsLatch.await (actor.timeout.inMilliseconds,
                                                JavaTimeUnit.MILLISECONDS)
                     }
 

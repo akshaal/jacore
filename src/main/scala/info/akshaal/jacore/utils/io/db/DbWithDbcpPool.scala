@@ -42,8 +42,8 @@ class DbWithDbcpPool (val url : String,
                       val removeAbandonedTimeout : TimeValue = 15 minutes)
                                     extends Db with Logging
 {
-    require (removeAbandonedTimeout.asSeconds > 0, "removeAbandonedTimeout must be > 0 seconds")
-    require (validationQueryTimeout.asSeconds > 0, "validationQueryTimeout must be > 0 seconds")
+    require (removeAbandonedTimeout.inSeconds > 0, "removeAbandonedTimeout must be > 0 seconds")
+    require (validationQueryTimeout.inSeconds > 0, "validationQueryTimeout must be > 0 seconds")
 
     // Load DB driver if given (since JDBC 4 there is autoloading of drivers)
     driverClass map Class.forName
@@ -82,7 +82,7 @@ class DbWithDbcpPool (val url : String,
                     connectionPool,
                     if (poolPreparedStatements) createPoolFactoryForStatements () else null,
                     validationQuery getOrElse null,
-                    validationQueryTimeout.asSeconds.asInstanceOf [Int],
+                    validationQueryTimeout.inSeconds.asInstanceOf [Int],
                     connectionInitSqls,
                     defaultReadonly,
                     defaultAutocommit,
@@ -103,7 +103,7 @@ class DbWithDbcpPool (val url : String,
         val config = new AbandonedConfig
         config.setLogAbandoned (logAbandoned)
         config.setRemoveAbandoned (removeAbandoned)
-        config.setRemoveAbandonedTimeout (removeAbandonedTimeout.asSeconds.asInstanceOf [Int])
+        config.setRemoveAbandonedTimeout (removeAbandonedTimeout.inSeconds.asInstanceOf [Int])
         config.setLogWriter (logWriter)
 
         config
@@ -139,10 +139,10 @@ class DbWithDbcpPool (val url : String,
         config.minIdle = minOpenConnections
         config.testOnBorrow = validationQuery.isDefined
         config.testOnReturn = false
-        config.timeBetweenEvictionRunsMillis = evictConnectionIdleFor.asMilliseconds / 2
-        config.minEvictableIdleTimeMillis = evictConnectionIdleFor.asMilliseconds
+        config.timeBetweenEvictionRunsMillis = evictConnectionIdleFor.inMilliseconds / 2
+        config.minEvictableIdleTimeMillis = evictConnectionIdleFor.inMilliseconds
         config.testWhileIdle = false
-        config.maxWait = maxWaitForConnection.asMicroseconds
+        config.maxWait = maxWaitForConnection.inMicroseconds
         config.lifo = false
         
         config

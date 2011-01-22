@@ -75,7 +75,7 @@ class SchedulerImpl @Inject() (
         val schedule =
             new OneTimeSchedule (actor,
                                  payload,
-                                 timeValue.asNanoseconds + System.nanoTime,
+                                 timeValue.inNanoseconds + System.nanoTime,
                                  control)
 
         schedulerThread.schedule (schedule)
@@ -87,7 +87,7 @@ class SchedulerImpl @Inject() (
      * Schedule payload for actor to be delivered every timeValue.
      */
     final def every (actor : Actor, payload : Any, period : TimeValue) : ScheduleControl = {
-        val periodNano = period.asNanoseconds
+        val periodNano = period.inNanoseconds
         val curNanoTime = System.nanoTime
         val semiStableNumber =
                 (
