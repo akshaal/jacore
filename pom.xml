@@ -248,10 +248,6 @@
                         <arg>-target:jvm-1.5</arg>
                         <arg>-deprecation</arg>
                         <arg>-unchecked</arg>
-                        <arg>-Xwarninit</arg>
-                        <!-- <arg>-make:transitivenocp</arg>
-                        <arg>-dependencyfile</arg>
-                        <arg>${project.build.directory}/.scala_dependencies</arg> -->
                         <!--<arg>-optimise</arg>-->
                         <!--<arg>-Ydebug</arg>-->
                         <!-- <arg>-Ytailrecommend</arg> -->
