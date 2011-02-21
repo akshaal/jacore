@@ -19,8 +19,7 @@ import utils.io.db.Db
  */
 abstract class AbstractBulkJdbcActor (db : Db,
                                       lowPriorityActorEnv : LowPriorityActorEnv)
-                    extends AbstractJdbcActor (db = db,
-                                               lowPriorityActorEnv = lowPriorityActorEnv)
+                    extends AbstractJdbcActor (lowPriorityActorEnv = lowPriorityActorEnv)
 {
     // Currently opened connection. Must not be used directly from method except
     // from getConnection or afterActs

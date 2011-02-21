@@ -4,10 +4,10 @@ package info.akshaal.jacore
 package io
 package db
 
-import java.sql.Connection
+import java.sql.{Connection, PreparedStatement => JdbcPS}
 
 import actor.{Actor, LowPriorityActorEnv}
-import utils.io.db.{Db, SqlUtils}
+import utils.io.db.SqlUtils
 import jdbctype._
 import jdbcaction._
 
@@ -17,10 +17,11 @@ import jdbcaction._
  * @param db database to use for connections
  * @param lowPriorityActorEnv low priority environment for this actor
  */
-abstract class AbstractJdbcActor (db : Db,
-                                  lowPriorityActorEnv : LowPriorityActorEnv)
+abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                 extends Actor (actorEnv = lowPriorityActorEnv)
 {
+    import AbstractJdbcActor._
+
     /**
      * Get connection to use for running statements.
      *
@@ -38,6 +39,8 @@ abstract class AbstractJdbcActor (db : Db,
     protected def prepareConnection (connection : Connection) : Unit = {}
 
 
+    // =====================================================================================
+    // =====================================================================================
     // =====================================================================================
     // =====================================================================================
     // =====================================================================================
@@ -219,7 +222,7 @@ abstract class AbstractJdbcActor (db : Db,
         } with PreparedStatement1 [T, R] {
             private val p1setter = getSetter (paramType)
             override def apply (param : T) : R = {
-                p1setter (1, param)
+                p1setter (getJdbcPS(), 1, param)
                 runAction ()
             }
         }
@@ -246,8 +249,9 @@ abstract class AbstractJdbcActor (db : Db,
             private val p1setter = getSetter (param1Type)
             private val p2setter = getSetter (param2Type)
             override def apply (p1 : T1, p2 : T2) : R = {
-                p1setter (1, p1)
-                p2setter (2, p2)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
                 runAction ()
             }
         }
@@ -278,9 +282,10 @@ abstract class AbstractJdbcActor (db : Db,
             private val p2setter = getSetter (param2Type)
             private val p3setter = getSetter (param3Type)
             override def apply (p1 : T1, p2 : T2, p3 : T3) : R = {
-                p1setter (1, p1)
-                p2setter (2, p2)
-                p3setter (3, p3)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
+                p3setter (jdbcPS, 3, p3)
                 runAction ()
             }
         }
@@ -314,10 +319,11 @@ abstract class AbstractJdbcActor (db : Db,
             private val p3setter = getSetter (param3Type)
             private val p4setter = getSetter (param4Type)
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4) : R = {
-                p1setter (1, p1)
-                p2setter (2, p2)
-                p3setter (3, p3)
-                p4setter (4, p4)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
+                p3setter (jdbcPS, 3, p3)
+                p4setter (jdbcPS, 4, p4)
                 runAction ()
             }
         }
@@ -354,11 +360,12 @@ abstract class AbstractJdbcActor (db : Db,
             private val p4setter = getSetter (param4Type)
             private val p5setter = getSetter (param5Type)
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5) : R = {
-                p1setter (1, p1)
-                p2setter (2, p2)
-                p3setter (3, p3)
-                p4setter (4, p4)
-                p5setter (5, p5)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
+                p3setter (jdbcPS, 3, p3)
+                p4setter (jdbcPS, 4, p4)
+                p5setter (jdbcPS, 5, p5)
                 runAction ()
             }
         }
@@ -398,12 +405,13 @@ abstract class AbstractJdbcActor (db : Db,
             private val p5setter = getSetter (param5Type)
             private val p6setter = getSetter (param6Type)
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6) : R = {
-                p1setter (1, p1)
-                p2setter (2, p2)
-                p3setter (3, p3)
-                p4setter (4, p4)
-                p5setter (5, p5)
-                p6setter (6, p6)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
+                p3setter (jdbcPS, 3, p3)
+                p4setter (jdbcPS, 4, p4)
+                p5setter (jdbcPS, 5, p5)
+                p6setter (jdbcPS, 6, p6)
                 runAction ()
             }
         }
@@ -448,13 +456,14 @@ abstract class AbstractJdbcActor (db : Db,
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6,
                                 p7 : T7) : R =
             {
-                p1setter (1, p1)
-                p2setter (2, p2)
-                p3setter (3, p3)
-                p4setter (4, p4)
-                p5setter (5, p5)
-                p6setter (6, p6)
-                p7setter (7, p7)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
+                p3setter (jdbcPS, 3, p3)
+                p4setter (jdbcPS, 4, p4)
+                p5setter (jdbcPS, 5, p5)
+                p6setter (jdbcPS, 6, p6)
+                p7setter (jdbcPS, 7, p7)
                 runAction ()
             }
         }
@@ -502,14 +511,15 @@ abstract class AbstractJdbcActor (db : Db,
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6,
                                 p7 : T7, p8 : T8) : R =
             {
-                p1setter (1, p1)
-                p2setter (2, p2)
-                p3setter (3, p3)
-                p4setter (4, p4)
-                p5setter (5, p5)
-                p6setter (6, p6)
-                p7setter (7, p7)
-                p8setter (8, p8)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
+                p3setter (jdbcPS, 3, p3)
+                p4setter (jdbcPS, 4, p4)
+                p5setter (jdbcPS, 5, p5)
+                p6setter (jdbcPS, 6, p6)
+                p7setter (jdbcPS, 7, p7)
+                p8setter (jdbcPS, 8, p8)
                 runAction ()
             }
         }
@@ -560,15 +570,16 @@ abstract class AbstractJdbcActor (db : Db,
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6,
                                 p7 : T7, p8 : T8, p9 : T9) : R =
             {
-                p1setter (1, p1)
-                p2setter (2, p2)
-                p3setter (3, p3)
-                p4setter (4, p4)
-                p5setter (5, p5)
-                p6setter (6, p6)
-                p7setter (7, p7)
-                p8setter (8, p8)
-                p9setter (9, p9)
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, p1)
+                p2setter (jdbcPS, 2, p2)
+                p3setter (jdbcPS, 3, p3)
+                p4setter (jdbcPS, 4, p4)
+                p5setter (jdbcPS, 5, p5)
+                p6setter (jdbcPS, 6, p6)
+                p7setter (jdbcPS, 7, p7)
+                p8setter (jdbcPS, 8, p8)
+                p9setter (jdbcPS, 9, p9)
                 runAction ()
             }
         }
@@ -595,12 +606,38 @@ abstract class AbstractJdbcActor (db : Db,
          */
         private val actionRunner : Function0 [R] = null
 
-        protected def getSetter [T] (paramType : JdbcType [T]) : Function2 [Int, T, Unit] = {
-            null
-        }
+        /**
+         * Reference to the real prepared statement.
+         */
+        private var jdbcPsOption : Option[JdbcPS] = None
 
+        /**
+         * Execute current action.
+         */
         protected def runAction () : R = {
             actionRunner ()
+        }
+
+        /**
+         * Return JDBC PreparedStatement object associated with this Jacore PreparedStatemnt.
+         * Create a new PreparedStatement if nothing is associated yet.
+         */
+        protected def getJdbcPS () : JdbcPS =
+            jdbcPsOption match {
+                case Some (jdbcPS) => jdbcPS
+                case None =>
+                    associateNewJdbcPS ()
+                    getJdbcPS ()
+            }
+
+        /**
+         * Construct new JdbcPS to be associated with this prepared statement.
+         */
+        private def associateNewJdbcPS () : Unit = {
+            assert (jdbcPsOption.isEmpty)
+
+            val jdbcPS = null
+            jdbcPsOption = Some (jdbcPS)
         }
 
         // ---------------------------------------------------------------------------
@@ -617,5 +654,42 @@ abstract class AbstractJdbcActor (db : Db,
                     + parameterCount + " parameters, but " + foundParameterCount + " found!")
             }
         }
+    }
+}
+
+
+/**
+ * Helper object for AbstractJdbcActor.
+ */
+private[db] object AbstractJdbcActor {
+    /**
+     * Function object to set Array parameter on JdbcPS.
+     */
+    object ArraySetter extends Function3 [JdbcPS, Int, java.sql.Array, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.Array) : Unit =
+            ps.setArray (idx, arg)
+    }
+
+    /**
+     * Function object to set AsciiStream parameter on JdbcPS.
+     */
+    object AsciiStreamSetter extends Function3 [JdbcPS, Int, java.io.InputStream, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.io.InputStream) : Unit =
+            ps.setAsciiStream (idx, arg)
+    }
+
+    /**
+     * Function object to set BigDecimal parameter on JdbcPS.
+     */
+    object BigDecimalSetter extends Function3 [JdbcPS, Int, java.math.BigDecimal, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.math.BigDecimal) : Unit =
+            ps.setBigDecimal (idx, arg)
+    }
+
+    /**
+     * Returns setter for the given param type.
+     */
+    protected def getSetter [T] (paramType : JdbcType [T]) : Function3 [JdbcPS, Int, T, Unit] = {
+        null
     }
 }

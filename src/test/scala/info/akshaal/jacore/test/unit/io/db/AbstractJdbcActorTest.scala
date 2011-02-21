@@ -8,7 +8,6 @@ import java.sql.Connection
 
 import unit.UnitTestHelper._
 import io.db.AbstractJdbcActor
-import utils.io.db.Db
 import io.db.jdbctype._
 import io.db.jdbcaction._
 
@@ -17,10 +16,8 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
     "AbstractJdbcActor" should {
         "must validate prepared statements parameter count" in {
-            val db = mockDb
-
-            class MockedJdbc extends AbstractJdbcActor (db = db,
-                                     lowPriorityActorEnv = TestModule.lowPriorityActorEnv)
+            class MockedJdbc extends AbstractJdbcActor (
+                                lowPriorityActorEnv = TestModule.lowPriorityActorEnv)
             {
                 override protected def getConnection () : Connection = null
             }
@@ -211,11 +208,6 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
             }
         }
     }
-
-    /**
-     * Return mocked db.
-     */
-    def mockDb : Db = null
 }
 
 object AbstractJdbcActorTest {
