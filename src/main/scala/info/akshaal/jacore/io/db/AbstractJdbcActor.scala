@@ -671,7 +671,7 @@ private[db] object AbstractJdbcActor {
     }
 
     /**
-     * Function object to set AsciiStream parameter on JdbcPS.
+     * Function object to set InputStream parameter with ascii data on JdbcPS.
      */
     object AsciiStreamSetter extends Function3 [JdbcPS, Int, java.io.InputStream, Unit] {
         override def apply (ps : JdbcPS, idx : Int, arg : java.io.InputStream) : Unit =
@@ -687,9 +687,264 @@ private[db] object AbstractJdbcActor {
     }
 
     /**
+     * Function object to set InputStream parameter with binary data on JdbcPS.
+     */
+    object BinaryStreamSetter extends Function3 [JdbcPS, Int, java.io.InputStream, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.io.InputStream) : Unit =
+            ps.setBinaryStream (idx, arg)
+    }
+
+    /**
+     * Function object to set Blob parameter on JdbcPS.
+     */
+    object BlobSetter extends Function3 [JdbcPS, Int, java.sql.Blob, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.Blob) : Unit =
+            ps.setBlob (idx, arg)
+    }
+
+    /**
+     * Function object to set InputStream providing data for Blob parameter on JdbcPS.
+     */
+    object BlobStreamSetter extends Function3 [JdbcPS, Int, java.io.InputStream, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.io.InputStream) : Unit =
+            ps.setBlob (idx, arg)
+    }
+
+    /**
+     * Function object to set Boolean parameter on JdbcPS.
+     */
+    object BooleanSetter extends Function3 [JdbcPS, Int, Boolean, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Boolean) : Unit =
+            ps.setBoolean (idx, arg)
+    }
+
+    /**
+     * Function object to set byte parameter on JdbcPS.
+     */
+    object ByteSetter extends Function3 [JdbcPS, Int, Byte, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Byte) : Unit =
+            ps.setByte (idx, arg)
+    }
+
+    /**
+     * Function object to set byte array parameter on JdbcPS.
+     */
+    object BytesSetter extends Function3 [JdbcPS, Int, Array[Byte], Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Array[Byte]) : Unit =
+            ps.setBytes (idx, arg)
+    }
+
+    /**
+     * Function object to set Reader parameter with character data on JdbcPS.
+     */
+    object CharacterStreamSetter extends Function3 [JdbcPS, Int, java.io.Reader, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.io.Reader) : Unit =
+            ps.setCharacterStream (idx, arg)
+    }
+
+    /**
+     * Function object to set Clob parameter on JdbcPS.
+     */
+    object ClobSetter extends Function3 [JdbcPS, Int, java.sql.Clob, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.Clob) : Unit =
+            ps.setClob (idx, arg)
+    }
+
+    /**
+     * Function object to set Reader providing data for Clob parameter on JdbcPS.
+     */
+    object ClobStreamSetter extends Function3 [JdbcPS, Int, java.io.Reader, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.io.Reader) : Unit =
+            ps.setClob (idx, arg)
+    }
+
+    /**
+     * Function object to set Date parameter on JdbcPS.
+     */
+    object SqlDateSetter extends Function3 [JdbcPS, Int, java.sql.Date, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.Date) : Unit =
+            ps.setDate (idx, arg)
+    }
+
+    /**
+     * Function object to set Date parameter on JdbcPS.
+     */
+    object DateSetter extends Function3 [JdbcPS, Int, java.util.Date, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.util.Date) : Unit =
+            ps.setDate (idx, new java.sql.Date (arg.getTime))
+    }
+
+    /**
+     * Function object to set Double parameter on JdbcPS.
+     */
+    object DoubleSetter extends Function3 [JdbcPS, Int, Double, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Double) : Unit =
+            ps.setDouble (idx, arg)
+    }
+
+    /**
+     * Function object to set Float parameter on JdbcPS.
+     */
+    object FloatSetter extends Function3 [JdbcPS, Int, Float, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Float) : Unit =
+            ps.setFloat (idx, arg)
+    }
+
+    /**
+     * Function object to set Int parameter on JdbcPS.
+     */
+    object IntSetter extends Function3 [JdbcPS, Int, Int, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Int) : Unit =
+            ps.setInt (idx, arg)
+    }
+
+    /**
+     * Function object to set Long parameter on JdbcPS.
+     */
+    object LongSetter extends Function3 [JdbcPS, Int, Long, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Long) : Unit =
+            ps.setLong (idx, arg)
+    }
+
+    /**
+     * Function object to set Reader parameter with ncharacter data on JdbcPS.
+     */
+    object NCharacterStreamSetter extends Function3 [JdbcPS, Int, java.io.Reader, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.io.Reader) : Unit =
+            ps.setNCharacterStream (idx, arg)
+    }
+
+    /**
+     * Function object to set NClob parameter on JdbcPS.
+     */
+    object NClobSetter extends Function3 [JdbcPS, Int, java.sql.NClob, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.NClob) : Unit =
+            ps.setNClob (idx, arg)
+    }
+
+    /**
+     * Function object to set Reader providing data for NClob parameter on JdbcPS.
+     */
+    object NClobStreamSetter extends Function3 [JdbcPS, Int, java.io.Reader, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.io.Reader) : Unit =
+            ps.setNClob (idx, arg)
+    }
+
+    /**
+     * Function object to set NString parameter on JdbcPS.
+     */
+    object NStringSetter extends Function3 [JdbcPS, Int, String, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : String) : Unit =
+            ps.setNString (idx, arg)
+    }
+
+    /**
+     * Function object to set Object parameter on JdbcPS.
+     */
+    object ObjectSetter extends Function3 [JdbcPS, Int, Object, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Object) : Unit =
+            ps.setObject (idx, arg)
+    }
+
+    /**
+     * Function object to set Ref parameter on JdbcPS.
+     */
+    object RefSetter extends Function3 [JdbcPS, Int, java.sql.Ref, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.Ref) : Unit =
+            ps.setRef (idx, arg)
+    }
+
+    /**
+     * Function object to set RowId parameter on JdbcPS.
+     */
+    object RowIdSetter extends Function3 [JdbcPS, Int, java.sql.RowId, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.RowId) : Unit =
+            ps.setRowId (idx, arg)
+    }
+
+    /**
+     * Function object to set Short parameter on JdbcPS.
+     */
+    object ShortSetter extends Function3 [JdbcPS, Int, Short, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : Short) : Unit =
+            ps.setShort (idx, arg)
+    }
+
+    /**
+     * Function object to set SQLXML parameter on JdbcPS.
+     */
+    object SqlXmlSetter extends Function3 [JdbcPS, Int, java.sql.SQLXML, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.SQLXML) : Unit =
+            ps.setSQLXML (idx, arg)
+    }
+
+    /**
+     * Function object to set String parameter on JdbcPS.
+     */
+    object StringSetter extends Function3 [JdbcPS, Int, String, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : String) : Unit =
+            ps.setString (idx, arg)
+    }
+
+    /**
+     * Function object to set Time parameter on JdbcPS.
+     */
+    object TimeSetter extends Function3 [JdbcPS, Int, java.sql.Time, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.Time) : Unit =
+            ps.setTime (idx, arg)
+    }
+
+    /**
+     * Function object to set Timestamp parameter on JdbcPS.
+     */
+    object TimestampSetter extends Function3 [JdbcPS, Int, java.sql.Timestamp, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.sql.Timestamp) : Unit =
+            ps.setTimestamp (idx, arg)
+    }
+
+    /**
+     * Function object to set Url parameter on JdbcPS.
+     */
+    object UrlSetter extends Function3 [JdbcPS, Int, java.net.URL, Unit] {
+        override def apply (ps : JdbcPS, idx : Int, arg : java.net.URL) : Unit =
+            ps.setURL (idx, arg)
+    }
+
+    /**
      * Returns setter for the given param type.
      */
-    protected def getSetter [T] (paramType : JdbcType [T]) : Function3 [JdbcPS, Int, T, Unit] = {
-        null
-    }
+    protected def getSetter [T] (paramType : JdbcType [T]) : Function3 [JdbcPS, Int, T, Unit] =
+        paramType match {
+            case JdbcArray                  => ArraySetter
+            case JdbcAsciiStream            => AsciiStreamSetter
+            case JdbcBigDecimal             => BigDecimalSetter
+            case JdbcBinaryStream           => BinaryStreamSetter
+            case JdbcBlob                   => BlobSetter
+            case JdbcBlobStream             => BlobStreamSetter
+            case JdbcBoolean                => BooleanSetter
+            case JdbcByte                   => ByteSetter
+            case JdbcBytes                  => BytesSetter
+            case JdbcCharacterStream        => CharacterStreamSetter
+            case JdbcClob                   => ClobSetter
+            case JdbcClobStream             => ClobStreamSetter
+            case JdbcDate                   => DateSetter
+            case JdbcDouble                 => DoubleSetter
+            case JdbcFloat                  => FloatSetter
+            case JdbcInt                    => IntSetter
+            case JdbcLong                   => LongSetter
+            case JdbcNCharacterStream       => NCharacterStreamSetter
+            case JdbcNClob                  => NClobSetter
+            case JdbcNClobStream            => NClobStreamSetter
+            case JdbcNString                => NStringSetter
+            case JdbcObject                 => ObjectSetter
+            case JdbcRef                    => RefSetter
+            case JdbcRowId                  => RowIdSetter
+            case JdbcShort                  => ShortSetter
+            case JdbcSqlDate                => SqlDateSetter
+            case JdbcSqlXml                 => SqlXmlSetter
+            case JdbcString                 => StringSetter
+            case JdbcTime                   => TimeSetter
+            case JdbcTimestamp              => TimestampSetter
+            case JdbcUrl                    => UrlSetter
+        }
 }
