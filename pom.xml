@@ -11,13 +11,14 @@
     <properties>
         <custom.build.directory>${basedir}/target</custom.build.directory>
         <project-build-directory-with-markers>||||${project.build.directory}||||</project-build-directory-with-markers>
+        <jacore.java.version>1.7</jacore.java.version>
 
         <!-- Versions -->
         <scala.version>2.8.1</scala.version>
         <jetlang.version>0.2.0</jetlang.version>
         <junit.version>4.8.2</junit.version>
         <slf4j.version>1.6.1</slf4j.version>
-        <logback.version>0.9.27</logback.version>
+        <logback.version>0.9.28</logback.version>
         <guice.version>2.0</guice.version>
         <aopalliance.version>1.0</aopalliance.version>
         <cglib.version>2.2</cglib.version>
@@ -35,6 +36,7 @@
         <maven-resources-plugin.version>2.5</maven-resources-plugin.version>
         <maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.8.1</maven-surefire-plugin.version>
+        <maven-enforcer-plugin.version>1.0</maven-enforcer-plugin.version>
     </properties>
 
     <scm>
@@ -202,6 +204,31 @@
         </testResources>
 
         <plugins>
+            <!-- Enforce -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-enforcer-plugin.version}</version>
+
+                <executions>
+                    <execution>
+                        <id>enforce</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <message>!!! !!! !!! Please use a JDK version which harmonizes with build target: JDK ${jacore.java.version} !!! !!! !!!</message>
+                                    <version>[${jacore.java.version}.0,${jacore.java.version}.9]</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Release -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -237,8 +264,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${jacore.java.version}</source>
+                    <target>${jacore.java.version}</target>
                 </configuration>
             </plugin>
 
