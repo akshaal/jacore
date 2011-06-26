@@ -609,7 +609,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         /**
          * Reference to the real prepared statement.
          */
-        private var jdbcPsOption : Option[JdbcPS] = None
+        private var jdbcPsOption : Option [JdbcPS] = None
 
         /**
          * Execute current action.

@@ -1,11 +1,11 @@
 #!/bin/sh
 
-bdir=`mvn help:evaluate -o -Dexpression=project-build-directory-with-markers | rgrep '^||||.*||||$' | sed -r 's/^\|\|\|\|(.*)\|\|\|\|$/\1/'`
+bdir=`mvn help:evaluate -Dexpression=project-build-directory-with-markers | rgrep '^||||.*||||$' | sed -r 's/^\|\|\|\|(.*)\|\|\|\|$/\1/'`
 
 rm -rf ${bdir}/jacore
 rm -f ${bdir}/test-log4j.log
 rm -rf ${bdir}/cglib
 
-j7 mvn -o test "$@" || exit
+j7 mvn test "$@" || exit
 
 dot -T png ${bdir}/jacore/test-module.dot > ${bdir}/jacore/test-module.png
