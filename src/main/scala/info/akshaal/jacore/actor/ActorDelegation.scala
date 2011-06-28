@@ -157,7 +157,7 @@ object Operation {
     }
 
     /**
-     * Encapsulate asyncronous operation with some result of complex type.
+     * Encapsulate asynhcronous operation with some result of complex type.
      *
      * @tparam A type of result
      */

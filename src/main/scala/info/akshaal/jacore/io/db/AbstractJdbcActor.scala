@@ -23,7 +23,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
     import AbstractJdbcActor._
 
     /**
-     * Get connection to use for running statements.
+     * Get connection to use for running statements. This method is abstract in AbstractJdbcActor.
      *
      * @return connection
      */
@@ -200,7 +200,10 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             protected override val parameterCount = 0
             protected override val sqlAction = action
         } with PreparedStatement0 [R] {
-            override def apply () : R = runAction ()
+            override def apply () : R = {
+                val jdbcPS = getJdbcPS ()
+                runAction (jdbcPS)
+            }
         }
 
 
@@ -221,9 +224,11 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             protected override val sqlAction = action
         } with PreparedStatement1 [T, R] {
             private val p1setter = getSetter (paramType)
+
             override def apply (param : T) : R = {
-                p1setter (getJdbcPS(), 1, param)
-                runAction ()
+                val jdbcPS = getJdbcPS ()
+                p1setter (jdbcPS, 1, param)
+                runAction (jdbcPS)
             }
         }
 
@@ -248,11 +253,12 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         } with PreparedStatement2 [T1, T2, R] {
             private val p1setter = getSetter (param1Type)
             private val p2setter = getSetter (param2Type)
+
             override def apply (p1 : T1, p2 : T2) : R = {
                 val jdbcPS = getJdbcPS ()
                 p1setter (jdbcPS, 1, p1)
                 p2setter (jdbcPS, 2, p2)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -281,12 +287,13 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val p1setter = getSetter (param1Type)
             private val p2setter = getSetter (param2Type)
             private val p3setter = getSetter (param3Type)
+
             override def apply (p1 : T1, p2 : T2, p3 : T3) : R = {
                 val jdbcPS = getJdbcPS ()
                 p1setter (jdbcPS, 1, p1)
                 p2setter (jdbcPS, 2, p2)
                 p3setter (jdbcPS, 3, p3)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -318,13 +325,14 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val p2setter = getSetter (param2Type)
             private val p3setter = getSetter (param3Type)
             private val p4setter = getSetter (param4Type)
+
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4) : R = {
                 val jdbcPS = getJdbcPS ()
                 p1setter (jdbcPS, 1, p1)
                 p2setter (jdbcPS, 2, p2)
                 p3setter (jdbcPS, 3, p3)
                 p4setter (jdbcPS, 4, p4)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -359,6 +367,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val p3setter = getSetter (param3Type)
             private val p4setter = getSetter (param4Type)
             private val p5setter = getSetter (param5Type)
+
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5) : R = {
                 val jdbcPS = getJdbcPS ()
                 p1setter (jdbcPS, 1, p1)
@@ -366,7 +375,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                 p3setter (jdbcPS, 3, p3)
                 p4setter (jdbcPS, 4, p4)
                 p5setter (jdbcPS, 5, p5)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -404,6 +413,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val p4setter = getSetter (param4Type)
             private val p5setter = getSetter (param5Type)
             private val p6setter = getSetter (param6Type)
+
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6) : R = {
                 val jdbcPS = getJdbcPS ()
                 p1setter (jdbcPS, 1, p1)
@@ -412,7 +422,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                 p4setter (jdbcPS, 4, p4)
                 p5setter (jdbcPS, 5, p5)
                 p6setter (jdbcPS, 6, p6)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -453,6 +463,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val p5setter = getSetter (param5Type)
             private val p6setter = getSetter (param6Type)
             private val p7setter = getSetter (param7Type)
+
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6,
                                 p7 : T7) : R =
             {
@@ -464,7 +475,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                 p5setter (jdbcPS, 5, p5)
                 p6setter (jdbcPS, 6, p6)
                 p7setter (jdbcPS, 7, p7)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -508,6 +519,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val p6setter = getSetter (param6Type)
             private val p7setter = getSetter (param7Type)
             private val p8setter = getSetter (param8Type)
+
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6,
                                 p7 : T7, p8 : T8) : R =
             {
@@ -520,7 +532,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                 p6setter (jdbcPS, 6, p6)
                 p7setter (jdbcPS, 7, p7)
                 p8setter (jdbcPS, 8, p8)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -567,6 +579,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val p7setter = getSetter (param7Type)
             private val p8setter = getSetter (param8Type)
             private val p9setter = getSetter (param9Type)
+
             override def apply (p1 : T1, p2 : T2, p3 : T3, p4 : T4, p5 : T5, p6 : T6,
                                 p7 : T7, p8 : T8, p9 : T9) : R =
             {
@@ -580,7 +593,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                 p7setter (jdbcPS, 7, p7)
                 p8setter (jdbcPS, 8, p8)
                 p9setter (jdbcPS, 9, p9)
-                runAction ()
+                runAction (jdbcPS)
             }
         }
 
@@ -592,41 +605,60 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      */
     trait PreparedStatement [+R] {
         /**
-         * Number of parameters that this prepared statement must prepare.
+         * Number of parameters that this prepared statement must prepare. This value
+         * should be defined in the implementation of the prepared statement using early
+         * initialization for it is used in the trait for validation during trait initialization.
+         *
+         * Because traits do not support parameters we use this way to customize trait behavior.
          */
         protected val parameterCount : Int
 
         /**
-         * Action definition.
+         * Action definition. Should be set using early initialization. Because
+         * traits do not support parameters we use this way to customize trait behavior.
          */
         protected val sqlAction : JdbcAction [R]
 
         /**
-         * Function to be used to axecute action.
+         * Function to be used to axecute action. Action runner receives real prepared
+         * statement and runs jdbc action that this action runner is responsible for.
          */
-        private val actionRunner : Function0 [R] = null
+        private val actionRunner : ActionRunner [R] = null // TODO !!!!!!!!!!!!!!!!!
+        // TODO !!!!!!!!!!!!!! ^^^^^^ Action runner depends on the way we run it
+        // it should be possible to write custom actions runner proviers
+        // because in one case we have to process one message in one transaction
+        // in some cases we need to use addBatch on statement... or possible
+        // consider when preparing statement?
 
         /**
-         * Reference to the real prepared statement.
+         * Reference to the JDBC's prepared statement.
          */
         private var jdbcPsOption : Option [JdbcPS] = None
 
         /**
-         * Execute current action.
+         * Execute action that is associated with this prepared statement.
+         * This method is supposed to be called at the and of 'apply' method implementation
+         * when all parameters are set.
+         *
+         * @param jdbcPS JDBC PreparedStatement that was previouslyy (at the beginning of
+         *               the 'apply' method) obtained using getJdbcPS method.
          */
-        protected def runAction () : R = {
-            actionRunner ()
-        }
+        @inline
+        protected final def runAction (jdbcPS : JdbcPS) : R = actionRunner (jdbcPS)
 
         /**
          * Return JDBC PreparedStatement object associated with this Jacore PreparedStatemnt.
          * Create a new PreparedStatement if nothing is associated yet.
          */
-        protected def getJdbcPS () : JdbcPS =
+        protected final def getJdbcPS () : JdbcPS =
             jdbcPsOption match {
                 case Some (jdbcPS) => jdbcPS
                 case None =>
+                    // jdbcPs is not defined, so we have to define it
                     associateNewJdbcPS ()
+
+                    // Recursive call to this function, we are sure that this call
+                    // will return correct value
                     getJdbcPS ()
             }
 
@@ -636,7 +668,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         private def associateNewJdbcPS () : Unit = {
             assert (jdbcPsOption.isEmpty)
 
-            val jdbcPS = null
+            val jdbcPS = null // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
             jdbcPsOption = Some (jdbcPS)
         }
 
@@ -662,6 +694,14 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
  * Helper object for AbstractJdbcActor.
  */
 private[db] object AbstractJdbcActor {
+    // ActionRunner is a function that receives JDBC PreparedStatement and executes
+    // some action upon it.
+    trait ActionRunner [+R] extends Function1 [JdbcPS, R]
+
+    // ===================================================================================
+    // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    // ===================================================================================
+
     /**
      * Function object to set Array parameter on JdbcPS.
      */
