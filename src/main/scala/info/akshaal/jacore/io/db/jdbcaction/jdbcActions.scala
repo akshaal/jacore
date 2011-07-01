@@ -7,10 +7,13 @@ package jdbcaction
 
 /**
  * A type that JDBC can possibly handle.
- *
- * @param T type of action result
  */
-sealed abstract class JdbcAction [+T] (val statement : String, val validate : Boolean)
+sealed abstract class JdbcAction (val statement : String, val validate : Boolean) {
+    /**
+     * Type of result of this action.
+     */
+    type Result
+}
 
 /**
  * Some arbitrary JDBC operation.
@@ -20,9 +23,10 @@ sealed abstract class JdbcAction [+T] (val statement : String, val validate : Bo
  */
 final case class JdbcCommand (override val statement : String,
                               override val validate : Boolean = true)
-                    extends JdbcAction [Boolean] (
-                                statement = statement,
-                                validate = validate)
+                    extends JdbcAction (statement = statement, validate = validate)
+{
+    type Result = Boolean
+}
 
 /**
  * JDBC query.
@@ -32,9 +36,10 @@ final case class JdbcCommand (override val statement : String,
  */
 final case class JdbcQuery (override val statement : String,
                             override val validate : Boolean = true)
-                    extends JdbcAction [java.sql.ResultSet] (
-                                statement = statement,
-                                validate = validate)
+                    extends JdbcAction (statement = statement, validate = validate)
+{
+    type Result = java.sql.ResultSet
+}
 
 /**
  * JDBC update.
@@ -44,6 +49,7 @@ final case class JdbcQuery (override val statement : String,
  */
 final case class JdbcUpdate (override val statement : String,
                              override val validate : Boolean = true)
-                    extends JdbcAction [Int] (
-                                statement = statement,
-                                validate = validate)
+                    extends JdbcAction (statement = statement, validate = validate)
+{
+    type Result = Int
+}

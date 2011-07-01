@@ -23,6 +23,11 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
     class MyObject extends JavaObject
     class MyDecimal extends BigDecimal (0)
 
+    // Abbreviations
+    type JC = JdbcCommand
+    type JQ = JdbcQuery
+    type JU = JdbcUpdate
+
     // JdbcActor without connection (null)
     class MockedJdbc extends AbstractJdbcActor (
         lowPriorityActorEnv = TestModule.lowPriorityActorEnv)
@@ -34,311 +39,313 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
         // =================================================================================
         // =================================================================================
         // =================================================================================
-        "must have correct variance for PreparedStatements" in {
+        "must have correct variance for PreparedActions" in {
             // - - -- - -- --- - - - 0 arguments
 
             new MockedJdbc {
-                val command1 : PreparedStatement0 [Boolean] = prepare (JdbcCommand ("..."))
-                val command2 : PreparedStatement0 [AnyVal] = command1
+                val command1 : PreparedAction0 [JC] = prepare (JdbcCommand ("..."))
+                val command2 : PreparedAction0 [JdbcAction] = command1
 
-                val query1 : PreparedStatement0 [ResultSet] = prepare (JdbcQuery ("..."))
-                val query2 : PreparedStatement0 [Object] = query1
+                val query1 : PreparedAction0 [JQ] = prepare (JdbcQuery ("..."))
+                val query2 : PreparedAction0 [JdbcAction] = query1
 
-                val update1 : PreparedStatement0 [Int] = prepare (JdbcUpdate ("..."))
-                val update2 : PreparedStatement0 [AnyVal] = update1
+                val update1 : PreparedAction0 [JU] = prepare (JdbcUpdate ("..."))
+                val update2 : PreparedAction0 [JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 1 argument
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement1 [Date, Boolean] =
-                            prepare (JdbcCommand ("?"), JdbcDate)
-                
-                val command2 : PreparedStatement1 [MyDate, AnyVal] = command1
+                val command1 : PreparedAction1 [Date, JC] = prepare (JdbcCommand ("?"), JdbcDate)
+                val command2 : PreparedAction1 [MyDate, JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement1 [JavaObject, ResultSet] =
+                val query1 : PreparedAction1 [JavaObject, JQ] =
                             prepare (JdbcQuery ("?"), JdbcObject)
 
-                val query2 : PreparedStatement1 [MyObject, Object] = query1
+                val query2 : PreparedAction1 [MyObject, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement1 [BigDecimal, Int] =
+                val update1 : PreparedAction1 [BigDecimal, JU] =
                             prepare (JdbcUpdate ("?"), JdbcBigDecimal)
                         
-                val update2 : PreparedStatement1 [MyDecimal, AnyVal] = update1
+                val update2 : PreparedAction1 [MyDecimal, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 2 arguments
             
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement2 [Date, BigDecimal, Boolean] =
+                val command1 : PreparedAction2 [Date, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ?"), JdbcDate, JdbcBigDecimal)
 
-                val command2 : PreparedStatement2 [MyDate, MyDecimal, Any] = command1
+                val command2 : PreparedAction2 [MyDate, MyDecimal, JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement2 [JavaObject, Date, ResultSet] =
+                val query1 : PreparedAction2 [JavaObject, Date, JQ] =
                             prepare (JdbcQuery ("? ?"), JdbcObject, JdbcDate)
 
-                val query2 : PreparedStatement2 [MyObject, MyDate, Object] = query1
+                val query2 : PreparedAction2 [MyObject, MyDate, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement2 [Date, BigDecimal, Int] =
+                val update1 : PreparedAction2 [Date, BigDecimal, JU] =
                             prepare (JdbcUpdate ("? ?"), JdbcDate, JdbcBigDecimal)
 
-                val update2 : PreparedStatement2 [MyDate, MyDecimal, AnyVal] = update1
+                val update2 : PreparedAction2 [MyDate, MyDecimal, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 3 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement3 [Date, JavaObject, BigDecimal, Boolean] =
+                val command1 : PreparedAction3 [Date, JavaObject, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ? ?"), JdbcDate, JdbcObject, JdbcBigDecimal)
 
-                val command2 : PreparedStatement3 [MyDate, MyObject, MyDecimal, Any] = command1
+                val command2 : PreparedAction3 [MyDate, MyObject, MyDecimal, JdbcAction] =
+                            command1
 
                 // query
-                val query1 : PreparedStatement3 [JavaObject, JavaObject, Date, ResultSet] =
+                val query1 : PreparedAction3 [JavaObject, JavaObject, Date, JQ] =
                             prepare (JdbcQuery ("? ? ?"), JdbcObject, JdbcObject, JdbcDate)
 
-                val query2 : PreparedStatement3 [MyObject, MyObject, MyDate, Object] = query1
+                val query2 : PreparedAction3 [MyObject, MyObject, MyDate, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement3 [Date, BigDecimal, Date, Int] =
+                val update1 : PreparedAction3 [Date, BigDecimal, Date, JU] =
                             prepare (JdbcUpdate ("? ? ?"), JdbcDate, JdbcBigDecimal, JdbcDate)
 
-                val update2 : PreparedStatement3 [MyDate, MyDecimal, MyDate, AnyVal] = update1
+                val update2 : PreparedAction3 [MyDate, MyDecimal, MyDate, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 3 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement3 [Date, JavaObject, BigDecimal, Boolean] =
+                val command1 : PreparedAction3 [Date, JavaObject, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ? ?"), JdbcDate, JdbcObject, JdbcBigDecimal)
 
-                val command2 : PreparedStatement3 [MyDate, MyObject, MyDecimal, Any] = command1
+                val command2 : PreparedAction3 [MyDate, MyObject, MyDecimal, JdbcAction] =
+                            command1
 
                 // query
-                val query1 : PreparedStatement3 [JavaObject, JavaObject, Date, ResultSet] =
+                val query1 : PreparedAction3 [JavaObject, JavaObject, Date, JQ] =
                             prepare (JdbcQuery ("? ? ?"), JdbcObject, JdbcObject, JdbcDate)
 
-                val query2 : PreparedStatement3 [MyObject, MyObject, MyDate, Object] = query1
+                val query2 : PreparedAction3 [MyObject, MyObject, MyDate, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement3 [Date, BigDecimal, Date, Int] =
+                val update1 : PreparedAction3 [Date, BigDecimal, Date, JU] =
                             prepare (JdbcUpdate ("? ? ?"), JdbcDate, JdbcBigDecimal, JdbcDate)
 
-                val update2 : PreparedStatement3 [MyDate, MyDecimal, MyDate, AnyVal] = update1
+                val update2 : PreparedAction3 [MyDate, MyDecimal, MyDate, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 4 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement4 [Date, Date, JavaObject, BigDecimal, Boolean] =
+                val command1 : PreparedAction4 [Date, Date, JavaObject, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ? ? ?"),
                                      JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal)
 
-                val command2 : PreparedStatement4 [MyDate, MyDate, MyObject,
-                                                   MyDecimal, Any] = command1
+                val command2 : PreparedAction4 [MyDate, MyDate, MyObject,
+                                                MyDecimal, JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement4 [Date, JavaObject, JavaObject, Date, ResultSet] =
+                val query1 : PreparedAction4 [Date, JavaObject, JavaObject, Date, JQ] =
                             prepare (JdbcQuery ("? ? ? ?"),
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate)
 
-                val query2 : PreparedStatement4 [MyDate, MyObject, MyObject,
-                                                 MyDate, Object] = query1
+                val query2 : PreparedAction4 [MyDate, MyObject, MyObject,
+                                              MyDate, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement4 [JavaObject, Date, BigDecimal, Date, Int] =
+                val update1 : PreparedAction4 [JavaObject, Date, BigDecimal, Date, JU] =
                             prepare (JdbcUpdate ("? ? ? ?"),
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate)
 
-                val update2 : PreparedStatement4 [MyObject, MyDate, MyDecimal,
-                                                  MyDate, AnyVal] = update1
+                val update2 : PreparedAction4 [MyObject, MyDate, MyDecimal,
+                                               MyDate, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 5 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement5 [Date, Date, JavaObject,
-                                                   BigDecimal, Date, Boolean] =
+                val command1 : PreparedAction5 [Date, Date, JavaObject,
+                                                BigDecimal, Date, JC] =
                             prepare (JdbcCommand ("? ? ? ? ?"),
                                      JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal, JdbcDate)
 
-                val command2 : PreparedStatement5 [MyDate, MyDate, MyObject,
-                                                   MyDecimal, MyDate, Any] = command1
+                val command2 : PreparedAction5 [MyDate, MyDate, MyObject,
+                                                MyDecimal, MyDate, JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement5 [Date, JavaObject, JavaObject, Date, JavaObject,
-                                                 ResultSet] =
+                val query1 : PreparedAction5 [Date, JavaObject, JavaObject, Date, JavaObject,
+                                              JQ] =
                             prepare (JdbcQuery ("? ? ? ? ?"),
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate, JdbcObject)
 
-                val query2 : PreparedStatement5 [MyDate, MyObject, MyObject,
-                                                 MyDate, MyObject, Object] = query1
+                val query2 : PreparedAction5 [MyDate, MyObject, MyObject,
+                                              MyDate, MyObject, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement5 [JavaObject, Date, BigDecimal, Date, BigDecimal,
-                                                  Int] =
+                val update1 : PreparedAction5 [JavaObject, Date, BigDecimal, Date, BigDecimal,
+                                               JU] =
                             prepare (JdbcUpdate ("? ? ? ? ?"),
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate, JdbcBigDecimal)
 
-                val update2 : PreparedStatement5 [MyObject, MyDate, MyDecimal,
-                                                  MyDate, MyDecimal, AnyVal] = update1
+                val update2 : PreparedAction5 [MyObject, MyDate, MyDecimal,
+                                               MyDate, MyDecimal, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 6 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement6 [Date, Date, JavaObject,
-                                                   BigDecimal, Date, BigDecimal, Boolean] =
+                val command1 : PreparedAction6 [Date, Date, JavaObject,
+                                                BigDecimal, Date, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ? ? ? ? ?"),
                                      JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal, JdbcDate,
                                      JdbcBigDecimal)
 
-                val command2 : PreparedStatement6 [MyDate, MyDate, MyObject,
-                                                   MyDecimal, MyDate, MyDecimal, Any] = command1
+                val command2 : PreparedAction6 [MyDate, MyDate, MyObject, MyDecimal, MyDate,
+                                                MyDecimal, JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement6 [Date, JavaObject, JavaObject, Date, JavaObject,
-                                                 Date, ResultSet] =
+                val query1 : PreparedAction6 [Date, JavaObject, JavaObject, Date, JavaObject,
+                                              Date, JQ] =
                             prepare (JdbcQuery ("? ? ? ? ? ?"),
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate, JdbcObject,
                                      JdbcDate)
 
-                val query2 : PreparedStatement6 [MyDate, MyObject, MyObject,
-                                                 MyDate, MyObject, MyDate, Object] = query1
+                val query2 : PreparedAction6 [MyDate, MyObject, MyObject,
+                                              MyDate, MyObject, MyDate, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement6 [JavaObject, Date, BigDecimal, Date, BigDecimal,
-                                                  Date, Int] =
+                val update1 : PreparedAction6 [JavaObject, Date, BigDecimal, Date, BigDecimal,
+                                               Date, JU] =
                             prepare (JdbcUpdate ("? ? ? ? ? ?"),
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate,
                                      JdbcBigDecimal, JdbcDate)
 
-                val update2 : PreparedStatement6 [MyObject, MyDate, MyDecimal,
-                                                  MyDate, MyDecimal, MyDate, AnyVal] = update1
+                val update2 : PreparedAction6 [MyObject, MyDate, MyDecimal,
+                                               MyDate, MyDecimal, MyDate, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 7 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement7 [JavaObject, Date, Date, JavaObject,
-                                                   BigDecimal, Date, BigDecimal, Boolean] =
+                val command1 : PreparedAction7 [JavaObject, Date, Date, JavaObject,
+                                                BigDecimal, Date, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ? ?  ? ? ?  ?"),
                                      JdbcObject, JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal,
                                      JdbcDate, JdbcBigDecimal)
 
-                val command2 : PreparedStatement7 [MyObject, MyDate, MyDate, MyObject,
-                                                   MyDecimal, MyDate, MyDecimal, Any] = command1
+                val command2 : PreparedAction7 [MyObject, MyDate, MyDate, MyObject,
+                                                MyDecimal, MyDate, MyDecimal,
+                                                JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement7 [Date, JavaObject, JavaObject, Date, JavaObject,
-                                                 Date, JavaObject, ResultSet] =
+                val query1 : PreparedAction7 [Date, JavaObject, JavaObject, Date, JavaObject,
+                                              Date, JavaObject, JQ] =
                             prepare (JdbcQuery ("? ? ?  ? ? ?  ?"),
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate, JdbcObject,
                                      JdbcDate, JdbcObject)
 
-                val query2 : PreparedStatement7 [MyDate, MyObject, MyObject,
-                                                 MyDate, MyObject, MyDate,
-                                                 MyObject, Object] = query1
+                val query2 : PreparedAction7 [MyDate, MyObject, MyObject,
+                                              MyDate, MyObject, MyDate,
+                                              MyObject, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement7 [JavaObject, Date, BigDecimal, Date, BigDecimal,
-                                                  Date, JavaObject, Int] =
+                val update1 : PreparedAction7 [JavaObject, Date, BigDecimal, Date, BigDecimal,
+                                               Date, JavaObject, JU] =
                             prepare (JdbcUpdate ("? ? ?  ? ? ?  ?"),
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate,
                                      JdbcBigDecimal, JdbcDate, JdbcObject)
 
-                val update2 : PreparedStatement7 [MyObject, MyDate, MyDecimal,
-                                                  MyDate, MyDecimal, MyDate,
-                                                  MyObject, AnyVal] = update1
+                val update2 : PreparedAction7 [MyObject, MyDate, MyDecimal,
+                                               MyDate, MyDecimal, MyDate,
+                                               MyObject, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 8 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement8 [JavaObject, Date, Date, JavaObject,
-                                                   BigDecimal, Date, BigDecimal,
-                                                   JavaObject, Boolean] =
+                val command1 : PreparedAction8 [JavaObject, Date, Date, JavaObject,
+                                                BigDecimal, Date, BigDecimal,
+                                                JavaObject, JC] =
                             prepare (JdbcCommand ("? ? ?  ? ? ?  ? ?"),
                                      JdbcObject, JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal,
                                      JdbcDate, JdbcBigDecimal, JdbcObject)
 
-                val command2 : PreparedStatement8 [MyObject, MyDate, MyDate, MyObject,
+                val command2 : PreparedAction8 [MyObject, MyDate, MyDate, MyObject,
                                                    MyDecimal, MyDate, MyDecimal,
-                                                   MyObject, Any] = command1
+                                                   MyObject, JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement8 [Date, JavaObject, JavaObject, Date, JavaObject,
-                                                 Date, JavaObject, BigDecimal, ResultSet] =
+                val query1 : PreparedAction8 [Date, JavaObject, JavaObject, Date, JavaObject,
+                                              Date, JavaObject, BigDecimal, JQ] =
                             prepare (JdbcQuery ("? ? ?  ? ? ?  ? ?"),
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate, JdbcObject,
                                      JdbcDate, JdbcObject, JdbcBigDecimal)
 
-                val query2 : PreparedStatement8 [MyDate, MyObject, MyObject,
+                val query2 : PreparedAction8 [MyDate, MyObject, MyObject,
                                                  MyDate, MyObject, MyDate,
-                                                 MyObject, MyDecimal, Object] = query1
+                                                 MyObject, MyDecimal, JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement8 [JavaObject, Date, BigDecimal, Date, BigDecimal,
-                                                  Date, JavaObject, Date, Int] =
+                val update1 : PreparedAction8 [JavaObject, Date, BigDecimal, Date, BigDecimal,
+                                                  Date, JavaObject, Date, JU] =
                             prepare (JdbcUpdate ("? ? ?  ? ? ?  ? ?"),
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate,
                                      JdbcBigDecimal, JdbcDate, JdbcObject, JdbcDate)
 
-                val update2 : PreparedStatement8 [MyObject, MyDate, MyDecimal,
-                                                  MyDate, MyDecimal, MyDate,
-                                                  MyObject, MyDate, AnyVal] = update1
+                val update2 : PreparedAction8 [MyObject, MyDate, MyDecimal,
+                                               MyDate, MyDecimal, MyDate,
+                                               MyObject, MyDate, JdbcAction] = update1
             }
 
             // - - -- - -- --- - - - 9 arguments
 
             new MockedJdbc {
                 // command
-                val command1 : PreparedStatement9 [JavaObject, Date, Date, JavaObject,
-                                                   BigDecimal, Date, BigDecimal,
-                                                   JavaObject, Date, Boolean] =
+                val command1 : PreparedAction9 [JavaObject, Date, Date, JavaObject,
+                                                BigDecimal, Date, BigDecimal,
+                                                JavaObject, Date, JC] =
                             prepare (JdbcCommand ("? ? ?  ? ? ?  ? ? ?"),
                                      JdbcObject, JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal,
                                      JdbcDate, JdbcBigDecimal, JdbcObject, JdbcDate)
 
-                val command2 : PreparedStatement9 [MyObject, MyDate, MyDate, MyObject,
-                                                   MyDecimal, MyDate, MyDecimal,
-                                                   MyObject, MyDate, Any] = command1
+                val command2 : PreparedAction9 [MyObject, MyDate, MyDate, MyObject,
+                                                MyDecimal, MyDate, MyDecimal,
+                                                MyObject, MyDate, JdbcAction] = command1
 
                 // query
-                val query1 : PreparedStatement9 [Date, JavaObject, JavaObject, Date, JavaObject,
-                                                 Date, JavaObject, BigDecimal, Date, ResultSet] =
+                val query1 : PreparedAction9 [Date, JavaObject, JavaObject, Date, JavaObject,
+                                              Date, JavaObject, BigDecimal, Date, JQ] =
                             prepare (JdbcQuery ("? ? ?  ? ? ?  ? ? ?"),
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate, JdbcObject,
                                      JdbcDate, JdbcObject, JdbcBigDecimal, JdbcDate)
 
-                val query2 : PreparedStatement9 [MyDate, MyObject, MyObject,
-                                                 MyDate, MyObject, MyDate,
-                                                 MyObject, MyDecimal, MyDate, Object] = query1
+                val query2 : PreparedAction9 [MyDate, MyObject, MyObject,
+                                              MyDate, MyObject, MyDate,
+                                              MyObject, MyDecimal, MyDate,
+                                              JdbcAction] = query1
 
                 // update
-                val update1 : PreparedStatement9 [JavaObject, Date, BigDecimal, Date, BigDecimal,
-                                                  Date, JavaObject, Date, JavaObject, Int] =
+                val update1 : PreparedAction9 [JavaObject, Date, BigDecimal, Date, BigDecimal,
+                                               Date, JavaObject, Date, JavaObject, JU] =
                             prepare (JdbcUpdate ("? ? ?  ? ? ?  ? ? ?"),
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate,
                                      JdbcBigDecimal, JdbcDate, JdbcObject, JdbcDate, JdbcObject)
 
-                val update2 : PreparedStatement9 [MyObject, MyDate, MyDecimal,
-                                                  MyDate, MyDecimal, MyDate,
-                                                  MyObject, MyDate, MyObject, AnyVal] = update1
+                val update2 : PreparedAction9 [MyObject, MyDate, MyDecimal,
+                                               MyDate, MyDecimal, MyDate,
+                                               MyObject, MyDate, MyObject, JdbcAction] = update1
             }
 
             // This test is just compilation-time test. So we have to give something
@@ -349,7 +356,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
         // =================================================================================
         // =================================================================================
         // =================================================================================
-        "must validate prepared statements parameter count" in {
+        "must validate prepared actions parameter count" in {
             def illegal (actor : => MockedJdbc) : Unit = {
                 actor must throwA (new IllegalArgumentException).like {
                     case exc : Exception => exc.getMessage.contains ("expected to have")

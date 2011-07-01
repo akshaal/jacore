@@ -20,7 +20,6 @@ import jdbcaction._
   * @define paramWillBePassed parameter that will be passed to JDBC statement of the action
   *
   * @define CommonTParams
-  *    @tparam Result JDBC action result type
   *    @tparam Action JDBC action type
   *    @tparam Param the type of the parameter for the action
   *    @tparam Param1 the type of the first $paramWillBePassed
@@ -91,17 +90,17 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction0 [+Result, +Action <: JdbcAction [Result]]
-                extends Function0 [Result] with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction0 [+Action <: JdbcAction]
+                extends Function0 [Action#Result] with PreparedAction [Action]
 
-
+    
     /**
      * Prepared parametrized action with one parameter.
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction1 [-Param, +Result, +Action <: JdbcAction [Result]]
-                extends Function1 [Param, Result] with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction1 [-Param, +Action <: JdbcAction]
+                extends Function1 [Param, Action#Result] with PreparedAction [Action]
 
 
     /**
@@ -109,8 +108,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction2 [-Param1, -Param2, +Result, +Action <: JdbcAction [Result]]
-                extends Function2 [Param1, Param2, Result] with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction2 [-Param1, -Param2, +Action <: JdbcAction]
+                extends Function2 [Param1, Param2, Action#Result] with PreparedAction [Action]
 
 
     /**
@@ -118,9 +117,9 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction3 [-Param1, -Param2, -Param3, +Result, +Action <: JdbcAction [Result]]
-                extends Function3 [Param1, Param2, Param3, Result]
-                   with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction3 [-Param1, -Param2, -Param3, +Action <: JdbcAction]
+                extends Function3 [Param1, Param2, Param3, Action#Result]
+                   with PreparedAction [Action]
 
 
     /**
@@ -128,10 +127,10 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction4 [-Param1, -Param2, -Param3, -Param4, +Result,
-                           +Action <: JdbcAction [Result]]
-                extends Function4 [Param1, Param2, Param3, Param4, Result]
-                   with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction4 [-Param1, -Param2, -Param3, -Param4,
+                                            +Action <: JdbcAction]
+                extends Function4 [Param1, Param2, Param3, Param4, Action#Result]
+                   with PreparedAction [Action]
 
 
     /**
@@ -139,10 +138,10 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction5 [-Param1, -Param2, -Param3, -Param4, -Param5, +Result,
-                           +Action <: JdbcAction [Result]]
-                extends Function5 [Param1, Param2, Param3, Param4, Param5, Result]
-                   with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction5 [-Param1, -Param2, -Param3, -Param4, -Param5,
+                                            +Action <: JdbcAction]
+                extends Function5 [Param1, Param2, Param3, Param4, Param5, Action#Result]
+                   with PreparedAction [Action]
 
 
     /**
@@ -150,10 +149,10 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction6 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
-                           +Result, +Action <: JdbcAction [Result]]
-                extends Function6 [Param1, Param2, Param3, Param4, Param5, Param6, Result]
-                   with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction6 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
+                                            +Action <: JdbcAction]
+                extends Function6 [Param1, Param2, Param3, Param4, Param5, Param6, Action#Result]
+                   with PreparedAction [Action]
 
 
     /**
@@ -161,10 +160,11 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction7 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
-                           -Param7, +Result, +Action <: JdbcAction [Result]]
-                extends Function7 [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Result]
-                   with PreparedAction [Result, Action]
+    protected sealed trait PreparedAction7 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
+                                            -Param7, +Action <: JdbcAction]
+                extends Function7 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
+                                   Action#Result]
+                   with PreparedAction [Action]
 
 
     /**
@@ -172,10 +172,10 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction8 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
-                           -Param7, -Param8, +Result, +Action <: JdbcAction [Result]]
+    protected sealed trait PreparedAction8 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
+                                            -Param7, -Param8, +Action <: JdbcAction]
                 extends Function8 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
-                                   Param8, Result] with PreparedAction [Result, Action]
+                                   Param8, Action#Result] with PreparedAction [Action]
 
 
     /**
@@ -183,44 +183,43 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    trait PreparedAction9 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6, -Param7,
-                           -Param8, -Param9, +Result, +Action <: JdbcAction [Result]]
+    protected sealed trait PreparedAction9 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
+                                            -Param7, -Param8, -Param9, +Action <: JdbcAction]
                 extends Function9 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
-                                   Param8, Param9, Result]
-                   with PreparedAction [Result, Action]
+                                   Param8, Param9, Action#Result]
+                   with PreparedAction [Action]
 
-
+    
     /**
      * Prepare parameterless action.
      *
      * $prepareMethod
      */
-    protected def prepare [Result, Action <: JdbcAction [Result]] (action : Action)
-                            : PreparedAction0 [Result, Action] =
+    protected final def prepare [Action <: JdbcAction] (action : Action)
+                            : PreparedAction0 [Action] =
         new {
             protected override val parameterCount = 0
             protected override val sqlAction = action
-        } with PreparedAction0 [Result, Action] {
+        } with PreparedAction0 [Action] {
             override def apply () : Result = {
                 val jdbcPS = getPreparedStatement ()
                 runAction (jdbcPS)
             }
         }
 
-
     /**
      * Prepare action with one parameter.
      *
      * $prepareMethod
      */
-    protected def prepare [Param, Result, Action <: JdbcAction [Result]] (
+    protected final def prepare [Param, Action <: JdbcAction] (
                                   action : Action,
                                   paramJdbcType : JdbcType [Param])
-                            : PreparedAction1 [Param, Result, Action] =
+                            : PreparedAction1 [Param, Action] =
         new {
             protected override val parameterCount = 1
             protected override val sqlAction = action
-        } with PreparedAction1 [Param, Result, Action] {
+        } with PreparedAction1 [Param, Action] {
             private val p1setter = getSetter (paramJdbcType)
 
             override def apply (param : Param) : Result = {
@@ -236,15 +235,15 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Result, Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2])
-                            : PreparedAction2 [Param1, Param2, Result, Action] =
+                            : PreparedAction2 [Param1, Param2, Action] =
         new {
             protected override val parameterCount = 2
             protected override val sqlAction = action
-        } with PreparedAction2 [Param1, Param2, Result, Action] {
+        } with PreparedAction2 [Param1, Param2, Action] {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
 
@@ -262,16 +261,16 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Param3, Result, Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Param3, Result, Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2],
                                 param3JdbcType : JdbcType [Param3])
-                            : PreparedAction3 [Param1, Param2, Param3, Result, Action] =
+                            : PreparedAction3 [Param1, Param2, Param3, Action] =
         new {
             protected override val parameterCount = 3
             protected override val sqlAction = action
-        } with PreparedAction3 [Param1, Param2, Param3, Result, Action] {
+        } with PreparedAction3 [Param1, Param2, Param3, Action] {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
             private val p3setter = getSetter (param3JdbcType)
@@ -291,17 +290,17 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Param3, Param4, Result, Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2],
                                 param3JdbcType : JdbcType [Param3],
                                 param4JdbcType : JdbcType [Param4])
-                            : PreparedAction4 [Param1, Param2, Param3, Param4, Result, Action] =
+                            : PreparedAction4 [Param1, Param2, Param3, Param4, Action] =
         new {
             protected override val parameterCount = 4
             protected override val sqlAction = action
-        } with PreparedAction4 [Param1, Param2, Param3, Param4, Result, Action] {
+        } with PreparedAction4 [Param1, Param2, Param3, Param4, Action] {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
             private val p3setter = getSetter (param3JdbcType)
@@ -323,8 +322,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Param3, Param4, Param5, Result,
-                           Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Param5, Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2],
@@ -332,11 +330,11 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                 param4JdbcType : JdbcType [Param4],
                                 param5JdbcType : JdbcType [Param5])
                             : PreparedAction5 [Param1, Param2, Param3, Param4, Param5,
-                                               Result, Action] =
+                                               Action] =
         new {
             protected override val parameterCount = 5
             protected override val sqlAction = action
-        } with PreparedAction5 [Param1, Param2, Param3, Param4, Param5, Result, Action] {
+        } with PreparedAction5 [Param1, Param2, Param3, Param4, Param5, Action] {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
             private val p3setter = getSetter (param3JdbcType)
@@ -362,8 +360,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Result,
-                           Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6,
+                           Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2],
@@ -372,12 +370,11 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                 param5JdbcType : JdbcType [Param5],
                                 param6JdbcType : JdbcType [Param6])
                             : PreparedAction6 [Param1, Param2, Param3, Param4, Param5,
-                                               Param6, Result, Action] =
+                                               Param6, Action] =
         new {
             protected override val parameterCount = 6
             protected override val sqlAction = action
-        } with PreparedAction6 [Param1, Param2, Param3, Param4, Param5, Param6,
-                                Result, Action]
+        } with PreparedAction6 [Param1, Param2, Param3, Param4, Param5, Param6, Action]
         {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
@@ -406,8 +403,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Result,
-                           Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
+                           Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2],
@@ -417,12 +414,11 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                 param6JdbcType : JdbcType [Param6],
                                 param7JdbcType : JdbcType [Param7])
                             : PreparedAction7 [Param1, Param2, Param3, Param4, Param5, Param6,
-                                               Param7, Result, Action] =
+                                               Param7, Action] =
         new {
             protected override val parameterCount = 7
             protected override val sqlAction = action
-        } with PreparedAction7 [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Result,
-                                Action]
+        } with PreparedAction7 [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Action]
         {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
@@ -453,8 +449,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, Result,
-                           Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8,
+                           Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2],
@@ -465,12 +461,12 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                 param7JdbcType : JdbcType [Param7],
                                 param8JdbcType : JdbcType [Param8])
                             : PreparedAction8 [Param1, Param2, Param3, Param4, Param5, Param6,
-                                               Param7, Param8, Result, Action] =
+                                               Param7, Param8, Action] =
         new {
             protected override val parameterCount = 8
             protected override val sqlAction = action
         } with PreparedAction8 [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8,
-                                Result, Action]
+                                Action]
         {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
@@ -503,8 +499,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, Param9,
-                           Result, Action <: JdbcAction [Result]] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8,
+                                 Param9, Action <: JdbcAction] (
                                 action : Action,
                                 param1JdbcType : JdbcType [Param1],
                                 param2JdbcType : JdbcType [Param2],
@@ -516,12 +512,12 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                 param8JdbcType : JdbcType [Param8],
                                 param9JdbcType : JdbcType [Param9])
                             : PreparedAction9 [Param1, Param2, Param3, Param4, Param5, Param6,
-                                               Param7, Param8, Param9, Result, Action] =
+                                               Param7, Param8, Param9, Action] =
         new {
             protected override val parameterCount = 9
             protected override val sqlAction = action
         } with PreparedAction9 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
-                                Param8, Param9, Result, Action]
+                                Param8, Param9, Action]
         {
             private val p1setter = getSetter (param1JdbcType)
             private val p2setter = getSetter (param2JdbcType)
@@ -550,16 +546,19 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             }
         }
 
-    
     /**
      * Abstract prepared action to be used to access database.
      * 
      * Call it as a function to perform requested action.
      *
-     * @tparam Result type of expected action result
      * @tparam Action type of JDBC action that this prepared action is supposed to perform
      */
-    trait PreparedAction [+Result, +Action <: JdbcAction [Result]] {
+    protected sealed trait PreparedAction [+Action <: JdbcAction] {
+        /**
+         * Alias for result type of action.
+         */
+        protected type Result = Action#Result
+
         /**
          * Number of parameters that this prepared action must prepare. This value
          * should be defined in the implementation of the prepared action using early
@@ -659,7 +658,7 @@ private[db] object AbstractJdbcActor {
      *
      * @tparam Result type of action result.
      */
-    trait ActionRunner [+Result] extends Function1 [PreparedStatement, Result]
+    sealed trait ActionRunner [+Result] extends Function1 [PreparedStatement, Result]
 
     // ===================================================================================
     // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
