@@ -553,9 +553,14 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
         "allow access to underlying JDBC PreparedStatement" in {
             val mockedPS1 = mock [PreparedStatement]
             val mockedPS2 = mock [PreparedStatement]
+            val mockedPS3 = mock [PreparedStatement]
             val mockedConn = mock [Connection]
 
-            mockedConn.prepareStatement ("?") returns mockedPS1 thenReturns mockedPS2
+            mockedPS1  must_!=  mockedPS2
+            mockedPS1  must_!=  mockedPS3
+            mockedPS2  must_!=  mockedPS3
+
+            mockedConn.prepareStatement ("?") returns mockedPS1 thenReturns mockedPS2 thenReturns mockedPS3
 
             new AbstractJdbcActor (lowPriorityActorEnv = TestModule.lowPriorityActorEnv) {
                 override protected def getConnection () : Connection = mockedConn
