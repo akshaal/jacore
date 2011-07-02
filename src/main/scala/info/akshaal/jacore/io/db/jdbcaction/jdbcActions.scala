@@ -53,3 +53,16 @@ final case class JdbcUpdate (override val statement : String,
 {
     type Result = Int
 }
+
+/**
+ * JDBC batch.
+ *
+ * @param statement sql statement
+ * @param validate validate sql statement if true
+ */
+final case class JdbcBatch (override val statement : String,
+                            override val validate : Boolean = true)
+                    extends JdbcAction (statement = statement, validate = validate)
+{
+    type Result = Unit
+}
