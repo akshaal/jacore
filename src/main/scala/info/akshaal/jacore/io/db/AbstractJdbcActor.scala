@@ -602,6 +602,12 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         protected final def runAction (jdbcPS : PreparedStatement) : Result = actionRunner (jdbcPS)
 
         /**
+         * Returns JDBC PreparedStatement if it already created for this action.
+         * Otherwise returns None.
+         */
+        final def getPreparedStatementIfAny () : Option [PreparedStatement] = jdbcPsOption
+
+        /**
          * Return JDBC PreparedStatement object associated with this PreparedAction.
          *
          * Createss a new PreparedStatement if nothing was associated so far.
@@ -624,7 +630,9 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         private def associateNewPreparedStatement () : Unit = {
             assert (jdbcPsOption.isEmpty)
 
-            val jdbcPS = null // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            val conn = getConnection ()
+            val jdbcPS = conn.prepareStatement (sqlAction.statement)
+
             jdbcPsOption = Some (jdbcPS)
         }
 

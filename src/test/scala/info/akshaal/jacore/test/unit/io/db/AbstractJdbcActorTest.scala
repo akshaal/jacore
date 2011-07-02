@@ -4,18 +4,22 @@ package info.akshaal.jacore
 package test
 package unit.io.db
 
-import java.sql.{Connection, ResultSet}
-import scala.runtime.{RichInt, RichLong, RichBoolean}
+import java.sql.{Connection, ResultSet, PreparedStatement}
 import java.util.Date
 import java.lang.{Object => JavaObject}
 import java.math.BigDecimal
+
+import org.specs.mock.Mockito
+import scala.runtime.{RichInt, RichLong, RichBoolean}
 
 import unit.UnitTestHelper._
 import io.db.AbstractJdbcActor
 import io.db.jdbctype._
 import io.db.jdbcaction._
 
-class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor specification") {
+class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor specification")
+                               with Mockito
+{
     import AbstractJdbcActorTest._
 
     // Empty deriviations of standard types
@@ -540,6 +544,42 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                 val prep = prepare (JdbcQuery ("? ? ?  ? ? ?  ? ? ?"),
                                     JdbcShort, JdbcBoolean, JdbcClob, JdbcShort,
                                     JdbcBoolean, JdbcClob, JdbcBigDecimal, JdbcInt, JdbcInt)
+            }
+        }
+
+        // =================================================================================
+        // =================================================================================
+        // =================================================================================
+        "allow access to underlying JDBC PreparedStatement" in {
+            val mockedPS1 = mock [PreparedStatement]
+            val mockedPS2 = mock [PreparedStatement]
+            val mockedConn = mock [Connection]
+
+            mockedConn.prepareStatement ("?") returns mockedPS1 thenReturns mockedPS2
+
+            new AbstractJdbcActor (lowPriorityActorEnv = TestModule.lowPriorityActorEnv) {
+                override protected def getConnection () : Connection = mockedConn
+
+                val prep1 = prepare (JdbcUpdate ("?"), JdbcBoolean)
+                val prep2 = prepare (JdbcUpdate ("?"), JdbcBoolean)
+
+                // Should not create new prepared statement unless asked explicitly to do so
+                prep1.getPreparedStatementIfAny  must_==  None
+                prep2.getPreparedStatementIfAny  must_==  None
+                prep1.getPreparedStatementIfAny  must_==  None
+                prep2.getPreparedStatementIfAny  must_==  None
+
+                // Create and get new prepared statement
+                prep1.getPreparedStatement  must_==  mockedPS1
+                prep2.getPreparedStatement  must_==  mockedPS2
+                prep1.getPreparedStatement  must_==  mockedPS1
+                prep2.getPreparedStatement  must_==  mockedPS2
+
+                prep1.getPreparedStatementIfAny  must_==  Some (mockedPS1)
+                prep2.getPreparedStatementIfAny  must_==  Some (mockedPS2)
+                prep1.getPreparedStatementIfAny  must_==  Some (mockedPS1)
+                prep2.getPreparedStatementIfAny  must_==  Some (mockedPS2)
+
             }
         }
     }
