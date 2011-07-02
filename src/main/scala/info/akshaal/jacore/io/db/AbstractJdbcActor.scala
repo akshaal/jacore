@@ -630,8 +630,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         private def associateNewPreparedStatement () : Unit = {
             assert (jdbcPsOption.isEmpty)
 
-            val conn = getConnection ()
-            val jdbcPS = conn.prepareStatement (sqlAction.statement)
+            val connection = getConnection ()
+            val jdbcPS = newPreparedStatement (connection, sqlAction)
 
             jdbcPsOption = Some (jdbcPS)
         }
@@ -668,9 +668,22 @@ private[db] object AbstractJdbcActor {
      */
     sealed trait ActionRunner [+Result] extends Function1 [PreparedStatement, Result]
 
+    /**
+     * Create new prepared statement using the given connection for the given action.
+     * All initialization for the actions is supposed to be done in this method.
+     *
+     * @param conn JDBC connection
+     * @param action action to construct prepared statement for
+     * @return created prepared statement
+     */
+    def newPreparedStatement (conn : Connection, action : JdbcAction) : PreparedStatement = {
+        conn.prepareStatement (action.statement)
+    }
+
     // ===================================================================================
     // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     // ===================================================================================
+    // Parameter setters
 
     /**
      * Function object to set Array parameter on PreparedStatement.
