@@ -17,6 +17,10 @@ import jdbcaction._
   * @param db database to use for connections
   * @param lowPriorityActorEnv low priority environment for this actor
   *
+  * @define lowlevel
+  *    This method is very low level and incorrect use may break design of the actor. Don't use
+  *    it unless you know what you are doing.
+  *
   * @define paramWillBePassed parameter that will be passed to JDBC statement of the action
   *
   * @define CommonTParams
@@ -604,6 +608,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         /**
          * Returns JDBC PreparedStatement if it already created for this action.
          * Otherwise returns None.
+         *
+         * $lowlevel
          */
         final def getPreparedStatementIfAny () : Option [PreparedStatement] = jdbcPsOption
 
@@ -611,6 +617,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          * Return JDBC PreparedStatement object associated with this PreparedAction.
          *
          * Createss a new PreparedStatement if nothing was associated so far.
+         *
+         * $lowlevel
          */
         final def getPreparedStatement () : PreparedStatement =
             jdbcPsOption match {
@@ -625,7 +633,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             }
 
         /**
-         * Construct new PreparedStatement to be associated with this prepared action.
+         * Construct and associate a new PreparedStatement with this prepared action and actor.
          */
         private def associateNewPreparedStatement () : Unit = {
             assert (jdbcPsOption.isEmpty)
