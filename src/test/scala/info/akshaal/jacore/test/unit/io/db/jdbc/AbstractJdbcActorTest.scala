@@ -2,7 +2,7 @@
 
 package info.akshaal.jacore
 package test
-package unit.io.db
+package unit.io.db.jdbc
 
 import java.sql.{Connection, ResultSet, PreparedStatement}
 import java.util.Date
@@ -13,9 +13,9 @@ import org.specs.mock.Mockito
 import scala.runtime.{RichInt, RichLong, RichBoolean}
 
 import unit.UnitTestHelper._
-import io.db.AbstractJdbcActor
-import io.db.jdbctype._
-import io.db.jdbcaction._
+import io.db.jdbc.AbstractJdbcActor
+import io.db.jdbc.`type`._
+import io.db.jdbc.action._
 
 class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor specification")
                                with Mockito

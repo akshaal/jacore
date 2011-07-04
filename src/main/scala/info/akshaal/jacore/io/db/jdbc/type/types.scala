@@ -3,7 +3,8 @@
 package info.akshaal.jacore
 package io
 package db
-package jdbctype
+package jdbc
+package `type`
 
 /**
  * A type that JDBC can possibly handle.

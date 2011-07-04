@@ -3,13 +3,16 @@
 package info.akshaal.jacore
 package io
 package db
+package jdbc
 
 import java.sql.{Connection, PreparedStatement}
 
 import actor.{Actor, LowPriorityActorEnv}
 import utils.io.db.SqlUtils
-import jdbctype._
-import jdbcaction._
+
+import `type`._
+import `type`.setter._
+import action._
 
 /**
   * Template for all actors that are interested in working with JDBC.
@@ -85,9 +88,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
     // =====================================================================================
     // =====================================================================================
     // =====================================================================================
-    // =====================================================================================
-    // =====================================================================================
-    // Prepared action
+    // PreparedAction traits
 
     /**
      * Prepared parameterless JDBC action.
@@ -193,6 +194,12 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                    Param8, Param9, Action#Result]
                    with PreparedAction [Action]
 
+
+    // =====================================================================================
+    // =====================================================================================
+    // =====================================================================================
+    // =====================================================================================
+    // prepare method
     
     /**
      * Prepare parameterless action.
@@ -550,6 +557,13 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             }
         }
 
+    
+    // =====================================================================================
+    // =====================================================================================
+    // =====================================================================================
+    // =====================================================================================
+    // Common PreparedAction trait
+
     /**
      * Abstract prepared action to be used to access database.
      * 
@@ -582,17 +596,18 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          * Function to be used to axecute action. Action runner receives prepared
          * statement and runs jdbc action that this action runner is responsible for.
          */
-        private val actionRunner : ActionRunner [Result] = null // TODO !!!!!!!!!!!!!!!!!
-        // TODO !!!!!!!!!!!!!! ^^^^^^ Action runner depends on the way we run it
-        // it should be possible to write custom actions runner proviers
-        // because in one case we have to process one message in one transaction
-        // in some cases we need to use addBatch on statement... or possible
-        // consider when preparing statement?
+        private val actionRunner : ActionRunner [Result] = getActionRunner (sqlAction)
 
         /**
          * Reference to the JDBC's prepared statement.
          */
         private var jdbcPsOption : Option [PreparedStatement] = None
+
+        /**
+         * True indicates that somthing was added to batch but not executed yet.
+         * Should only be used by routines from this file only.
+         */
+        private[jdbc] var batchDirty : Boolean = false
 
         /**
          * Execute action that is associated with this prepared action.
@@ -611,6 +626,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          *
          * $lowlevel
          */
+        @inline
         final def getPreparedStatementIfAny () : Option [PreparedStatement] = jdbcPsOption
 
         /**
@@ -644,6 +660,41 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             jdbcPsOption = Some (jdbcPS)
         }
 
+        /**
+         * Reset prepared action do its initial state.
+         *
+         * Underlying prepared statement gets closed as well.
+         * Calling this method may result in losing uncommitting changes, batches...
+         * 
+         * $lowlevel
+         */
+        final def reset () : Unit = {
+            batchDirty = false
+
+            // Close underlying prepared statement
+            for (jdbcPS <- jdbcPsOption) {
+                // First forget about the underlying prepared statement
+                jdbcPsOption = None
+
+                // Now close it
+                jdbcPS.close ()
+            }
+        }
+
+        // ---------------------------------------------------------------------------
+        // Action runners
+
+        /**
+         * ActionRunner is a function that receives JDBC PreparedStatement and executes
+ * some action upon it.
+ *
+ * All JDBC parameters must be set action runnder is called
+ *
+ * @tparam Result type of action result.
+ */
+sealed trait ActionRunner [+Result] extends Function1 [AbstractJdbcActor.PreparedAction, Result]
+
+
         // ---------------------------------------------------------------------------
         // Initialization of prepared action
 
@@ -659,23 +710,71 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             }
         }
     }
+
+    // =====================================================================================
+    // =====================================================================================
+    // =====================================================================================
+    // =====================================================================================
+    // Specialized PreparedActions wrappers for different JDBC Actions
+
+    /**
+     * Implicit method that creates specialized version of prepared action with methods
+     * suitable for batch action.
+     */
+    protected implicit def toPreparedBatchAction (preparedAction : PreparedAction [JdbcBatch])
+                             : PreparedBatchAction = new PreparedBatchAction (preparedAction)
+
+    /**
+     * Class provides additional methods for PreparedAction of Batch type.
+     *
+     * @param preparedAction prepared action of batch type
+     */
+    protected final class PreparedBatchAction (preparedAction : PreparedAction [JdbcBatch]) {
+        /**
+         * Check if batch statement was added but not yet executed.
+         *
+         * @return true if there is batch to execute
+         */
+        @inline
+        def isBatchDirty () : Boolean = preparedAction.batchDirty
+
+        /**
+         * Execute batch.
+         *
+         * If no batch is found then returns empty array.
+         *
+         * @see PreparedStatement.executeBatch for more information
+         */
+        def executeBatch () : Array [Int] = {
+            if (preparedAction.batchDirty) {
+                // Execute batch
+                val jdbcPS = preparedAction.getPreparedStatement ()
+                val result = jdbcPS.executeBatch ()
+                jdbcPS.clearBatch ()
+
+                // No longer dirty
+                preparedAction.batchDirty = false
+
+                // Return result
+                result
+            } else {
+                Array.empty
+            }
+        }
+    }
 }
 
+// =============================================================================================
+// =============================================================================================
+// = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+// =============================================================================================
+// =============================================================================================
+// Companion object
 
 /**
  * Helper object for AbstractJdbcActor.
  */
-private[db] object AbstractJdbcActor {
-    /**
-     * ActionRunner is a function that receives JDBC PreparedStatement and executes
-     * some action upon it.
-     * 
-     * All JDBC parameters must be set action runnder is called
-     *
-     * @tparam Result type of action result.
-     */
-    sealed trait ActionRunner [+Result] extends Function1 [PreparedStatement, Result]
-
+private[jdbc] object AbstractJdbcActor {
     /**
      * Create new prepared statement using the given connection for the given action.
      * All initialization for the actions is supposed to be done in this method.
@@ -688,264 +787,10 @@ private[db] object AbstractJdbcActor {
         conn.prepareStatement (action.statement)
     }
 
-    // ===================================================================================
-    // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    // ===================================================================================
-    // Parameter setters
-
-    /**
-     * Function object to set Array parameter on PreparedStatement.
-     */
-    object ArraySetter extends Function3 [PreparedStatement, Int, java.sql.Array, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.Array) : Unit =
-            ps.setArray (idx, arg)
-    }
-
-    /**
-     * Function object to set InputStream parameter with ascii data on PreparedStatement.
-     */
-    object AsciiStreamSetter extends Function3 [PreparedStatement, Int, java.io.InputStream, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.io.InputStream) : Unit =
-            ps.setAsciiStream (idx, arg)
-    }
-
-    /**
-     * Function object to set BigDecimal parameter on PreparedStatement.
-     */
-    object BigDecimalSetter extends Function3 [PreparedStatement, Int, java.math.BigDecimal, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.math.BigDecimal) : Unit =
-            ps.setBigDecimal (idx, arg)
-    }
-
-    /**
-     * Function object to set InputStream parameter with binary data on PreparedStatement.
-     */
-    object BinaryStreamSetter extends Function3 [PreparedStatement, Int, java.io.InputStream, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.io.InputStream) : Unit =
-            ps.setBinaryStream (idx, arg)
-    }
-
-    /**
-     * Function object to set Blob parameter on PreparedStatement.
-     */
-    object BlobSetter extends Function3 [PreparedStatement, Int, java.sql.Blob, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.Blob) : Unit =
-            ps.setBlob (idx, arg)
-    }
-
-    /**
-     * Function object to set InputStream providing data for Blob parameter on PreparedStatement.
-     */
-    object BlobStreamSetter extends Function3 [PreparedStatement, Int, java.io.InputStream, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.io.InputStream) : Unit =
-            ps.setBlob (idx, arg)
-    }
-
-    /**
-     * Function object to set Boolean parameter on PreparedStatement.
-     */
-    object BooleanSetter extends Function3 [PreparedStatement, Int, Boolean, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Boolean) : Unit =
-            ps.setBoolean (idx, arg)
-    }
-
-    /**
-     * Function object to set byte parameter on PreparedStatement.
-     */
-    object ByteSetter extends Function3 [PreparedStatement, Int, Byte, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Byte) : Unit =
-            ps.setByte (idx, arg)
-    }
-
-    /**
-     * Function object to set byte array parameter on PreparedStatement.
-     */
-    object BytesSetter extends Function3 [PreparedStatement, Int, Array[Byte], Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Array[Byte]) : Unit =
-            ps.setBytes (idx, arg)
-    }
-
-    /**
-     * Function object to set Reader parameter with character data on PreparedStatement.
-     */
-    object CharacterStreamSetter extends Function3 [PreparedStatement, Int, java.io.Reader, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.io.Reader) : Unit =
-            ps.setCharacterStream (idx, arg)
-    }
-
-    /**
-     * Function object to set Clob parameter on PreparedStatement.
-     */
-    object ClobSetter extends Function3 [PreparedStatement, Int, java.sql.Clob, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.Clob) : Unit =
-            ps.setClob (idx, arg)
-    }
-
-    /**
-     * Function object to set Reader providing data for Clob parameter on PreparedStatement.
-     */
-    object ClobStreamSetter extends Function3 [PreparedStatement, Int, java.io.Reader, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.io.Reader) : Unit =
-            ps.setClob (idx, arg)
-    }
-
-    /**
-     * Function object to set Date parameter on PreparedStatement.
-     */
-    object SqlDateSetter extends Function3 [PreparedStatement, Int, java.sql.Date, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.Date) : Unit =
-            ps.setDate (idx, arg)
-    }
-
-    /**
-     * Function object to set Date parameter on PreparedStatement.
-     */
-    object DateSetter extends Function3 [PreparedStatement, Int, java.util.Date, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.util.Date) : Unit =
-            ps.setDate (idx, new java.sql.Date (arg.getTime))
-    }
-
-    /**
-     * Function object to set Double parameter on PreparedStatement.
-     */
-    object DoubleSetter extends Function3 [PreparedStatement, Int, Double, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Double) : Unit =
-            ps.setDouble (idx, arg)
-    }
-
-    /**
-     * Function object to set Float parameter on PreparedStatement.
-     */
-    object FloatSetter extends Function3 [PreparedStatement, Int, Float, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Float) : Unit =
-            ps.setFloat (idx, arg)
-    }
-
-    /**
-     * Function object to set Int parameter on PreparedStatement.
-     */
-    object IntSetter extends Function3 [PreparedStatement, Int, Int, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Int) : Unit =
-            ps.setInt (idx, arg)
-    }
-
-    /**
-     * Function object to set Long parameter on PreparedStatement.
-     */
-    object LongSetter extends Function3 [PreparedStatement, Int, Long, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Long) : Unit =
-            ps.setLong (idx, arg)
-    }
-
-    /**
-     * Function object to set Reader parameter with ncharacter data on PreparedStatement.
-     */
-    object NCharacterStreamSetter extends Function3 [PreparedStatement, Int, java.io.Reader, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.io.Reader) : Unit =
-            ps.setNCharacterStream (idx, arg)
-    }
-
-    /**
-     * Function object to set NClob parameter on PreparedStatement.
-     */
-    object NClobSetter extends Function3 [PreparedStatement, Int, java.sql.NClob, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.NClob) : Unit =
-            ps.setNClob (idx, arg)
-    }
-
-    /**
-     * Function object to set Reader providing data for NClob parameter on PreparedStatement.
-     */
-    object NClobStreamSetter extends Function3 [PreparedStatement, Int, java.io.Reader, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.io.Reader) : Unit =
-            ps.setNClob (idx, arg)
-    }
-
-    /**
-     * Function object to set NString parameter on PreparedStatement.
-     */
-    object NStringSetter extends Function3 [PreparedStatement, Int, String, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : String) : Unit =
-            ps.setNString (idx, arg)
-    }
-
-    /**
-     * Function object to set Object parameter on PreparedStatement.
-     */
-    object ObjectSetter extends Function3 [PreparedStatement, Int, Object, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Object) : Unit =
-            ps.setObject (idx, arg)
-    }
-
-    /**
-     * Function object to set Ref parameter on PreparedStatement.
-     */
-    object RefSetter extends Function3 [PreparedStatement, Int, java.sql.Ref, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.Ref) : Unit =
-            ps.setRef (idx, arg)
-    }
-
-    /**
-     * Function object to set RowId parameter on PreparedStatement.
-     */
-    object RowIdSetter extends Function3 [PreparedStatement, Int, java.sql.RowId, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.RowId) : Unit =
-            ps.setRowId (idx, arg)
-    }
-
-    /**
-     * Function object to set Short parameter on PreparedStatement.
-     */
-    object ShortSetter extends Function3 [PreparedStatement, Int, Short, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : Short) : Unit =
-            ps.setShort (idx, arg)
-    }
-
-    /**
-     * Function object to set SQLXML parameter on PreparedStatement.
-     */
-    object SqlXmlSetter extends Function3 [PreparedStatement, Int, java.sql.SQLXML, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.SQLXML) : Unit =
-            ps.setSQLXML (idx, arg)
-    }
-
-    /**
-     * Function object to set String parameter on PreparedStatement.
-     */
-    object StringSetter extends Function3 [PreparedStatement, Int, String, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : String) : Unit =
-            ps.setString (idx, arg)
-    }
-
-    /**
-     * Function object to set Time parameter on PreparedStatement.
-     */
-    object TimeSetter extends Function3 [PreparedStatement, Int, java.sql.Time, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.Time) : Unit =
-            ps.setTime (idx, arg)
-    }
-
-    /**
-     * Function object to set Timestamp parameter on PreparedStatement.
-     */
-    object TimestampSetter extends Function3 [PreparedStatement, Int, java.sql.Timestamp, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.sql.Timestamp) : Unit =
-            ps.setTimestamp (idx, arg)
-    }
-
-    /**
-     * Function object to set Url parameter on PreparedStatement.
-     */
-    object UrlSetter extends Function3 [PreparedStatement, Int, java.net.URL, Unit] {
-        override def apply (ps : PreparedStatement, idx : Int, arg : java.net.URL) : Unit =
-            ps.setURL (idx, arg)
-    }
-
     /**
      * Returns setter for the given param type.
      */
-    protected def getSetter [Param] (paramJdbcType : JdbcType [Param])
-                                        : Function3 [PreparedStatement, Int, Param, Unit] =
+    def getSetter [Param] (paramJdbcType : JdbcType [Param]) : JdbcSetter [Param] =
         paramJdbcType match {
             case JdbcArray                  => ArraySetter
             case JdbcAsciiStream            => AsciiStreamSetter

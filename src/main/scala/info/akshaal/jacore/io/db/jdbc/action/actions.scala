@@ -3,7 +3,8 @@
 package info.akshaal.jacore
 package io
 package db
-package jdbcaction
+package jdbc
+package action
 
 /**
  * A type that JDBC can possibly handle.

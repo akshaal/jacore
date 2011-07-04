@@ -3,6 +3,7 @@
 package info.akshaal.jacore
 package io
 package db
+package jdbc
 
 import java.sql.Connection
 

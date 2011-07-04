@@ -2,14 +2,14 @@
 
 package info.akshaal.jacore
 package test
-package unit.io.db
+package unit.io.db.jdbc
 
 import org.specs.mock.Mockito
 import java.sql.Connection
 
 import unit.UnitTestHelper._
-import io.db.AbstractBulkJdbcActor
 import actor.Operation
+import io.db.jdbc.AbstractBulkJdbcActor
 import utils.io.db.ConnectionProvider
 
 class AbstractBulkJdbcActorTest extends JacoreSpecWithJUnit ("AbstractBulkJdbcActor specification")
