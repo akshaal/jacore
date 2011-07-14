@@ -131,10 +131,10 @@ private[jacore] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
     override def broadcast (msg : Any) : Unit = {
         executed.clear
         
-        iterateOverJavaIterable (subscriptionEntries) (
+        iterate (subscriptionEntries) (
             subscriptionEntry =>
                 if (subscriptionEntry.getKey.isAcceptable (msg)) {
-                    iterateOverJavaIterable (subscriptionEntry.getValue.entrySet) (
+                    iterate (subscriptionEntry.getValue.entrySet) (
                         actorEntry => {
                             val actor = actorEntry.getKey
 
