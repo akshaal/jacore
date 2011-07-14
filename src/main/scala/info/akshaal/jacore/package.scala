@@ -70,7 +70,7 @@ package object jacore {
      * @param f function to call for each item produced by 'c'
      */
     @inline
-    def iterateOverJavaIterable[T] (c : JavaIterable[T]) (f : T => Unit) : Unit = {
+    def iterate[T] (c : JavaIterable[T]) (f : T => Unit) : Unit = {
         val it = c.iterator
 
         while (it.hasNext) {
