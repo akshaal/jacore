@@ -15,6 +15,8 @@ class PackageTest extends JacoreSpecWithJUnit ("Jacore package specification") {
 
             (1 |> (_ + 2))  must_==  3
             (13 |> (_.toString) |> test)  must_==  "@13!"
+           
+            ("x" + "y" |> test)  must_==  "@xy!"
         }
     }
 }
