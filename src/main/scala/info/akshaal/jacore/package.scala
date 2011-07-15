@@ -223,6 +223,33 @@ package object jacore {
     // /////////////////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////////////
     // /////////////////////////////////////////////////////////////////////
+    // Rich operations
+
+    /**
+     * Methods to provide operations on any object or value.
+     *
+     * @tparam T type of value that is used for operations
+     * @param x value that is used for operations
+     */
+    final class RichOperations [T] (x : T) {
+        /**
+         * Pipepline operator. Applies value on the left from oeprator to the right side.
+         * 
+         * @param f function to be applied with argument {x}
+         * @tparam U type of value returned by function {f}
+         * @return value returned by function {f}
+         */
+        @inline
+        def |> [U] (f : T => U) : U = f (x)
+    }
+
+    @inline
+    implicit def newRichOperations [T] (x : T) : RichOperations [T] = new RichOperations (x)
+
+
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////
     // Rich string
 
     /**
