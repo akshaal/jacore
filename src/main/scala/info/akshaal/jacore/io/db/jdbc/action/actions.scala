@@ -8,6 +8,9 @@ package action
 
 /**
  * A type that JDBC can possibly handle.
+ *
+ * @param statement action statement
+ * @param validate whether to validate given sql statement or not
  */
 sealed abstract class JdbcAction (val statement : String, val validate : Boolean) {
     /**
