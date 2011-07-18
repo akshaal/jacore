@@ -37,13 +37,15 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
         }
 
         "construct Statement1 objects" in {
-            def check [S, T] (s : S, t : T) (implicit sm : Manifest [S], tm : Manifest [T]) : Unit = {
-                s    must haveClass [Statement1 [_]]
-                s    must haveClass [S]
-                t    must haveSuperClass [JdbcType [_]]
-                t    must haveClass [T]
-
+            def check [T <: JdbcType [_], S <: Statement1 [T]]
+                        (s : S, t : T) (implicit sm : Manifest [S], tm : Manifest [T]) : Unit =
+            {
+                // TODO: WTF?
                 sm.typeArguments.head.asInstanceOf [Object]  must_==  tm.asInstanceOf [Object]
+
+                // TODO: WTF? should be (s.placeholder  must_==  (t, 1))
+                s.placeholder._1.asInstanceOf[Object]  must_==  t.asInstanceOf[Object]
+                s.placeholder._2  must_==  1
             }
 
             check (s1_int, JdbcInt)

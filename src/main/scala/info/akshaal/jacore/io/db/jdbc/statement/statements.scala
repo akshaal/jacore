@@ -6,11 +6,12 @@ package db
 package jdbc
 package statement
 
-import scala.collection.immutable.Vector
+import `type`.JdbcType
 
-import `type`._
-import Statement._
 
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Abstract SQL statement. Contains sql statement string which might be parametrized with placeholders.
@@ -21,11 +22,36 @@ sealed abstract class Statement {
      */
     val sql : String
 
-    protected val paramDefs : ParamDefs
+    /**
+     * Collection of placeholders.
+     *
+     * Placeholder doesn't have value at the moment of definition
+     * and provided later during invokation for prepared action.
+     *
+     * Should be lazy for it is only used by Statement implementation when
+     * it needs to get a particular placeholder. For intermediate statements
+     * which used to construct a final statement this value is never calculated.
+     */
+    final lazy val placeholders =
+        for ((parameter, idx) <- zippedParameters if parameter._2.isEmpty)
+            yield (parameter._1, idx + 1)
+
+    // - - - -  - - - - - - - - Protected and private part - - - - - - - - - - - - - - -
 
     /**
-     * This SQL string with additional placeholder. This value should be used during
-     * construction of new Statement from this one when extra placeholder is added to this
+     * All parameters of the statement. This is a mix of placeholders and values.
+     */
+    protected val parameters : Parameters
+
+    /**
+     * The same as {parameters} collection but with indexes (starting from 0).
+     * Should be lazy for the same reason as for {placeholders} value!
+     */
+    private lazy val zippedParameters = parameters.zipWithIndex
+
+    /**
+     * This SQL string with additional parameter. This value should be used during
+     * construction of new Statement from this one when extra parameter is added to this
      * statement.
      */
     protected final def thisSqlWithArg : String = sql + " ?"
@@ -36,36 +62,36 @@ sealed abstract class Statement {
      */
     protected final def thisSqlWith (thatSql : String) : String = sql + " " + thatSql
 
-    protected final def thisParamDefsWith (jdbcType : JdbcType [_]) : ParamDefs =
-            paramDefs :+ ((jdbcType, None))
+    protected final def thisParametersWith (jdbcType : JdbcType [_]) : Parameters =
+            parameters :+ ((jdbcType, None))
 }
 
 
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
 final case class Statement0 (override val sql : String) extends Statement {
-    protected override val paramDefs = emptyParamDefs
+    protected override val parameters = emptyCollection
 
     def + (thatSql : String) : Statement0 = Statement0 (thisSqlWith (thatSql))
 
     def + (stmt : Statement0) : Statement0 = Statement0 (thisSqlWith (stmt.sql))
 
     def + [JdbcType1 <: JdbcType[_]] (jdbcType1 : JdbcType1) : Statement1 [JdbcType1] =
-                    Statement1 (thisSqlWithArg, thisParamDefsWith (jdbcType1))
+                    Statement1 (thisSqlWithArg, thisParametersWith (jdbcType1))
 }
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
 
 
 final case class Statement1 [JdbcType1 <: JdbcType [_]] private [statement] (
                             override val sql : String,
-                            val paramDefs : ParamDefs) extends Statement
+                            protected val parameters : Parameters) extends Statement
 {
-    //lazy val param
-}
-
-
-
-private[statement] object Statement {
-    type ParamDef = (JdbcType [Parameter], Option [Parameter]) forSome {type Parameter}
-
-    type ParamDefs = Vector [ParamDef]
-    
-    val emptyParamDefs : ParamDefs = Vector.empty
+    lazy val placeholder = placeholders (0) // TODO
 }
