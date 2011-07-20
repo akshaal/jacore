@@ -14,22 +14,22 @@ import java.sql.PreparedStatement
  * Setter trait for objects that are responisble for setting provided value on the given
  * PreparedStatement in the given parameter position.
  *
- * @tparam Param type of value that setter is able to set
+ * @tparam Value type of value that setter is able to set
  */
-sealed trait JdbcSetter [Param] extends Function3 [PreparedStatement, Int, Param, Unit]
+sealed trait JdbcSetter [Value] extends Function3 [PreparedStatement, Int, Value, Unit]
 
 /**
  * Compainion object for {JdbcSetter} trait.
  */
 object JdbcSetter {
     /**
-     * Returns setter for the given jdbc type.
+     * Returns setter for the given JDBC type.
      *
-     * @tparam Param type of Scala value that jdbc type represents
-     * @param jdbcType object that represents jdbc type
+     * @tparam Value type of Scala value that JDBC type represents
+     * @param jdbcType object that represents JDBC type
      * @return instance of setter that is able to set value given type on JDBC Prepared Statement 
      */
-    def getFor [Param] (jdbcType : JdbcType [Param]) : JdbcSetter [Param] =
+    def getFor [Value] (jdbcType : JdbcType [Value]) : JdbcSetter [Value] =
         jdbcType match {
             case JdbcArray                  => ArraySetter
             case JdbcAsciiStream            => AsciiStreamSetter

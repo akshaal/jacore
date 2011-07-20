@@ -574,7 +574,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         /**
          * Alias for result type of action.
          */
-        protected type Result = Action#Result
+        protected final type Result = Action#Result
 
         /**
          * Number of parameters that this prepared action must prepare. This value

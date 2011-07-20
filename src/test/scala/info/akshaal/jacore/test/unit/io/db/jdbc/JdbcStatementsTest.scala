@@ -43,9 +43,7 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
                 // TODO: WTF?
                 sm.typeArguments.head.asInstanceOf [Object]  must_==  tm.asInstanceOf [Object]
 
-                // TODO: WTF? should be (s.placeholder  must_==  (t, 1))
-                s.placeholder._1.asInstanceOf[Object]  must_==  t.asInstanceOf[Object]
-                s.placeholder._2  must_==  1
+                (s.placeholder : (T, Int))  must_==  (t, 1)
             }
 
             check (s1_int, JdbcInt)

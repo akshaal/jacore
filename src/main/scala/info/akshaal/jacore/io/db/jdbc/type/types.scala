@@ -7,11 +7,11 @@ package jdbc
 package `type`
 
 /**
- * A type that JDBC can possibly handle.
+ * Objects of this trait are used to define classes of values which JDBC can possibly handle.
  *
- * @tparam T actual type
+ * @tparam Value scala type that JDBC Type wraps
  */
-sealed trait JdbcType [T]
+sealed trait JdbcType [Value]
 
 /**
  * Jdbc Array type.
