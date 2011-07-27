@@ -16,6 +16,16 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
     val s1_blob = s0_1 + JdbcBlob
     val s1_clob = s0_2 + JdbcClob
 
+    // Two objects should be equals regardless their type
+    def checkArgs (manifest : Manifest [_], args : Manifest [_]*) : Unit = {
+        manifest.typeArguments  must_==  args.toList
+    }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
     "Statement0" should {
         "be constructable from strings" in {
             s0_2.sql  must_==  "set xxx"
@@ -40,8 +50,7 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
             def check [T <: JdbcType [_], S <: Statement1 [T]]
                         (s : S, t : T) (implicit sm : Manifest [S], tm : Manifest [T]) : Unit =
             {
-                // TODO: WTF?
-                sm.typeArguments.head.asInstanceOf [Object]  must_==  tm.asInstanceOf [Object]
+                checkArgs (sm, tm)
 
                 (s.placeholder : (T, Int))  must_==  (t, 1)
             }
