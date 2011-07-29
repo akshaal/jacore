@@ -6,7 +6,7 @@ package db
 package jdbc
 package statement
 
-import `type`.JdbcType
+import `type`.AbstractJdbcType
 
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@ import `type`.JdbcType
 object Statement {
     /**
      * Immutable collection type used to keep placeholders/parameters/values.
+     * It is important to have fast random access to the values in the collection,
      *
      * @tparam T type of elements in collection
      */
@@ -29,37 +30,70 @@ object Statement {
      * Should be used to hide underlying collection implementation and make it possible
      * to replace it without changing code in Statement* classes.
      *
-     * @tparam type of elements in collection
+     * @tparam T type of elements in collection
      * @return empty collection value
      */
     @inline
     def emptyCollection [T] : Collection [T] = Vector.empty
 
+    // - - - - - - - - - - - - Placeholder - - - - - - - - - - -
+
+    /**
+     * The type that represents placeholder in a statement.
+     *
+     * @tparam JdbcType JDBC type accepted by placeholder
+     * @param jdbcType case object representing the given JDBC type
+     * @param position placeholder's position in a statement (starting from 1)
+     */
+    final case class Placeholder [JdbcType <: AbstractJdbcType [_]] (
+                            jdbcType : JdbcType,
+                            position : Int)
+
+    /**
+     * Colection of placeholders.
+     */
+    private[statement] type Placeholders = Collection [Placeholder [_]]
+
+    // - - - - - - - - - - - - ProvidedValue - - - - - - - - - - -
+
+    /**
+     * The type that represents value in a statement. It is something like a placeholder
+     * but with a value already provided during construction of placeholder.
+     *
+     * @tparam Value type of value for the JDBC parameter
+     * @tparam JdbcType type that represents JDBC type of the JDBC parameter
+     * @param jdbcType case object representing the given jdbc type
+     * @param value provided value object
+     * @param position placeholder position in a statement (starting from 1)
+     */
+    final case class ProvidedValue [Value, JdbcType <: AbstractJdbcType [Value]] (
+                            jdbcType : JdbcType,
+                            value : Value,
+                            position : Int)
+
+    /**
+     * Collection of provided values.
+     */
+    type ProvidedValues = Collection [ProvidedValue [Value, AbstractJdbcType [Value]] forSome {type Value}]
+
+    // - - - - - - - - - - - - Parameter - - - - - - - - - - -
+
     /**
      * Type that describes SQL statement parameter. SQL statement parameter is defined
-     * by its JdbcType and might have value provided.
+     * by its AbstractJdbcType and might have value provided.
      *
      * @tparam Value type of value parameter accepts
+     * @param jdbcType case object representing the given JDBC type
+     * @param optionalValue optional value. If not provided then this parameter is a placeholder
      */
-    private[statement] type Parameter [Value] = (JdbcType [Value], Option [Value])
+    private[statement] final case class Parameter [Value] (
+                            jdbcType : AbstractJdbcType [Value],
+                            optionalValue : Option [Value])
 
     /**
      * Collection of SQL statement parameters.
      */
     private[statement] type Parameters = Collection [Parameter [_]]
-
-    /**
-     * This type represents placeholder in a statement. Placeholder is represented by its JdbcType
-     * and its position (starting from 1).
-     *
-     * @tparam [PlaceholderJdbcType] JdbcType accepted by placeholder
-     */
-    type Placeholder [PlaceholderJdbcType <: JdbcType [_]] = (PlaceholderJdbcType, Int)
-
-    /**
-     * Colection of placeholders.
-     */
-    type Placeholders = Collection [Placeholder [_]]
 }
 
 
@@ -71,6 +105,11 @@ import Statement._
 
 /**
  * Abstract SQL statement. Contains sql statement string which might be parametrized with placeholders.
+ *
+ * @define ShouldBeLazy
+ *    Should be lazy value for it is only used by Statement implementation when
+ *    it needs to get a detailed information. For intermediate statements,
+ *    which used to construct a final statement, this value is never calculated.
  */
 sealed abstract class Statement {
     /**
@@ -79,29 +118,60 @@ sealed abstract class Statement {
     val sql : String
 
     /**
-     * Collection of placeholders.
+     * Collection of provided values.
      *
-     * Placeholder doesn't have value at the moment of definition
-     * and provided later during invokation for prepared action.
-     *
-     * Should be lazy for it is only used by Statement implementation when
-     * it needs to get a particular placeholder. For intermediate statements
-     * which used to construct a final statement this value is never calculated.
+     * $ShouldBeLazy
      */
-    final lazy val placeholders : Placeholders =
-        for ((parameter, idx) <- zippedParameters if parameter._2.isEmpty)
-            yield (parameter._1, idx + 1)
+    final lazy val providedValues : ProvidedValues = {
+        def mkYield [Value] (parameter : Parameter [Value], idx : Int) =
+            ProvidedValue [Value, AbstractJdbcType [Value]] (
+                    parameter.jdbcType,
+                    parameter.optionalValue.get,
+                    idx + 1)
+
+        for ((parameter, idx) <- zippedParameters if parameter.optionalValue.isDefined)
+            yield mkYield (parameter, idx)
+    }
+
+    final def + (thatSql : String) : this.type = sameType (thisSqlWith (thatSql), parameters)
+
+    final def + (stmt : Statement0) : this.type = sameType (thisSqlWith (stmt.sql), parameters ++ stmt.parameters)
+
+    final def + [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : this.type =
+                    sameType (thisSqlWithArg, thisParametersWith (jdbcType, value))
 
     // - - - -  - - - - - - - - Protected and private part - - - - - - - - - - - - - - -
 
     /**
-     * All parameters of the statement. This is a mix of placeholders and values.
+     * All parameters of the statement. This is a mix of placeholders and provided values.
      */
     protected val parameters : Parameters
 
     /**
+     * Construct a new Statement of the same type as this one but with different set of
+     * parameters. This is just a way to keep type information while cloning object.
+     *
+     * @param newSql new sql string for the new statement
+     * @param newParameters new set of parameters
+     */
+    protected def sameType (newSql : String, newParameters : Parameters) : this.type
+
+    /**
+     * Collection of placeholders.
+     *
+     * Placeholder doesn't have value at the moment of definition.
+     * Values for placeholders are provided later during invokation of prepared action.
+     * 
+     * $ShouldBeLazy
+     */
+    protected final lazy val placeholders : Placeholders =
+        for ((parameter, idx) <- zippedParameters if parameter.optionalValue.isEmpty)
+            yield Placeholder (parameter.jdbcType, idx + 1)
+
+    /**
      * The same as {parameters} collection but with indexes (starting from 0).
-     * Should be lazy for the same reason as for {placeholders} value!
+     *
+     * $ShouldBeLazy
      */
     private lazy val zippedParameters : Collection [(Parameter [_], Int)] = parameters.zipWithIndex
 
@@ -120,10 +190,36 @@ sealed abstract class Statement {
     @inline
     protected final def thisSqlWith (thatSql : String) : String = sql + " " + thatSql
 
+    /**
+     * Returns this set of parameters with the additional placeholder of the given JDBC type.
+     * This method is used to construct a new set of parameters for a new Statement of higher
+     * arity (number of placeholders) than the current one.
+     *
+     * @param jdbcType JDBC type object that represent type of placeholder
+     */
     @inline
-    protected final def thisParametersWith (jdbcType : JdbcType [_]) : Parameters =
-            parameters :+ ((jdbcType, None))
+    protected final def thisParametersWith (jdbcType : AbstractJdbcType [_]) : Parameters =
+            parameters :+ Parameter (jdbcType, None)
 
+    /**
+     * Returns this set of parameters with the additional provided value of the given JDBC type.
+     * This method is used to construct a new set of parameters for a new Statement with same
+     * arity (number of placeholders) as the current one.
+     *
+     * @tparam Value type of value
+     * @param jdbcType JDBC type object that represent type of placeholder
+     */
+    @inline
+    protected final def thisParametersWith [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : Parameters =
+            parameters :+ Parameter (jdbcType, Some (value))
+
+    /**
+     * Get placeholder by its index, This method is not type safe and should only
+     * be used when it is 100% clear that placeholder at the given position is actually
+     * one of the given type.
+     *
+     * @param idx index of placeholder, starting from 0
+     */
     @inline
     protected final def getPlaceholder [ThisPlaceholder <: Placeholder [_]] (idx : Int) : ThisPlaceholder =
             placeholders (idx).asInstanceOf [ThisPlaceholder]
@@ -135,15 +231,16 @@ sealed abstract class Statement {
 // /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-final case class Statement0 (override val sql : String) extends Statement {
-    protected override val parameters = emptyCollection
+final case class Statement0 private [statement] (
+                            override val sql : String,
+                            protected val parameters : Parameters = emptyCollection)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement0 (newSql, newParameters).asInstanceOf [this.type]
 
-    def + (thatSql : String) : Statement0 = Statement0 (thisSqlWith (thatSql))
-
-    def + (stmt : Statement0) : Statement0 = Statement0 (thisSqlWith (stmt.sql))
-
-    def + [JdbcType1 <: JdbcType[_]] (jdbcType1 : JdbcType1) : Statement1 [JdbcType1] =
-                    Statement1 (thisSqlWithArg, thisParametersWith (jdbcType1))
+    def + [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement1 [JdbcType] =
+                    Statement1 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 
@@ -152,9 +249,13 @@ final case class Statement0 (override val sql : String) extends Statement {
 // /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-final case class Statement1 [JdbcType1 <: JdbcType [_]] private [statement] (
+final case class Statement1 [JdbcType <: AbstractJdbcType [_]] private [statement] (
                             override val sql : String,
-                            protected val parameters : Parameters) extends Statement
+                            protected val parameters : Parameters)
+                    extends Statement
 {
-    lazy val placeholder : Placeholder [JdbcType1] = getPlaceholder (0)
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement1 (newSql, newParameters).asInstanceOf [this.type]
+
+    lazy val placeholder : Placeholder [JdbcType] = getPlaceholder (0)
 }

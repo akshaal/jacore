@@ -95,7 +95,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    protected sealed trait PreparedAction0 [+Action <: JdbcAction]
+    protected sealed trait PreparedAction0 [+Action <: AbstractJdbcAction]
                 extends Function0 [Action#Result] with PreparedAction [Action]
 
     
@@ -104,7 +104,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    protected sealed trait PreparedAction1 [-Param, +Action <: JdbcAction]
+    protected sealed trait PreparedAction1 [-Param, +Action <: AbstractJdbcAction]
                 extends Function1 [Param, Action#Result] with PreparedAction [Action]
 
 
@@ -113,7 +113,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    protected sealed trait PreparedAction2 [-Param1, -Param2, +Action <: JdbcAction]
+    protected sealed trait PreparedAction2 [-Param1, -Param2, +Action <: AbstractJdbcAction]
                 extends Function2 [Param1, Param2, Action#Result] with PreparedAction [Action]
 
 
@@ -122,7 +122,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $PreparedActionDeclaration
      */
-    protected sealed trait PreparedAction3 [-Param1, -Param2, -Param3, +Action <: JdbcAction]
+    protected sealed trait PreparedAction3 [-Param1, -Param2, -Param3, +Action <: AbstractJdbcAction]
                 extends Function3 [Param1, Param2, Param3, Action#Result]
                    with PreparedAction [Action]
 
@@ -133,7 +133,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $PreparedActionDeclaration
      */
     protected sealed trait PreparedAction4 [-Param1, -Param2, -Param3, -Param4,
-                                            +Action <: JdbcAction]
+                                            +Action <: AbstractJdbcAction]
                 extends Function4 [Param1, Param2, Param3, Param4, Action#Result]
                    with PreparedAction [Action]
 
@@ -144,7 +144,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $PreparedActionDeclaration
      */
     protected sealed trait PreparedAction5 [-Param1, -Param2, -Param3, -Param4, -Param5,
-                                            +Action <: JdbcAction]
+                                            +Action <: AbstractJdbcAction]
                 extends Function5 [Param1, Param2, Param3, Param4, Param5, Action#Result]
                    with PreparedAction [Action]
 
@@ -155,7 +155,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $PreparedActionDeclaration
      */
     protected sealed trait PreparedAction6 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
-                                            +Action <: JdbcAction]
+                                            +Action <: AbstractJdbcAction]
                 extends Function6 [Param1, Param2, Param3, Param4, Param5, Param6, Action#Result]
                    with PreparedAction [Action]
 
@@ -166,7 +166,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $PreparedActionDeclaration
      */
     protected sealed trait PreparedAction7 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
-                                            -Param7, +Action <: JdbcAction]
+                                            -Param7, +Action <: AbstractJdbcAction]
                 extends Function7 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
                                    Action#Result]
                    with PreparedAction [Action]
@@ -178,7 +178,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $PreparedActionDeclaration
      */
     protected sealed trait PreparedAction8 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
-                                            -Param7, -Param8, +Action <: JdbcAction]
+                                            -Param7, -Param8, +Action <: AbstractJdbcAction]
                 extends Function8 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
                                    Param8, Action#Result] with PreparedAction [Action]
 
@@ -189,7 +189,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $PreparedActionDeclaration
      */
     protected sealed trait PreparedAction9 [-Param1, -Param2, -Param3, -Param4, -Param5, -Param6,
-                                            -Param7, -Param8, -Param9, +Action <: JdbcAction]
+                                            -Param7, -Param8, -Param9, +Action <: AbstractJdbcAction]
                 extends Function9 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
                                    Param8, Param9, Action#Result]
                    with PreparedAction [Action]
@@ -206,7 +206,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected final def prepare [Action <: JdbcAction] (action : Action)
+    protected final def prepare [Action <: AbstractJdbcAction] (action : Action)
                             : PreparedAction0 [Action] =
         new {
             protected override val parameterCount = 0
@@ -222,15 +222,15 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected final def prepare [Param, Action <: JdbcAction] (
+    protected final def prepare [Param, Action <: AbstractJdbcAction] (
                                   action : Action,
-                                  paramJdbcType : JdbcType [Param])
+                                  paramJdbcType : AbstractJdbcType [Param])
                             : PreparedAction1 [Param, Action] =
         new {
             protected override val parameterCount = 1
             protected override val jdbcAction = action
         } with PreparedAction1 [Param, Action] {
-            private val p1setter = JdbcSetter.getFor (paramJdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (paramJdbcType)
 
             override def apply (param : Param) : Result = {
                 val jdbcPS = getPreparedStatement ()
@@ -245,17 +245,17 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected final def prepare [Param1, Param2, Action <: JdbcAction] (
+    protected final def prepare [Param1, Param2, Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2])
                             : PreparedAction2 [Param1, Param2, Action] =
         new {
             protected override val parameterCount = 2
             protected override val jdbcAction = action
         } with PreparedAction2 [Param1, Param2, Action] {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2) : Result = {
                 val jdbcPS = getPreparedStatement ()
@@ -271,19 +271,19 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected final def prepare [Param1, Param2, Param3, Result, Action <: JdbcAction] (
+    protected final def prepare [Param1, Param2, Param3, Result, Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2],
-                                param3JdbcType : JdbcType [Param3])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2],
+                                param3JdbcType : AbstractJdbcType [Param3])
                             : PreparedAction3 [Param1, Param2, Param3, Action] =
         new {
             protected override val parameterCount = 3
             protected override val jdbcAction = action
         } with PreparedAction3 [Param1, Param2, Param3, Action] {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
-            private val p3setter = JdbcSetter.getFor (param3JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
+            private val p3setter = AbstractJdbcSetter.getFor (param3JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2, p3 : Param3) : Result = {
                 val jdbcPS = getPreparedStatement ()
@@ -300,21 +300,21 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected final def prepare [Param1, Param2, Param3, Param4, Action <: JdbcAction] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2],
-                                param3JdbcType : JdbcType [Param3],
-                                param4JdbcType : JdbcType [Param4])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2],
+                                param3JdbcType : AbstractJdbcType [Param3],
+                                param4JdbcType : AbstractJdbcType [Param4])
                             : PreparedAction4 [Param1, Param2, Param3, Param4, Action] =
         new {
             protected override val parameterCount = 4
             protected override val jdbcAction = action
         } with PreparedAction4 [Param1, Param2, Param3, Param4, Action] {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
-            private val p3setter = JdbcSetter.getFor (param3JdbcType)
-            private val p4setter = JdbcSetter.getFor (param4JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
+            private val p3setter = AbstractJdbcSetter.getFor (param3JdbcType)
+            private val p4setter = AbstractJdbcSetter.getFor (param4JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2, p3 : Param3, p4 : Param4) : Result = {
                 val jdbcPS = getPreparedStatement ()
@@ -332,24 +332,24 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-    protected final def prepare [Param1, Param2, Param3, Param4, Param5, Action <: JdbcAction] (
+    protected final def prepare [Param1, Param2, Param3, Param4, Param5, Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2],
-                                param3JdbcType : JdbcType [Param3],
-                                param4JdbcType : JdbcType [Param4],
-                                param5JdbcType : JdbcType [Param5])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2],
+                                param3JdbcType : AbstractJdbcType [Param3],
+                                param4JdbcType : AbstractJdbcType [Param4],
+                                param5JdbcType : AbstractJdbcType [Param5])
                             : PreparedAction5 [Param1, Param2, Param3, Param4, Param5,
                                                Action] =
         new {
             protected override val parameterCount = 5
             protected override val jdbcAction = action
         } with PreparedAction5 [Param1, Param2, Param3, Param4, Param5, Action] {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
-            private val p3setter = JdbcSetter.getFor (param3JdbcType)
-            private val p4setter = JdbcSetter.getFor (param4JdbcType)
-            private val p5setter = JdbcSetter.getFor (param5JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
+            private val p3setter = AbstractJdbcSetter.getFor (param3JdbcType)
+            private val p4setter = AbstractJdbcSetter.getFor (param4JdbcType)
+            private val p5setter = AbstractJdbcSetter.getFor (param5JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2, p3 : Param3, p4 : Param4,
                                 p5 : Param5) : Result =
@@ -371,14 +371,14 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $prepareMethod
      */
     protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6,
-                           Action <: JdbcAction] (
+                           Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2],
-                                param3JdbcType : JdbcType [Param3],
-                                param4JdbcType : JdbcType [Param4],
-                                param5JdbcType : JdbcType [Param5],
-                                param6JdbcType : JdbcType [Param6])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2],
+                                param3JdbcType : AbstractJdbcType [Param3],
+                                param4JdbcType : AbstractJdbcType [Param4],
+                                param5JdbcType : AbstractJdbcType [Param5],
+                                param6JdbcType : AbstractJdbcType [Param6])
                             : PreparedAction6 [Param1, Param2, Param3, Param4, Param5,
                                                Param6, Action] =
         new {
@@ -386,12 +386,12 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             protected override val jdbcAction = action
         } with PreparedAction6 [Param1, Param2, Param3, Param4, Param5, Param6, Action]
         {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
-            private val p3setter = JdbcSetter.getFor (param3JdbcType)
-            private val p4setter = JdbcSetter.getFor (param4JdbcType)
-            private val p5setter = JdbcSetter.getFor (param5JdbcType)
-            private val p6setter = JdbcSetter.getFor (param6JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
+            private val p3setter = AbstractJdbcSetter.getFor (param3JdbcType)
+            private val p4setter = AbstractJdbcSetter.getFor (param4JdbcType)
+            private val p5setter = AbstractJdbcSetter.getFor (param5JdbcType)
+            private val p6setter = AbstractJdbcSetter.getFor (param6JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2, p3 : Param3, p4 : Param4, p5 : Param5,
                                 p6 : Param6) : Result =
@@ -414,15 +414,15 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $prepareMethod
      */
     protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
-                           Action <: JdbcAction] (
+                           Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2],
-                                param3JdbcType : JdbcType [Param3],
-                                param4JdbcType : JdbcType [Param4],
-                                param5JdbcType : JdbcType [Param5],
-                                param6JdbcType : JdbcType [Param6],
-                                param7JdbcType : JdbcType [Param7])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2],
+                                param3JdbcType : AbstractJdbcType [Param3],
+                                param4JdbcType : AbstractJdbcType [Param4],
+                                param5JdbcType : AbstractJdbcType [Param5],
+                                param6JdbcType : AbstractJdbcType [Param6],
+                                param7JdbcType : AbstractJdbcType [Param7])
                             : PreparedAction7 [Param1, Param2, Param3, Param4, Param5, Param6,
                                                Param7, Action] =
         new {
@@ -430,13 +430,13 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             protected override val jdbcAction = action
         } with PreparedAction7 [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Action]
         {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
-            private val p3setter = JdbcSetter.getFor (param3JdbcType)
-            private val p4setter = JdbcSetter.getFor (param4JdbcType)
-            private val p5setter = JdbcSetter.getFor (param5JdbcType)
-            private val p6setter = JdbcSetter.getFor (param6JdbcType)
-            private val p7setter = JdbcSetter.getFor (param7JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
+            private val p3setter = AbstractJdbcSetter.getFor (param3JdbcType)
+            private val p4setter = AbstractJdbcSetter.getFor (param4JdbcType)
+            private val p5setter = AbstractJdbcSetter.getFor (param5JdbcType)
+            private val p6setter = AbstractJdbcSetter.getFor (param6JdbcType)
+            private val p7setter = AbstractJdbcSetter.getFor (param7JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2, p3 : Param3, p4 : Param4, p5 : Param5,
                                 p6 : Param6, p7 : Param7) : Result =
@@ -460,16 +460,16 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $prepareMethod
      */
     protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8,
-                           Action <: JdbcAction] (
+                           Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2],
-                                param3JdbcType : JdbcType [Param3],
-                                param4JdbcType : JdbcType [Param4],
-                                param5JdbcType : JdbcType [Param5],
-                                param6JdbcType : JdbcType [Param6],
-                                param7JdbcType : JdbcType [Param7],
-                                param8JdbcType : JdbcType [Param8])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2],
+                                param3JdbcType : AbstractJdbcType [Param3],
+                                param4JdbcType : AbstractJdbcType [Param4],
+                                param5JdbcType : AbstractJdbcType [Param5],
+                                param6JdbcType : AbstractJdbcType [Param6],
+                                param7JdbcType : AbstractJdbcType [Param7],
+                                param8JdbcType : AbstractJdbcType [Param8])
                             : PreparedAction8 [Param1, Param2, Param3, Param4, Param5, Param6,
                                                Param7, Param8, Action] =
         new {
@@ -478,14 +478,14 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         } with PreparedAction8 [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8,
                                 Action]
         {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
-            private val p3setter = JdbcSetter.getFor (param3JdbcType)
-            private val p4setter = JdbcSetter.getFor (param4JdbcType)
-            private val p5setter = JdbcSetter.getFor (param5JdbcType)
-            private val p6setter = JdbcSetter.getFor (param6JdbcType)
-            private val p7setter = JdbcSetter.getFor (param7JdbcType)
-            private val p8setter = JdbcSetter.getFor (param8JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
+            private val p3setter = AbstractJdbcSetter.getFor (param3JdbcType)
+            private val p4setter = AbstractJdbcSetter.getFor (param4JdbcType)
+            private val p5setter = AbstractJdbcSetter.getFor (param5JdbcType)
+            private val p6setter = AbstractJdbcSetter.getFor (param6JdbcType)
+            private val p7setter = AbstractJdbcSetter.getFor (param7JdbcType)
+            private val p8setter = AbstractJdbcSetter.getFor (param8JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2, p3 : Param3, p4 : Param4, p5 : Param5,
                                 p6 : Param6, p7 : Param7, p8 : Param8) : Result =
@@ -510,17 +510,17 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $prepareMethod
      */
     protected final def prepare [Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8,
-                                 Param9, Action <: JdbcAction] (
+                                 Param9, Action <: AbstractJdbcAction] (
                                 action : Action,
-                                param1JdbcType : JdbcType [Param1],
-                                param2JdbcType : JdbcType [Param2],
-                                param3JdbcType : JdbcType [Param3],
-                                param4JdbcType : JdbcType [Param4],
-                                param5JdbcType : JdbcType [Param5],
-                                param6JdbcType : JdbcType [Param6],
-                                param7JdbcType : JdbcType [Param7],
-                                param8JdbcType : JdbcType [Param8],
-                                param9JdbcType : JdbcType [Param9])
+                                param1JdbcType : AbstractJdbcType [Param1],
+                                param2JdbcType : AbstractJdbcType [Param2],
+                                param3JdbcType : AbstractJdbcType [Param3],
+                                param4JdbcType : AbstractJdbcType [Param4],
+                                param5JdbcType : AbstractJdbcType [Param5],
+                                param6JdbcType : AbstractJdbcType [Param6],
+                                param7JdbcType : AbstractJdbcType [Param7],
+                                param8JdbcType : AbstractJdbcType [Param8],
+                                param9JdbcType : AbstractJdbcType [Param9])
                             : PreparedAction9 [Param1, Param2, Param3, Param4, Param5, Param6,
                                                Param7, Param8, Param9, Action] =
         new {
@@ -529,15 +529,15 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         } with PreparedAction9 [Param1, Param2, Param3, Param4, Param5, Param6, Param7,
                                 Param8, Param9, Action]
         {
-            private val p1setter = JdbcSetter.getFor (param1JdbcType)
-            private val p2setter = JdbcSetter.getFor (param2JdbcType)
-            private val p3setter = JdbcSetter.getFor (param3JdbcType)
-            private val p4setter = JdbcSetter.getFor (param4JdbcType)
-            private val p5setter = JdbcSetter.getFor (param5JdbcType)
-            private val p6setter = JdbcSetter.getFor (param6JdbcType)
-            private val p7setter = JdbcSetter.getFor (param7JdbcType)
-            private val p8setter = JdbcSetter.getFor (param8JdbcType)
-            private val p9setter = JdbcSetter.getFor (param9JdbcType)
+            private val p1setter = AbstractJdbcSetter.getFor (param1JdbcType)
+            private val p2setter = AbstractJdbcSetter.getFor (param2JdbcType)
+            private val p3setter = AbstractJdbcSetter.getFor (param3JdbcType)
+            private val p4setter = AbstractJdbcSetter.getFor (param4JdbcType)
+            private val p5setter = AbstractJdbcSetter.getFor (param5JdbcType)
+            private val p6setter = AbstractJdbcSetter.getFor (param6JdbcType)
+            private val p7setter = AbstractJdbcSetter.getFor (param7JdbcType)
+            private val p8setter = AbstractJdbcSetter.getFor (param8JdbcType)
+            private val p9setter = AbstractJdbcSetter.getFor (param9JdbcType)
 
             override def apply (p1 : Param1, p2 : Param2, p3 : Param3, p4 : Param4, p5 : Param5,
                                 p6 : Param6, p7 : Param7, p8 : Param8, p9 : Param9) : Result =
@@ -570,7 +570,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * @tparam Action type of JDBC action that this prepared action is supposed to perform
      */
-    protected sealed trait PreparedAction [+Action <: JdbcAction] {
+    protected sealed trait PreparedAction [+Action <: AbstractJdbcAction] {
         /**
          * Alias for result type of action.
          */
@@ -782,7 +782,7 @@ private[jdbc] object AbstractJdbcActor {
      * @param action action to construct prepared statement for
      * @return created prepared statement
      */
-    def newPreparedStatement (conn : Connection, action : JdbcAction) : PreparedStatement = {
+    def newPreparedStatement (conn : Connection, action : AbstractJdbcAction) : PreparedStatement = {
         conn.prepareStatement (action.statement)
     }
 }

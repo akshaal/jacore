@@ -7,12 +7,12 @@ package jdbc
 package action
 
 /**
- * A type that JDBC can possibly handle.
+ * Abstract action that JDBC can possible perform.
  *
  * @param statement action statement
  * @param validate whether to validate given sql statement or not
  */
-sealed abstract class JdbcAction (val statement : String, val validate : Boolean) {
+sealed abstract class AbstractJdbcAction (val statement : String, val validate : Boolean) {
     /**
      * Type of result of this action.
      */
@@ -27,7 +27,7 @@ sealed abstract class JdbcAction (val statement : String, val validate : Boolean
  */
 final case class JdbcCommand (override val statement : String,
                               override val validate : Boolean = true)
-                    extends JdbcAction (statement = statement, validate = validate)
+                    extends AbstractJdbcAction (statement = statement, validate = validate)
 {
     type Result = Boolean
 }
@@ -40,7 +40,7 @@ final case class JdbcCommand (override val statement : String,
  */
 final case class JdbcQuery (override val statement : String,
                             override val validate : Boolean = true)
-                    extends JdbcAction (statement = statement, validate = validate)
+                    extends AbstractJdbcAction (statement = statement, validate = validate)
 {
     type Result = java.sql.ResultSet
 }
@@ -53,7 +53,7 @@ final case class JdbcQuery (override val statement : String,
  */
 final case class JdbcUpdate (override val statement : String,
                              override val validate : Boolean = true)
-                    extends JdbcAction (statement = statement, validate = validate)
+                    extends AbstractJdbcAction (statement = statement, validate = validate)
 {
     type Result = Int
 }
@@ -66,7 +66,7 @@ final case class JdbcUpdate (override val statement : String,
  */
 final case class JdbcBatch (override val statement : String,
                             override val validate : Boolean = true)
-                    extends JdbcAction (statement = statement, validate = validate)
+                    extends AbstractJdbcAction (statement = statement, validate = validate)
 {
     type Result = Unit
 }

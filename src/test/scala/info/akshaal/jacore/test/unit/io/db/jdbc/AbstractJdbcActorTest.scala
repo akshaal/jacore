@@ -49,16 +49,16 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
             new MockedJdbc {
                 val command1 : PreparedAction0 [JC] = prepare (JdbcCommand ("..."))
-                val command2 : PreparedAction0 [JdbcAction] = command1
+                val command2 : PreparedAction0 [AbstractJdbcAction] = command1
 
                 val query1 : PreparedAction0 [JQ] = prepare (JdbcQuery ("..."))
-                val query2 : PreparedAction0 [JdbcAction] = query1
+                val query2 : PreparedAction0 [AbstractJdbcAction] = query1
 
                 val update1 : PreparedAction0 [JU] = prepare (JdbcUpdate ("..."))
-                val update2 : PreparedAction0 [JdbcAction] = update1
+                val update2 : PreparedAction0 [AbstractJdbcAction] = update1
 
                 val batch1 : PreparedAction0 [JB] = prepare (JdbcBatch ("..."))
-                val batch2 : PreparedAction0 [JdbcAction] = batch1
+                val batch2 : PreparedAction0 [AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 1 argument
@@ -66,25 +66,25 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
             new MockedJdbc {
                 // command
                 val command1 : PreparedAction1 [Date, JC] = prepare (JdbcCommand ("?"), JdbcDate)
-                val command2 : PreparedAction1 [MyDate, JdbcAction] = command1
+                val command2 : PreparedAction1 [MyDate, AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction1 [JavaObject, JQ] =
                             prepare (JdbcQuery ("?"), JdbcObject)
 
-                val query2 : PreparedAction1 [MyObject, JdbcAction] = query1
+                val query2 : PreparedAction1 [MyObject, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction1 [BigDecimal, JU] =
                             prepare (JdbcUpdate ("?"), JdbcBigDecimal)
                         
-                val update2 : PreparedAction1 [MyDecimal, JdbcAction] = update1
+                val update2 : PreparedAction1 [MyDecimal, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction1 [JavaObject, JB] =
                             prepare (JdbcBatch ("?"), JdbcObject)
 
-                val batch2 : PreparedAction1 [MyObject, JdbcAction] = batch1
+                val batch2 : PreparedAction1 [MyObject, AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 2 arguments
@@ -94,25 +94,25 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                 val command1 : PreparedAction2 [Date, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ?"), JdbcDate, JdbcBigDecimal)
 
-                val command2 : PreparedAction2 [MyDate, MyDecimal, JdbcAction] = command1
+                val command2 : PreparedAction2 [MyDate, MyDecimal, AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction2 [JavaObject, Date, JQ] =
                             prepare (JdbcQuery ("? ?"), JdbcObject, JdbcDate)
 
-                val query2 : PreparedAction2 [MyObject, MyDate, JdbcAction] = query1
+                val query2 : PreparedAction2 [MyObject, MyDate, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction2 [Date, BigDecimal, JU] =
                             prepare (JdbcUpdate ("? ?"), JdbcDate, JdbcBigDecimal)
 
-                val update2 : PreparedAction2 [MyDate, MyDecimal, JdbcAction] = update1
+                val update2 : PreparedAction2 [MyDate, MyDecimal, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction2 [JavaObject, BigDecimal, JB] =
                             prepare (JdbcBatch ("? ?"), JdbcObject, JdbcBigDecimal)
 
-                val batch2 : PreparedAction2 [MyObject, MyDecimal, JdbcAction] = batch1
+                val batch2 : PreparedAction2 [MyObject, MyDecimal, AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 3 arguments
@@ -122,26 +122,26 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                 val command1 : PreparedAction3 [Date, JavaObject, BigDecimal, JC] =
                             prepare (JdbcCommand ("? ? ?"), JdbcDate, JdbcObject, JdbcBigDecimal)
 
-                val command2 : PreparedAction3 [MyDate, MyObject, MyDecimal, JdbcAction] =
+                val command2 : PreparedAction3 [MyDate, MyObject, MyDecimal, AbstractJdbcAction] =
                             command1
 
                 // query
                 val query1 : PreparedAction3 [JavaObject, JavaObject, Date, JQ] =
                             prepare (JdbcQuery ("? ? ?"), JdbcObject, JdbcObject, JdbcDate)
 
-                val query2 : PreparedAction3 [MyObject, MyObject, MyDate, JdbcAction] = query1
+                val query2 : PreparedAction3 [MyObject, MyObject, MyDate, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction3 [Date, BigDecimal, Date, JU] =
                             prepare (JdbcUpdate ("? ? ?"), JdbcDate, JdbcBigDecimal, JdbcDate)
 
-                val update2 : PreparedAction3 [MyDate, MyDecimal, MyDate, JdbcAction] = update1
+                val update2 : PreparedAction3 [MyDate, MyDecimal, MyDate, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction3 [JavaObject, BigDecimal, Int, JB] =
                             prepare (JdbcBatch ("? ? ?"), JdbcObject, JdbcBigDecimal, JdbcInt)
 
-                val batch2 : PreparedAction3 [MyObject, MyDecimal, Int, JdbcAction] = batch1
+                val batch2 : PreparedAction3 [MyObject, MyDecimal, Int, AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 4 arguments
@@ -153,7 +153,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal)
 
                 val command2 : PreparedAction4 [MyDate, MyDate, MyObject,
-                                                MyDecimal, JdbcAction] = command1
+                                                MyDecimal, AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction4 [Date, JavaObject, JavaObject, Date, JQ] =
@@ -161,7 +161,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate)
 
                 val query2 : PreparedAction4 [MyDate, MyObject, MyObject,
-                                              MyDate, JdbcAction] = query1
+                                              MyDate, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction4 [JavaObject, Date, BigDecimal, Date, JU] =
@@ -169,7 +169,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate)
 
                 val update2 : PreparedAction4 [MyObject, MyDate, MyDecimal,
-                                               MyDate, JdbcAction] = update1
+                                               MyDate, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction4 [JavaObject, BigDecimal, Int, Date, JB] =
@@ -177,7 +177,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate)
 
                 val batch2 : PreparedAction4 [MyObject, MyDecimal, Int, MyDate,
-                                              JdbcAction] = batch1
+                                              AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 5 arguments
@@ -190,7 +190,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate, JdbcDate, JdbcObject, JdbcBigDecimal, JdbcDate)
 
                 val command2 : PreparedAction5 [MyDate, MyDate, MyObject,
-                                                MyDecimal, MyDate, JdbcAction] = command1
+                                                MyDecimal, MyDate, AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction5 [Date, JavaObject, JavaObject, Date, JavaObject,
@@ -199,7 +199,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate, JdbcObject, JdbcObject, JdbcDate, JdbcObject)
 
                 val query2 : PreparedAction5 [MyDate, MyObject, MyObject,
-                                              MyDate, MyObject, JdbcAction] = query1
+                                              MyDate, MyObject, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction5 [JavaObject, Date, BigDecimal, Date, BigDecimal,
@@ -208,7 +208,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcObject, JdbcDate, JdbcBigDecimal, JdbcDate, JdbcBigDecimal)
 
                 val update2 : PreparedAction5 [MyObject, MyDate, MyDecimal,
-                                               MyDate, MyDecimal, JdbcAction] = update1
+                                               MyDate, MyDecimal, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction5 [JavaObject, BigDecimal, Int, Date, Date, JB] =
@@ -216,7 +216,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate, JdbcDate)
 
                 val batch2 : PreparedAction5 [MyObject, MyDecimal, Int, MyDate, MyDate,
-                                              JdbcAction] = batch1
+                                              AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 6 arguments
@@ -230,7 +230,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcBigDecimal)
 
                 val command2 : PreparedAction6 [MyDate, MyDate, MyObject, MyDecimal, MyDate,
-                                                MyDecimal, JdbcAction] = command1
+                                                MyDecimal, AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction6 [Date, JavaObject, JavaObject, Date, JavaObject,
@@ -240,7 +240,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate)
 
                 val query2 : PreparedAction6 [MyDate, MyObject, MyObject,
-                                              MyDate, MyObject, MyDate, JdbcAction] = query1
+                                              MyDate, MyObject, MyDate, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction6 [JavaObject, Date, BigDecimal, Date, BigDecimal,
@@ -250,7 +250,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcBigDecimal, JdbcDate)
 
                 val update2 : PreparedAction6 [MyObject, MyDate, MyDecimal,
-                                               MyDate, MyDecimal, MyDate, JdbcAction] = update1
+                                               MyDate, MyDecimal, MyDate, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction6 [JavaObject, BigDecimal, Int, Date, Date, JavaObject,
@@ -259,7 +259,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcDate, JdbcObject, JdbcObject)
 
                 val batch2 : PreparedAction6 [MyObject, MyDecimal, Int, MyDate, MyDate,
-                                              MyObject, JdbcAction] = batch1
+                                              MyObject, AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 7 arguments
@@ -274,7 +274,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val command2 : PreparedAction7 [MyObject, MyDate, MyDate, MyObject,
                                                 MyDecimal, MyDate, MyDecimal,
-                                                JdbcAction] = command1
+                                                AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction7 [Date, JavaObject, JavaObject, Date, JavaObject,
@@ -285,7 +285,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val query2 : PreparedAction7 [MyDate, MyObject, MyObject,
                                               MyDate, MyObject, MyDate,
-                                              MyObject, JdbcAction] = query1
+                                              MyObject, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction7 [JavaObject, Date, BigDecimal, Date, BigDecimal,
@@ -296,7 +296,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val update2 : PreparedAction7 [MyObject, MyDate, MyDecimal,
                                                MyDate, MyDecimal, MyDate,
-                                               MyObject, JdbcAction] = update1
+                                               MyObject, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction7 [JavaObject, BigDecimal, Int, Date, Date, JavaObject,
@@ -305,7 +305,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcInt, JdbcDate, JdbcObject, JdbcObject, JdbcDate)
 
                 val batch2 : PreparedAction7 [MyObject, MyDecimal, Int, MyDate, MyDate,
-                                              MyObject, MyDate, JdbcAction] = batch1
+                                              MyObject, MyDate, AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 8 arguments
@@ -321,7 +321,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val command2 : PreparedAction8 [MyObject, MyDate, MyDate, MyObject,
                                                    MyDecimal, MyDate, MyDecimal,
-                                                   MyObject, JdbcAction] = command1
+                                                   MyObject, AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction8 [Date, JavaObject, JavaObject, Date, JavaObject,
@@ -332,7 +332,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val query2 : PreparedAction8 [MyDate, MyObject, MyObject,
                                                  MyDate, MyObject, MyDate,
-                                                 MyObject, MyDecimal, JdbcAction] = query1
+                                                 MyObject, MyDecimal, AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction8 [JavaObject, Date, BigDecimal, Date, BigDecimal,
@@ -343,7 +343,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val update2 : PreparedAction8 [MyObject, MyDate, MyDecimal,
                                                MyDate, MyDecimal, MyDate,
-                                               MyObject, MyDate, JdbcAction] = update1
+                                               MyObject, MyDate, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction8 [JavaObject, BigDecimal, Int, Date, Date, JavaObject,
@@ -353,7 +353,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                                      JdbcBigDecimal)
 
                 val batch2 : PreparedAction8 [MyObject, MyDecimal, Int, MyDate, MyDate,
-                                              MyObject, MyDate, MyDecimal, JdbcAction] = batch1
+                                              MyObject, MyDate, MyDecimal, AbstractJdbcAction] = batch1
             }
 
             // - - -- - -- --- - - - 9 arguments
@@ -369,7 +369,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val command2 : PreparedAction9 [MyObject, MyDate, MyDate, MyObject,
                                                 MyDecimal, MyDate, MyDecimal,
-                                                MyObject, MyDate, JdbcAction] = command1
+                                                MyObject, MyDate, AbstractJdbcAction] = command1
 
                 // query
                 val query1 : PreparedAction9 [Date, JavaObject, JavaObject, Date, JavaObject,
@@ -381,7 +381,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
                 val query2 : PreparedAction9 [MyDate, MyObject, MyObject,
                                               MyDate, MyObject, MyDate,
                                               MyObject, MyDecimal, MyDate,
-                                              JdbcAction] = query1
+                                              AbstractJdbcAction] = query1
 
                 // update
                 val update1 : PreparedAction9 [JavaObject, Date, BigDecimal, Date, BigDecimal,
@@ -392,7 +392,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val update2 : PreparedAction9 [MyObject, MyDate, MyDecimal,
                                                MyDate, MyDecimal, MyDate,
-                                               MyObject, MyDate, MyObject, JdbcAction] = update1
+                                               MyObject, MyDate, MyObject, AbstractJdbcAction] = update1
 
                 // batch
                 val batch1 : PreparedAction9 [JavaObject, BigDecimal, Int, Date, Date, JavaObject,
@@ -403,7 +403,7 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val batch2 : PreparedAction9 [MyObject, MyDecimal, Int, MyDate, MyDate,
                                               MyObject, MyDate, MyDecimal, MyDate,
-                                              JdbcAction] = batch1
+                                              AbstractJdbcAction] = batch1
             }
 
             // This test is just compilation-time test. So we have to give something

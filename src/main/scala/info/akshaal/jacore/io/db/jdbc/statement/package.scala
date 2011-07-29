@@ -5,8 +5,6 @@ package io
 package db
 package jdbc
 
-import `type`.JdbcType
-
 
 /**
  * Package object that contains implicit to be useful for Statement types.
