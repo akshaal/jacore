@@ -100,4 +100,32 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
             checkStmt (s1_vint_str, "insert into x values ( ? , ? )", Prov (JdbcInt, 10, 1))
         }
     }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
+    "Statement1" should {
+        "support concatenation with strings" in {
+            val s = s1_int ++ "from ABC"
+
+            checkStmt (s, "select 1 ? from ABC")
+            s.placeholder  must_==  Hdr (JdbcInt, 1)
+        }
+
+        "support concatenation with Statement0 objects and provided values" in {
+            val ls1 = s1_string ++ s0_2
+            checkStmt (ls1, "select 1 ? set xxx")
+            ls1.placeholder  must_==  Hdr (JdbcString, 1)
+
+            val ls2 = "a" ++ JdbcBytes ++ (JdbcInt, 100) ++ s0_2
+            checkStmt (ls2, "a ? ? set xxx", Prov (JdbcInt, 100, 2))
+            ls2.placeholder  must_==  Hdr (JdbcBytes, 1)
+
+            val ls3 = "a" ++ (JdbcString, "xyz") ++ "x" ++ JdbcBytes ++ (JdbcInt, 50) ++ s0_2
+            checkStmt (ls3, "a ? x ? ? set xxx", Prov (JdbcString, "xyz", 1), Prov (JdbcInt, 50, 3))
+            ls3.placeholder  must_==  Hdr (JdbcBytes, 2)
+        }
+    }
 }

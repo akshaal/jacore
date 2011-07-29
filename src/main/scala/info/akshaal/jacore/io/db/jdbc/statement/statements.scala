@@ -111,13 +111,43 @@ import Statement._
  *    it needs to get a detailed information. For intermediate statements,
  *    which used to construct a final statement, this value is never calculated.
  *
+ * @define JdbcTypeXStart type of object that defines a way in which a value for the
+ * @define JdbcTypeXEnd placeholder should be handled by JDBC
+ * @define StatementX
+ *    SQL statement with $placeholdersCount placeholders.
+ *
+ *    @param JdbcType1  $JdbcTypeXStart first $JdbcTypeXEnd
+ *    @param JdbcType2  $JdbcTypeXStart second $JdbcTypeXEnd
+ *    @param JdbcType3  $JdbcTypeXStart third $JdbcTypeXEnd
+ *    @param JdbcType5  $JdbcTypeXStart fifth $JdbcTypeXEnd
+ *    @param JdbcType6  $JdbcTypeXStart sixth $JdbcTypeXEnd
+ *    @param JdbcType7  $JdbcTypeXStart seventh $JdbcTypeXEnd
+ *    @param JdbcType8  $JdbcTypeXStart 8th $JdbcTypeXEnd
+ *    @param JdbcType9  $JdbcTypeXStart 9th $JdbcTypeXEnd
+ *    @param JdbcType10 $JdbcTypeXStart 10th $JdbcTypeXEnd
+ *    @param JdbcType11 $JdbcTypeXStart 11th $JdbcTypeXEnd
+ *    @param JdbcType12 $JdbcTypeXStart 12th $JdbcTypeXEnd
+ *    @param JdbcType13 $JdbcTypeXStart 13th $JdbcTypeXEnd
+ *    @param JdbcType14 $JdbcTypeXStart 14th $JdbcTypeXEnd
+ *    @param JdbcType15 $JdbcTypeXStart 15th $JdbcTypeXEnd
+ *    @param JdbcType16 $JdbcTypeXStart 16th $JdbcTypeXEnd
+ *    @param JdbcType17 $JdbcTypeXStart 17th $JdbcTypeXEnd
+ *    @param JdbcType18 $JdbcTypeXStart 18th $JdbcTypeXEnd
+ *    @param JdbcType19 $JdbcTypeXStart 19th $JdbcTypeXEnd
+ *    @param JdbcType20 $JdbcTypeXStart 20th $JdbcTypeXEnd
+ *    @param JdbcType21 $JdbcTypeXStart 21th $JdbcTypeXEnd
+ *    @param JdbcType22 $JdbcTypeXStart 22th $JdbcTypeXEnd
+ *    @param JdbcType23 $JdbcTypeXStart 23th $JdbcTypeXEnd
+ *    @param JdbcType24 $JdbcTypeXStart 24th $JdbcTypeXEnd
+ *    @param JdbcType25 $JdbcTypeXStart 25th $JdbcTypeXEnd
+ *
  * @define PlusPlus
- *     Constructs a new $HigherStat object from this one and the given {jdbcType} placeholder.
+ *    Constructs a new $HigherStat object from this one and the given {jdbcType} placeholder.
  * 
- *     @tparam JdbcType type of JDBC type case object
- *     @param jdbcType case object that defined JDBC type of the placeholder
- *     @return the new statement object which SQL string is {this.sql + " ?"}, all parameters
- *             are copied from {this} statement with an extra parameter defined by {jdbcType}
+ *    @tparam JdbcType type of JDBC type case object
+ *    @param jdbcType case object that defined JDBC type of the placeholder
+ *    @return the new statement object which SQL string is {this.sql + " ?"}, all parameters
+ *            are copied from {this} statement with an extra parameter defined by {jdbcType}
  */
 sealed abstract class Statement {
     /**
@@ -293,7 +323,9 @@ final case class Statement0 private [statement] (
 /**
  * SQL statement with one placeholder.
  *
- * @param JdbcType1 type of object that defines a way value for placeholder is passed to DB
+ * @param JdbcType1 type of object that defines a way in which a value for the placeholder is
+ *                  passed to DB
+ * @define HigherStat Statement2
  */
 final case class Statement1 [JdbcType1 <: AbstractJdbcType [_]] private [statement] (
                             override val sql : String,
@@ -307,4 +339,43 @@ final case class Statement1 [JdbcType1 <: AbstractJdbcType [_]] private [stateme
      * Placeholder of the statement.
      */
     lazy val placeholder : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement2 [JdbcType1, JdbcType] =
+                    Statement2 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount two
+ * @define HigherStat Statement3
+ */
+final case class Statement2 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement2 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * First placeholder of the statement.
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * Second placeholder of the statement.
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+}
+
