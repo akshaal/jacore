@@ -133,11 +133,11 @@ sealed abstract class Statement {
             yield mkYield (parameter, idx)
     }
 
-    final def + (thatSql : String) : this.type = sameType (thisSqlWith (thatSql), parameters)
+    final def ++ (thatSql : String) : this.type = sameType (thisSqlWith (thatSql), parameters)
 
-    final def + (stmt : Statement0) : this.type = sameType (thisSqlWith (stmt.sql), parameters ++ stmt.parameters)
+    final def ++ (stmt : Statement0) : this.type = sameType (thisSqlWith (stmt.sql), parameters ++ stmt.parameters)
 
-    final def + [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : this.type =
+    final def ++ [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : this.type =
                     sameType (thisSqlWithArg, thisParametersWith (jdbcType, value))
 
     // - - - -  - - - - - - - - Protected and private part - - - - - - - - - - - - - - -
@@ -239,7 +239,7 @@ final case class Statement0 private [statement] (
     protected override def sameType (newSql : String, newParameters : Parameters) =
         Statement0 (newSql, newParameters).asInstanceOf [this.type]
 
-    def + [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement1 [JdbcType] =
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement1 [JdbcType] =
                     Statement1 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 

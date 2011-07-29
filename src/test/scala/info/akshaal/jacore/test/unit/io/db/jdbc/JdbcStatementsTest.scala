@@ -14,15 +14,15 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
     val s0_1 : Statement0 = "select 1"
     val s0_2 : Statement0 = "set xxx"
 
-    val s0_vint = s0_1 + (JdbcInt, 4)
-    val s0_vstring = s0_2 + (JdbcString, "xxx")
+    val s0_vint = s0_1 ++ (JdbcInt, 4)
+    val s0_vstring = s0_2 ++ (JdbcString, "xxx")
 
-    val s1_int = s0_1 + JdbcInt
-    val s1_string = s0_1 + JdbcString
-    val s1_blob = s0_1 + JdbcBlob
-    val s1_clob = s0_2 + JdbcClob
-    val s1_int_vstr = ("insert into x values (" : Statement0) + JdbcInt + "," + (JdbcString, "x") + ")"
-    val s1_vint_str = ("insert into x values (" : Statement0) + (JdbcInt, 10) + "," + JdbcString + ")"
+    val s1_int = s0_1 ++ JdbcInt
+    val s1_string = s0_1 ++ JdbcString
+    val s1_blob = s0_1 ++ JdbcBlob
+    val s1_clob = s0_2 ++ JdbcClob
+    val s1_int_vstr = "insert into x values (" ++ JdbcInt ++ "," ++ (JdbcString, "x") ++ ")"
+    val s1_vint_str = "insert into x values (" ++ (JdbcInt, 10) ++ "," ++ JdbcString ++ ")"
 
     // Two objects should be equals regardless their type
     def checkArgs (manifest : Manifest [_], args : Manifest [_]*) : Unit = {
@@ -49,29 +49,29 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
         }
 
         "support concatenation with strings" in {
-            checkStmt (s0_1 + "from A",      "select 1 from A")
-            checkStmt (s0_2 + "1",           "set xxx 1")
-            checkStmt (s0_vstring + "abc",   "set xxx ? abc",  Prov (JdbcString, "xxx", 1))
+            checkStmt (s0_1 ++ "from A",      "select 1 from A")
+            checkStmt (s0_2 ++ "1",           "set xxx 1")
+            checkStmt (s0_vstring ++ "abc",   "set xxx ? abc",  Prov (JdbcString, "xxx", 1))
         }
 
         "support concatenation with Statement0 objects" in {
-            checkStmt (s0_1 + s0_2,           "select 1 set xxx")
-            checkStmt (s0_2 + s0_1,           "set xxx select 1")
-            checkStmt (s0_1 + s0_1,           "select 1 select 1")
-            checkStmt (s0_1 + s0_2 + s0_1,    "select 1 set xxx select 1")
-            checkStmt (s0_vint + s0_1,        "select 1 ? select 1", Prov (JdbcInt, 4, 1))
+            checkStmt (s0_1 ++ s0_2,           "select 1 set xxx")
+            checkStmt (s0_2 ++ s0_1,           "set xxx select 1")
+            checkStmt (s0_1 ++ s0_1,           "select 1 select 1")
+            checkStmt (s0_1 ++ s0_2 ++ s0_1,   "select 1 set xxx select 1")
+            checkStmt (s0_vint ++ s0_1,        "select 1 ? select 1", Prov (JdbcInt, 4, 1))
 
-            (s0_1 + s0_2)  must haveClass [Statement0]
+            (s0_1 ++ s0_2)  must haveClass [Statement0]
         }
 
         "support concatenation with provided values" in {
             checkStmt (s0_vint,     "select 1 ?",  Prov (JdbcInt, 4, 1))
             checkStmt (s0_vstring,  "set xxx ?",   Prov (JdbcString, "xxx", 1))
 
-            checkStmt (s0_vint + s0_vstring,  "select 1 ? set xxx ?",
+            checkStmt (s0_vint ++ s0_vstring,  "select 1 ? set xxx ?",
                        Prov (JdbcInt, 4, 1), Prov (JdbcString, "xxx", 2))
 
-            checkStmt (s0_vstring + s0_vint,  "set xxx ? select 1 ?",
+            checkStmt (s0_vstring ++ s0_vint,  "set xxx ? select 1 ?",
                        Prov (JdbcString, "xxx", 1), Prov (JdbcInt, 4, 2))
 
             s0_vint     must haveClass [Statement0]
