@@ -29,10 +29,8 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
         manifest.typeArguments  must_==  args.toList
     }
 
-    def checkStmt (stmt : Statement,
-                   sql : String,
-                   pvs : Any*) : Unit =
-    {
+    // Check statement
+    def checkStmt (stmt : Statement, sql : String, pvs : Any*) : Unit = {
         stmt.sql                    must_==  sql
         stmt.providedValues.toList  must_==  pvs.toList
     }
