@@ -8,6 +8,7 @@ package `type`
 
 /**
  * Case objects of this trait are used to define classes of values which JDBC can possibly handle.
+ * It defines a way by which JDBC converts values from Scala type to database type.
  *
  * @tparam Value scala type that JDBC Type wraps
  */

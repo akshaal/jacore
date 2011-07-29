@@ -110,6 +110,14 @@ import Statement._
  *    Should be lazy value for it is only used by Statement implementation when
  *    it needs to get a detailed information. For intermediate statements,
  *    which used to construct a final statement, this value is never calculated.
+ *
+ * @define PlusPlus
+ *     Constructs a new $HigherStat object from this one and the given {jdbcType} placeholder.
+ * 
+ *     @tparam JdbcType type of JDBC type case object
+ *     @param jdbcType case object that defined JDBC type of the placeholder
+ *     @return the new statement object which SQL string is {this.sql + " ?"}, all parameters
+ *             are copied from {this} statement with an extra parameter defined by {jdbcType}
  */
 sealed abstract class Statement {
     /**
@@ -133,10 +141,35 @@ sealed abstract class Statement {
             yield mkYield (parameter, idx)
     }
 
-    final def ++ (thatSql : String) : this.type = sameType (thisSqlWith (thatSql), parameters)
+    /**
+     * Construct a new statement object with additional SQL string appended to it.
+     *
+     * @param sql SQL string to append at the end of the SQL string of this statement
+     * @return the new statement object ending with the given SQL string, parameters are preserved
+     */
+    final def ++ (sql : String) : this.type = sameType (thisSqlWith (sql), parameters)
 
+    /**
+     * Construct a new statement object by appending SQL string from the given statement
+     * to the SQL string of this statement. All values provided for the given statement
+     * are copied to the new statement along with the values provided for this statement.
+     *
+     * @param stmt statement to add to {this}
+     * @return the new statement object which SQL string is {this.sql + stmt.sql} and
+     *         paramaters are (this.parameters ++ stmt.parameters) 
+     */
     final def ++ (stmt : Statement0) : this.type = sameType (thisSqlWith (stmt.sql), parameters ++ stmt.parameters)
 
+    /**
+     * Construct a new statement object from this one by appending the given predefined value.
+     *
+     * @tparam Value type of value
+     * @param jdbcType JDBC type case object
+     * @param value value to be set
+     * @return the new statement object which SQL string is {this.sql + " ?"}, all parameters
+     *         are copied from {this} statement with an extra parameter defined by {jdbcType}
+     *         and {value} pair
+     */
     final def ++ [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : this.type =
                     sameType (thisSqlWithArg, thisParametersWith (jdbcType, value))
 
@@ -148,8 +181,8 @@ sealed abstract class Statement {
     protected val parameters : Parameters
 
     /**
-     * Construct a new Statement of the same type as this one but with different set of
-     * parameters. This is just a way to keep type information while cloning object.
+     * Construct a new Statement of the same type as one of {this} object but with different set
+     * of class parameters. This is just a way to keep type information while cloning object.
      *
      * @param newSql new sql string for the new statement
      * @param newParameters new set of parameters
@@ -231,6 +264,11 @@ sealed abstract class Statement {
 // /////////////////////////////////////////////////////////////////////////////////////////////
 
 
+/**
+ * SQL statement without placeholders.
+ *
+ * @define HigherStat Statement1
+ */
 final case class Statement0 private [statement] (
                             override val sql : String,
                             protected val parameters : Parameters = emptyCollection)
@@ -239,6 +277,9 @@ final case class Statement0 private [statement] (
     protected override def sameType (newSql : String, newParameters : Parameters) =
         Statement0 (newSql, newParameters).asInstanceOf [this.type]
 
+    /**
+     * $PlusPlus
+     */
     def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement1 [JdbcType] =
                     Statement1 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
@@ -249,7 +290,12 @@ final case class Statement0 private [statement] (
 // /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-final case class Statement1 [JdbcType <: AbstractJdbcType [_]] private [statement] (
+/**
+ * SQL statement with one placeholder.
+ *
+ * @param JdbcType1 type of object that defines a way value for placeholder is passed to DB
+ */
+final case class Statement1 [JdbcType1 <: AbstractJdbcType [_]] private [statement] (
                             override val sql : String,
                             protected val parameters : Parameters)
                     extends Statement
@@ -257,5 +303,8 @@ final case class Statement1 [JdbcType <: AbstractJdbcType [_]] private [statemen
     protected override def sameType (newSql : String, newParameters : Parameters) =
         Statement1 (newSql, newParameters).asInstanceOf [this.type]
 
-    lazy val placeholder : Placeholder [JdbcType] = getPlaceholder (0)
+    /**
+     * Placeholder of the statement.
+     */
+    lazy val placeholder : Placeholder [JdbcType1] = getPlaceholder (0)
 }
