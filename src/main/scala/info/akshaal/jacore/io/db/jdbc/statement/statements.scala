@@ -123,24 +123,9 @@ import Statement._
  *    @param JdbcType5  $JdbcTypeXStart fifth $JdbcTypeXEnd
  *    @param JdbcType6  $JdbcTypeXStart sixth $JdbcTypeXEnd
  *    @param JdbcType7  $JdbcTypeXStart seventh $JdbcTypeXEnd
- *    @param JdbcType8  $JdbcTypeXStart 8th $JdbcTypeXEnd
- *    @param JdbcType9  $JdbcTypeXStart 9th $JdbcTypeXEnd
- *    @param JdbcType10 $JdbcTypeXStart 10th $JdbcTypeXEnd
- *    @param JdbcType11 $JdbcTypeXStart 11th $JdbcTypeXEnd
- *    @param JdbcType12 $JdbcTypeXStart 12th $JdbcTypeXEnd
- *    @param JdbcType13 $JdbcTypeXStart 13th $JdbcTypeXEnd
- *    @param JdbcType14 $JdbcTypeXStart 14th $JdbcTypeXEnd
- *    @param JdbcType15 $JdbcTypeXStart 15th $JdbcTypeXEnd
- *    @param JdbcType16 $JdbcTypeXStart 16th $JdbcTypeXEnd
- *    @param JdbcType17 $JdbcTypeXStart 17th $JdbcTypeXEnd
- *    @param JdbcType18 $JdbcTypeXStart 18th $JdbcTypeXEnd
- *    @param JdbcType19 $JdbcTypeXStart 19th $JdbcTypeXEnd
- *    @param JdbcType20 $JdbcTypeXStart 20th $JdbcTypeXEnd
- *    @param JdbcType21 $JdbcTypeXStart 21th $JdbcTypeXEnd
- *    @param JdbcType22 $JdbcTypeXStart 22th $JdbcTypeXEnd
- *    @param JdbcType23 $JdbcTypeXStart 23th $JdbcTypeXEnd
- *    @param JdbcType24 $JdbcTypeXStart 24th $JdbcTypeXEnd
- *    @param JdbcType25 $JdbcTypeXStart 25th $JdbcTypeXEnd
+ *    @param JdbcType8  $JdbcTypeXStart eighth $JdbcTypeXEnd
+ *    @param JdbcType9  $JdbcTypeXStart ninth $JdbcTypeXEnd
+ *    @param JdbcType10 $JdbcTypeXStart tenth $JdbcTypeXEnd
  *
  * @define PlusPlus
  *    Constructs a new $HigherStat object from this one and the given {jdbcType} placeholder.
@@ -158,24 +143,9 @@ import Statement._
  * @define AccPlaceholder5 Fifth $placeholderOfSt
  * @define AccPlaceholder6 Sixth $placeholderOfSt
  * @define AccPlaceholder7 Seventh $placeholderOfSt
- * @define AccPlaceholder8 8th $placeholderOfSt
- * @define AccPlaceholder9 9th $placeholderOfSt
- * @define AccPlaceholder10 10th $placeholderOfSt
- * @define AccPlaceholder11 11th $placeholderOfSt
- * @define AccPlaceholder12 12th $placeholderOfSt
- * @define AccPlaceholder13 13th $placeholderOfSt
- * @define AccPlaceholder14 14th $placeholderOfSt
- * @define AccPlaceholder15 15th $placeholderOfSt
- * @define AccPlaceholder16 16th $placeholderOfSt
- * @define AccPlaceholder17 17th $placeholderOfSt
- * @define AccPlaceholder18 18th $placeholderOfSt
- * @define AccPlaceholder19 19th $placeholderOfSt
- * @define AccPlaceholder20 20th $placeholderOfSt
- * @define AccPlaceholder21 21th $placeholderOfSt
- * @define AccPlaceholder22 22th $placeholderOfSt
- * @define AccPlaceholder23 23th $placeholderOfSt
- * @define AccPlaceholder24 24th $placeholderOfSt
- * @define AccPlaceholder25 25th $placeholderOfSt
+ * @define AccPlaceholder8 eighth $placeholderOfSt
+ * @define AccPlaceholder9 ninth $placeholderOfSt
+ * @define AccPlaceholder10 tenth $placeholderOfSt
  */
 sealed abstract class Statement {
     /**
@@ -503,8 +473,437 @@ final case class Statement4 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-//    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-//                    Statement5 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType] (
-//                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement5 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount five
+ * @define HigherStat Statement6
+ */
+final case class Statement5 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_],
+                             JdbcType3 <: AbstractJdbcType [_],
+                             JdbcType4 <: AbstractJdbcType [_],
+                             JdbcType5 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement5 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $AccPlaceholder4
+     */
+    lazy val placeholder4 : Placeholder [JdbcType4] = getPlaceholder (3)
+
+    /**
+     * $AccPlaceholder5
+     */
+    lazy val placeholder5 : Placeholder [JdbcType5] = getPlaceholder (4)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement6 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount six
+ * @define HigherStat Statement7
+ */
+final case class Statement6 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_],
+                             JdbcType3 <: AbstractJdbcType [_],
+                             JdbcType4 <: AbstractJdbcType [_],
+                             JdbcType5 <: AbstractJdbcType [_],
+                             JdbcType6 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement6 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $AccPlaceholder4
+     */
+    lazy val placeholder4 : Placeholder [JdbcType4] = getPlaceholder (3)
+
+    /**
+     * $AccPlaceholder5
+     */
+    lazy val placeholder5 : Placeholder [JdbcType5] = getPlaceholder (4)
+
+    /**
+     * $AccPlaceholder6
+     */
+    lazy val placeholder6 : Placeholder [JdbcType6] = getPlaceholder (5)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement7 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                JdbcType6, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount seven
+ * @define HigherStat Statement8
+ */
+final case class Statement7 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_],
+                             JdbcType3 <: AbstractJdbcType [_],
+                             JdbcType4 <: AbstractJdbcType [_],
+                             JdbcType5 <: AbstractJdbcType [_],
+                             JdbcType6 <: AbstractJdbcType [_],
+                             JdbcType7 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement7 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $AccPlaceholder4
+     */
+    lazy val placeholder4 : Placeholder [JdbcType4] = getPlaceholder (3)
+
+    /**
+     * $AccPlaceholder5
+     */
+    lazy val placeholder5 : Placeholder [JdbcType5] = getPlaceholder (4)
+
+    /**
+     * $AccPlaceholder6
+     */
+    lazy val placeholder6 : Placeholder [JdbcType6] = getPlaceholder (5)
+
+    /**
+     * $AccPlaceholder7
+     */
+    lazy val placeholder7 : Placeholder [JdbcType7] = getPlaceholder (6)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement8 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                JdbcType6, JdbcType7, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount 8
+ * @define HigherStat Statement9
+ */
+final case class Statement8 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_],
+                             JdbcType3 <: AbstractJdbcType [_],
+                             JdbcType4 <: AbstractJdbcType [_],
+                             JdbcType5 <: AbstractJdbcType [_],
+                             JdbcType6 <: AbstractJdbcType [_],
+                             JdbcType7 <: AbstractJdbcType [_],
+                             JdbcType8 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement8 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $AccPlaceholder4
+     */
+    lazy val placeholder4 : Placeholder [JdbcType4] = getPlaceholder (3)
+
+    /**
+     * $AccPlaceholder5
+     */
+    lazy val placeholder5 : Placeholder [JdbcType5] = getPlaceholder (4)
+
+    /**
+     * $AccPlaceholder6
+     */
+    lazy val placeholder6 : Placeholder [JdbcType6] = getPlaceholder (5)
+
+    /**
+     * $AccPlaceholder7
+     */
+    lazy val placeholder7 : Placeholder [JdbcType7] = getPlaceholder (6)
+
+    /**
+     * $AccPlaceholder8
+     */
+    lazy val placeholder8 : Placeholder [JdbcType8] = getPlaceholder (7)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement9 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                JdbcType6, JdbcType7, JdbcType8, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount 9
+ * @define HigherStat Statement10
+ */
+final case class Statement9 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_],
+                             JdbcType3 <: AbstractJdbcType [_],
+                             JdbcType4 <: AbstractJdbcType [_],
+                             JdbcType5 <: AbstractJdbcType [_],
+                             JdbcType6 <: AbstractJdbcType [_],
+                             JdbcType7 <: AbstractJdbcType [_],
+                             JdbcType8 <: AbstractJdbcType [_],
+                             JdbcType9 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement9 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $AccPlaceholder4
+     */
+    lazy val placeholder4 : Placeholder [JdbcType4] = getPlaceholder (3)
+
+    /**
+     * $AccPlaceholder5
+     */
+    lazy val placeholder5 : Placeholder [JdbcType5] = getPlaceholder (4)
+
+    /**
+     * $AccPlaceholder6
+     */
+    lazy val placeholder6 : Placeholder [JdbcType6] = getPlaceholder (5)
+
+    /**
+     * $AccPlaceholder7
+     */
+    lazy val placeholder7 : Placeholder [JdbcType7] = getPlaceholder (6)
+
+    /**
+     * $AccPlaceholder8
+     */
+    lazy val placeholder8 : Placeholder [JdbcType8] = getPlaceholder (7)
+
+    /**
+     * $AccPlaceholder9
+     */
+    lazy val placeholder9 : Placeholder [JdbcType9] = getPlaceholder (8)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement10 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                 JdbcType6, JdbcType7, JdbcType8, JdbcType9, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount 10
+ * @define HigherStat Statement11
+ */
+final case class Statement10 [JdbcType1 <: AbstractJdbcType [_],
+                              JdbcType2 <: AbstractJdbcType [_],
+                              JdbcType3 <: AbstractJdbcType [_],
+                              JdbcType4 <: AbstractJdbcType [_],
+                              JdbcType5 <: AbstractJdbcType [_],
+                              JdbcType6 <: AbstractJdbcType [_],
+                              JdbcType7 <: AbstractJdbcType [_],
+                              JdbcType8 <: AbstractJdbcType [_],
+                              JdbcType9 <: AbstractJdbcType [_],
+                              JdbcType10 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement10 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $AccPlaceholder4
+     */
+    lazy val placeholder4 : Placeholder [JdbcType4] = getPlaceholder (3)
+
+    /**
+     * $AccPlaceholder5
+     */
+    lazy val placeholder5 : Placeholder [JdbcType5] = getPlaceholder (4)
+
+    /**
+     * $AccPlaceholder6
+     */
+    lazy val placeholder6 : Placeholder [JdbcType6] = getPlaceholder (5)
+
+    /**
+     * $AccPlaceholder7
+     */
+    lazy val placeholder7 : Placeholder [JdbcType7] = getPlaceholder (6)
+
+    /**
+     * $AccPlaceholder8
+     */
+    lazy val placeholder8 : Placeholder [JdbcType8] = getPlaceholder (7)
+
+    /**
+     * $AccPlaceholder9
+     */
+    lazy val placeholder9 : Placeholder [JdbcType9] = getPlaceholder (8)
+
+    /**
+     * $AccPlaceholder10
+     */
+    lazy val placeholder10 : Placeholder [JdbcType10] = getPlaceholder (9)
 }
 

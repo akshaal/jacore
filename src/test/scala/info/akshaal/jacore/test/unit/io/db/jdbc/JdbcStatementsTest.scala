@@ -32,6 +32,12 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
     val s3_int_vstr_str_ref = s2_int_vstr_str ++ JdbcRef ++ "m2"
 
     val s4 = s3_int_blob_short_vstr ++ "blah" ++ JdbcBytes
+    val s5 = s4 ++ JdbcLong
+    val s6 = s5 ++ (JdbcString, "test") ++ JdbcInt
+    val s7 = s6 ++ JdbcString
+    val s8 = s7 ++ JdbcInt
+    val s9 = s8 ++ JdbcBytes
+    val s10 = s9 ++ (JdbcLong, 10L) ++ JdbcInt ++ "x" ++ (JdbcFloat, 1.0f)
 
     // Two objects should be equals regardless their type
     def checkArgs (manifest : Manifest [_], args : Manifest [_]*) : Unit = {
@@ -159,6 +165,8 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
 
             checkPlaceholder (s2_vint_str_blob.placeholder1, JdbcString, 2)
             checkPlaceholder (s2_vint_str_blob.placeholder2, JdbcBlob, 3)
+
+            s2_int_blob  must haveClass [Statement2 [_, _]]
         }
     }
 
@@ -186,6 +194,8 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
             checkPlaceholder (s3_int_vstr_str_ref.placeholder1, JdbcInt, 1)
             checkPlaceholder (s3_int_vstr_str_ref.placeholder2, JdbcString, 3)
             checkPlaceholder (s3_int_vstr_str_ref.placeholder3, JdbcRef, 4)
+
+            s3_int_vstr_str_ref  must haveClass [Statement3 [_, _, _]]
         }
     }
 
@@ -204,6 +214,166 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
             checkPlaceholder (s4.placeholder2, JdbcBlob, 2)
             checkPlaceholder (s4.placeholder3, JdbcShort, 3)
             checkPlaceholder (s4.placeholder4, JdbcBytes, 5)
+
+            s4  must haveClass [Statement4 [_, _, _, _]]
+        }
+    }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
+    "Statement4" should {
+        "construct complex Statement5 object" in {
+            checkStmt (s5,
+                       "select 1 ? ? test ? ? blah ? ?",
+                       Prov (JdbcString, "x", 4))
+
+            checkPlaceholder (s5.placeholder1, JdbcInt, 1)
+            checkPlaceholder (s5.placeholder2, JdbcBlob, 2)
+            checkPlaceholder (s5.placeholder3, JdbcShort, 3)
+            checkPlaceholder (s5.placeholder4, JdbcBytes, 5)
+            checkPlaceholder (s5.placeholder5, JdbcLong, 6)
+
+            s5  must haveClass [Statement5 [_, _, _, _, _]]
+        }
+    }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
+    "Statement5" should {
+        "construct complex Statement6 object" in {
+            val s = s6
+
+            checkStmt (s,
+                       "select 1 ? ? test ? ? blah ? ? ? ?",
+                       Prov (JdbcString, "x", 4),
+                       Prov (JdbcString, "test", 7))
+
+            checkPlaceholder (s.placeholder1, JdbcInt, 1)
+            checkPlaceholder (s.placeholder2, JdbcBlob, 2)
+            checkPlaceholder (s.placeholder3, JdbcShort, 3)
+            checkPlaceholder (s.placeholder4, JdbcBytes, 5)
+            checkPlaceholder (s.placeholder5, JdbcLong, 6)
+            checkPlaceholder (s.placeholder6, JdbcInt, 8)
+
+            s  must haveClass [Statement6 [_, _, _, _, _, _]]
+        }
+    }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
+    "Statement6" should {
+        "construct complex Statement7 object" in {
+            val s = s7
+
+            checkStmt (s,
+                       "select 1 ? ? test ? ? blah ? ? ? ? ?",
+                       Prov (JdbcString, "x", 4),
+                       Prov (JdbcString, "test", 7))
+
+            checkPlaceholder (s.placeholder1, JdbcInt, 1)
+            checkPlaceholder (s.placeholder2, JdbcBlob, 2)
+            checkPlaceholder (s.placeholder3, JdbcShort, 3)
+            checkPlaceholder (s.placeholder4, JdbcBytes, 5)
+            checkPlaceholder (s.placeholder5, JdbcLong, 6)
+            checkPlaceholder (s.placeholder6, JdbcInt, 8)
+            checkPlaceholder (s.placeholder7, JdbcString, 9)
+
+            s  must haveClass [Statement7 [_, _, _, _, _, _, _]]
+        }
+    }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
+    "Statement7" should {
+        "construct complex Statement8 object" in {
+            val s = s8
+
+            checkStmt (s,
+                       "select 1 ? ? test ? ? blah ? ? ? ? ? ?",
+                       Prov (JdbcString, "x", 4),
+                       Prov (JdbcString, "test", 7))
+
+            checkPlaceholder (s.placeholder1, JdbcInt, 1)
+            checkPlaceholder (s.placeholder2, JdbcBlob, 2)
+            checkPlaceholder (s.placeholder3, JdbcShort, 3)
+            checkPlaceholder (s.placeholder4, JdbcBytes, 5)
+            checkPlaceholder (s.placeholder5, JdbcLong, 6)
+            checkPlaceholder (s.placeholder6, JdbcInt, 8)
+            checkPlaceholder (s.placeholder7, JdbcString, 9)
+            checkPlaceholder (s.placeholder8, JdbcInt, 10)
+
+            s  must haveClass [Statement8 [_, _, _, _, _, _, _, _]]
+        }
+    }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
+    "Statement8" should {
+        "construct complex Statement9 object" in {
+            val s = s9
+
+            checkStmt (s,
+                       "select 1 ? ? test ? ? blah ? ? ? ? ? ? ?",
+                       Prov (JdbcString, "x", 4),
+                       Prov (JdbcString, "test", 7))
+
+            checkPlaceholder (s.placeholder1, JdbcInt, 1)
+            checkPlaceholder (s.placeholder2, JdbcBlob, 2)
+            checkPlaceholder (s.placeholder3, JdbcShort, 3)
+            checkPlaceholder (s.placeholder4, JdbcBytes, 5)
+            checkPlaceholder (s.placeholder5, JdbcLong, 6)
+            checkPlaceholder (s.placeholder6, JdbcInt, 8)
+            checkPlaceholder (s.placeholder7, JdbcString, 9)
+            checkPlaceholder (s.placeholder8, JdbcInt, 10)
+            checkPlaceholder (s.placeholder9, JdbcBytes, 11)
+
+            s  must haveClass [Statement9 [_, _, _, _, _, _, _, _, _]]
+        }
+    }
+
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+    // ===============================================================================================
+
+    "Statement9" should {
+        "construct complex Statement10 object" in {
+            val s = s10
+
+            checkStmt (s,
+                       "select 1 ? ? test ? ? blah ? ? ? ? ? ? ? ? ? x ?",
+                       Prov (JdbcString, "x", 4),
+                       Prov (JdbcString, "test", 7),
+                       Prov (JdbcLong, 10L, 12),
+                       Prov (JdbcFloat, 1.0f, 14))
+
+            checkPlaceholder (s.placeholder1, JdbcInt, 1)
+            checkPlaceholder (s.placeholder2, JdbcBlob, 2)
+            checkPlaceholder (s.placeholder3, JdbcShort, 3)
+            checkPlaceholder (s.placeholder4, JdbcBytes, 5)
+            checkPlaceholder (s.placeholder5, JdbcLong, 6)
+            checkPlaceholder (s.placeholder6, JdbcInt, 8)
+            checkPlaceholder (s.placeholder7, JdbcString, 9)
+            checkPlaceholder (s.placeholder8, JdbcInt, 10)
+            checkPlaceholder (s.placeholder9, JdbcBytes, 11)
+            checkPlaceholder (s.placeholder10, JdbcInt, 13)
+
+            s  must haveClass [Statement10 [_, _, _, _, _, _, _, _, _, _]]
         }
     }
 }
