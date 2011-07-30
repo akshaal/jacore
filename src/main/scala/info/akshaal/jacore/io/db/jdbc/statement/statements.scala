@@ -119,6 +119,7 @@ import Statement._
  *    @param JdbcType1  $JdbcTypeXStart first $JdbcTypeXEnd
  *    @param JdbcType2  $JdbcTypeXStart second $JdbcTypeXEnd
  *    @param JdbcType3  $JdbcTypeXStart third $JdbcTypeXEnd
+ *    @param JdbcType4  $JdbcTypeXStart fourth $JdbcTypeXEnd
  *    @param JdbcType5  $JdbcTypeXStart fifth $JdbcTypeXEnd
  *    @param JdbcType6  $JdbcTypeXStart sixth $JdbcTypeXEnd
  *    @param JdbcType7  $JdbcTypeXStart seventh $JdbcTypeXEnd
@@ -148,6 +149,33 @@ import Statement._
  *    @param jdbcType case object that defined JDBC type of the placeholder
  *    @return the new statement object which SQL string is {this.sql + " ?"}, all parameters
  *            are copied from {this} statement with an extra parameter defined by {jdbcType}
+ *
+ * @define placeholderOfSt placeholder of the statement.
+ * @define AccPlaceholder1 First $placeholderOfSt
+ * @define AccPlaceholder2 Second $placeholderOfSt
+ * @define AccPlaceholder3 Third $placeholderOfSt
+ * @define AccPlaceholder4 Fourth $placeholderOfSt
+ * @define AccPlaceholder5 Fifth $placeholderOfSt
+ * @define AccPlaceholder6 Sixth $placeholderOfSt
+ * @define AccPlaceholder7 Seventh $placeholderOfSt
+ * @define AccPlaceholder8 8th $placeholderOfSt
+ * @define AccPlaceholder9 9th $placeholderOfSt
+ * @define AccPlaceholder10 10th $placeholderOfSt
+ * @define AccPlaceholder11 11th $placeholderOfSt
+ * @define AccPlaceholder12 12th $placeholderOfSt
+ * @define AccPlaceholder13 13th $placeholderOfSt
+ * @define AccPlaceholder14 14th $placeholderOfSt
+ * @define AccPlaceholder15 15th $placeholderOfSt
+ * @define AccPlaceholder16 16th $placeholderOfSt
+ * @define AccPlaceholder17 17th $placeholderOfSt
+ * @define AccPlaceholder18 18th $placeholderOfSt
+ * @define AccPlaceholder19 19th $placeholderOfSt
+ * @define AccPlaceholder20 20th $placeholderOfSt
+ * @define AccPlaceholder21 21th $placeholderOfSt
+ * @define AccPlaceholder22 22th $placeholderOfSt
+ * @define AccPlaceholder23 23th $placeholderOfSt
+ * @define AccPlaceholder24 24th $placeholderOfSt
+ * @define AccPlaceholder25 25th $placeholderOfSt
  */
 sealed abstract class Statement {
     /**
@@ -369,13 +397,114 @@ final case class Statement2 [JdbcType1 <: AbstractJdbcType [_],
         Statement2 (newSql, newParameters).asInstanceOf [this.type]
 
     /**
-     * First placeholder of the statement.
+     * $AccPlaceholder1
      */
     lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
 
     /**
-     * Second placeholder of the statement.
+     * $AccPlaceholder2
      */
     lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement3 [JdbcType1, JdbcType2, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount three
+ * @define HigherStat Statement4
+ */
+final case class Statement3 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_],
+                             JdbcType3 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement3 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $PlusPlus
+     */
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+                    Statement4 [JdbcType1, JdbcType2, JdbcType3, JdbcType] (
+                            thisSqlWithArg, thisParametersWith (jdbcType))
+}
+
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * $StatementX
+ * 
+ * @define placeholdersCount four
+ * @define HigherStat Statement5
+ */
+final case class Statement4 [JdbcType1 <: AbstractJdbcType [_],
+                             JdbcType2 <: AbstractJdbcType [_],
+                             JdbcType3 <: AbstractJdbcType [_],
+                             JdbcType4 <: AbstractJdbcType [_]] private [statement] (
+                                    override val sql : String,
+                                    protected val parameters : Parameters)
+                    extends Statement
+{
+    protected override def sameType (newSql : String, newParameters : Parameters) =
+        Statement4 (newSql, newParameters).asInstanceOf [this.type]
+
+    /**
+     * $AccPlaceholder1
+     */
+    lazy val placeholder1 : Placeholder [JdbcType1] = getPlaceholder (0)
+
+    /**
+     * $AccPlaceholder2
+     */
+    lazy val placeholder2 : Placeholder [JdbcType2] = getPlaceholder (1)
+
+    /**
+     * $AccPlaceholder3
+     */
+    lazy val placeholder3 : Placeholder [JdbcType3] = getPlaceholder (2)
+
+    /**
+     * $AccPlaceholder4
+     */
+    lazy val placeholder4 : Placeholder [JdbcType4] = getPlaceholder (3)
+
+    /**
+     * $PlusPlus
+     */
+//    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
+//                    Statement5 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType] (
+//                            thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
