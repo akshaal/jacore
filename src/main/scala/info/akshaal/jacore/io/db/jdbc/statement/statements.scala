@@ -36,7 +36,9 @@ object Statement {
     @inline
     def emptyCollection [T] : Collection [T] = Vector.empty
 
+
     // - - - - - - - - - - - - Placeholder - - - - - - - - - - -
+
 
     /**
      * The type that represents placeholder in a statement.
@@ -54,7 +56,9 @@ object Statement {
      */
     private[statement] type Placeholders = Collection [Placeholder [_]]
 
+
     // - - - - - - - - - - - - ProvidedValue - - - - - - - - - - -
+
 
     /**
      * The type that represents value in a statement. It is something like a placeholder
@@ -62,7 +66,7 @@ object Statement {
      *
      * @tparam Value type of value for the JDBC parameter
      * @tparam JdbcType type that represents JDBC type of the JDBC parameter
-     * @param jdbcType case object representing the given jdbc type
+     * @param jdbcType case object representing the given JDBC type
      * @param value provided value object
      * @param position placeholder position in a statement (starting from 1)
      */
@@ -74,21 +78,66 @@ object Statement {
     /**
      * Collection of provided values.
      */
-    type ProvidedValues = Collection [ProvidedValue [Value, AbstractJdbcType [Value]] forSome {type Value}]
+    type ProvidedValues =
+            Collection [ProvidedValue [Value, AbstractJdbcType [Value]] forSome {type Value}]
+
+
+    // - - - - - - - - - - - - DomainPlaceholder - - - - - - - - - - -
+
+
+    /**
+     * Domain placeholder is used to pass a value that corresponds to a field in a domain object.
+     * Access to domain object field is done through the provided function.
+     *
+     * Domain placeholder doesn't have value at the moment of definition.
+     * The value for domain placeholder is supposed to be obtained at a time of
+     * action execution from an object of the domain.
+     *
+     * @tparam Domain type of domain object that is possible to use for this placeholder
+     * @tparam Value type of value for the JDBC parameter
+     * @tparam JdbcType type that represents JDBC type of the JDBC parameter
+     * @param jdbcType case object representing the given JDBC type
+     * @param f function which returns a value from the domain object
+     * @param position placeholder position in a statement (starting from 1)
+     */
+    final case class DomainPlaceholder [Domain, Value, JdbcType <: AbstractJdbcType [Value]] (
+                            jdbcType : JdbcType,
+                            f : Domain => Value,
+                            position : Int)
+
+    /**
+     * Collection of provided values.
+     */
+    type DomainPlaceholders [Domain] =
+            Collection [DomainPlaceholder [Domain, Value, AbstractJdbcType [Value]] forSome {type Value}]
+
 
     // - - - - - - - - - - - - Parameter - - - - - - - - - - -
 
     /**
-     * Type that describes SQL statement parameter. SQL statement parameter is defined
-     * by its AbstractJdbcType and might have value provided.
+     * Type that describes SQL statement parameter (a things that is represented
+     * by ? character in a prepared SQL statement).
      *
+     * Parameters are different from {DomainPlaceholder} / {Placeholder} / {ProvidedValue}
+     * in a way that they don't have position value, their position is defined
+     * by index in {parameters} collection.
+     *
+     * @tparam JdbcType type that represents JDBC type of the JDBC parameter
      * @tparam Value type of value parameter accepts
      * @param jdbcType case object representing the given JDBC type
-     * @param optionalValue optional value. If not provided then this parameter is a placeholder
      */
-    private[statement] final case class Parameter [Value] (
-                            jdbcType : AbstractJdbcType [Value],
-                            optionalValue : Option [Value])
+    private[statement] abstract sealed class Parameter [Value]
+
+    private[statement] final case class PlaceholderParameter [Value] (jdbcType : AbstractJdbcType [Value])
+                                    extends Parameter [Value]
+
+    private[statement] final case class ProvidedParameter [Value] (
+                                        jdbcType : AbstractJdbcType [Value], value : Value)
+                                    extends Parameter [Value]
+
+    private[statement] final case class DomainParameter [Domain, Value] (
+                                        jdbcType : AbstractJdbcType [Value], f : Domain => Value)
+                                    extends Parameter [Value]
 
     /**
      * Collection of SQL statement parameters.
@@ -101,13 +150,19 @@ object Statement {
 // /////////////////////////////////////////////////////////////////////////////////////////////
 // /////////////////////////////////////////////////////////////////////////////////////////////
 
+
 import Statement._
+
 
 /**
  * Abstract SQL statement. Contains sql statement string which might be parametrized with placeholders.
  *
+ * @param Domain type of objects that this statement operates on using accessor functions.
+ *               This type is Nothing if Statement doesn't use accessor functions to get values
+ *               for its parameters.
+ *
  * @define ShouldBeLazy
- *    Should be lazy value for it is only used by Statement implementation when
+ *    Should be lazy (or def) value for it is only used by Statement implementation when
  *    it needs to get a detailed information. For intermediate statements,
  *    which used to construct a final statement, this value is never calculated.
  *
@@ -147,7 +202,7 @@ import Statement._
  * @define AccPlaceholder9 ninth $placeholderOfSt
  * @define AccPlaceholder10 tenth $placeholderOfSt
  */
-sealed abstract class Statement {
+sealed abstract class Statement [Domain] {
     /**
      * Statement as SQL string suitable for JDBC
      */
@@ -158,16 +213,14 @@ sealed abstract class Statement {
      *
      * $ShouldBeLazy
      */
-    final lazy val providedValues : ProvidedValues = {
-        def mkYield [Value] (parameter : Parameter [Value], idx : Int) =
-            ProvidedValue [Value, AbstractJdbcType [Value]] (
-                    parameter.jdbcType,
-                    parameter.optionalValue.get,
-                    idx + 1)
+    final def providedValues : ProvidedValues = parametersByKind._2
 
-        for ((parameter, idx) <- zippedParameters if parameter.optionalValue.isDefined)
-            yield mkYield (parameter, idx)
-    }
+    /**
+     * Collection of domain placeholders.
+     *
+     * $ShouldBeLazy
+     */
+    final def domainPlaceholders : DomainPlaceholders [Domain] = parametersByKind._3
 
     /**
      * Construct a new statement object with additional SQL string appended to it.
@@ -175,18 +228,7 @@ sealed abstract class Statement {
      * @param sql SQL string to append at the end of the SQL string of this statement
      * @return the new statement object ending with the given SQL string, parameters are preserved
      */
-    final def ++ (sql : String) : this.type = sameType (thisSqlWith (sql), parameters)
-
-    /**
-     * Construct a new statement object by appending SQL string from the given statement
-     * to the SQL string of this statement. All values provided for the given statement
-     * are copied to the new statement along with the values provided for this statement.
-     *
-     * @param stmt statement to add to {this}
-     * @return the new statement object which SQL string is {this.sql + stmt.sql} and
-     *         paramaters are (this.parameters ++ stmt.parameters) 
-     */
-    final def ++ (stmt : Statement0) : this.type = sameType (thisSqlWith (stmt.sql), parameters ++ stmt.parameters)
+    final def ++ (sql : String) : ThisWith [Domain] = sameType (this.sql + " " + sql, parameters)
 
     /**
      * Construct a new statement object from this one by appending the given predefined value.
@@ -198,10 +240,43 @@ sealed abstract class Statement {
      *         are copied from {this} statement with an extra parameter defined by {jdbcType}
      *         and {value} pair
      */
-    final def ++ [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : this.type =
-                    sameType (thisSqlWithArg, thisParametersWith (jdbcType, value))
+    final def ++ [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : ThisWith [Domain] =
+        sameType (thisSqlWithArg, parameters :+ ProvidedParameter (jdbcType, value))
 
-    // - - - -  - - - - - - - - Protected and private part - - - - - - - - - - - - - - -
+    /**
+     * Construct a new statement object from this one by introducting a new parameter
+     * of the given JDBC type and the given function which will be used to get value from
+     * domain object.
+     *
+     * Note that Statement must have Domain type properly specified for the statement before using
+     * this method. Use {/:} method to specify type of domain object for statement.
+     */
+    final def +++ [Ret] (jdbcType : AbstractJdbcType [Ret], f : Domain => Ret) : ThisWith [Domain] =
+        sameType (thisSqlWithArg, parameters :+ DomainParameter (jdbcType, f))
+
+    /**
+     * Specifies domain object type for the statement. Must be used before using {+++} method.
+     * This method is only available for statements for which no domain type set yet
+     * (i.e. domain type set to Nothing).
+     *
+     * @param clazz fully typed class, only type information from the given class is used
+     * @return statement with domain object type set to the type of the given class
+     * @example classOf [User] /: "INSERT INTO user SET name=" +++ (JdbcString, _.name)
+     */
+    final def /: [NewDomain] (clazz : Class [NewDomain])
+                             (implicit v : NewDomainVerified [Domain, NewDomain]) 
+                        : ThisWith [NewDomain] =
+        this.asInstanceOf [ThisWith [NewDomain]]
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --
+    // - - - -  - - - - - - - - Protected and private part - - - - - - - - - - - - - - - - - - -  - - - -
+
+    /**
+     * Type of {this} object with variable domain part of it.
+     * This type allows us to specify correct type in a subclass of Statement class.
+     */
+    protected type ThisWith [CustomDomain] <: Statement [CustomDomain]
 
     /**
      * All parameters of the statement. This is a mix of placeholders and provided values.
@@ -215,26 +290,59 @@ sealed abstract class Statement {
      * @param newSql new sql string for the new statement
      * @param newParameters new set of parameters
      */
-    protected def sameType (newSql : String, newParameters : Parameters) : this.type
+    protected def sameType (newSql : String, newParameters : Parameters) : ThisWith [Domain]
 
     /**
      * Collection of placeholders.
      *
      * Placeholder doesn't have value at the moment of definition.
      * Values for placeholders are provided later during invokation of prepared action.
-     * 
-     * $ShouldBeLazy
-     */
-    protected final lazy val placeholders : Placeholders =
-        for ((parameter, idx) <- zippedParameters if parameter.optionalValue.isEmpty)
-            yield Placeholder (parameter.jdbcType, idx + 1)
-
-    /**
-     * The same as {parameters} collection but with indexes (starting from 0).
      *
      * $ShouldBeLazy
      */
-    private lazy val zippedParameters : Collection [(Parameter [_], Int)] = parameters.zipWithIndex
+    protected final lazy val placeholders : Placeholders = parametersByKind._1
+
+    /**
+     * Parameters separated by kind.
+     *
+     * $ShouldBeLazy
+     */
+    private lazy val parametersByKind : (Placeholders, ProvidedValues, DomainPlaceholders [Domain]) = {
+        // Imperative implementation for performance
+        var phs : Placeholders = emptyCollection
+        var pvs : ProvidedValues = emptyCollection
+        var dps : DomainPlaceholders [Domain] = emptyCollection
+        var pos = 0
+
+        def handle [Value] (parameter : Parameter [Value]) : Unit = {
+            pos += 1
+
+            parameter match {
+                case PlaceholderParameter (jdbcType) =>
+                    phs :+= Placeholder (jdbcType = jdbcType, position = pos)
+
+                case ProvidedParameter (jdbcType, value) =>
+                    pvs :+= ProvidedValue [Value, AbstractJdbcType [Value]] (
+                                jdbcType = jdbcType,
+                                value    = value,
+                                position = pos)
+
+                case DomainParameter (jdbcType, f) =>
+                    dps :+= DomainPlaceholder [Domain, Value, AbstractJdbcType [Value]] (
+                                jdbcType = jdbcType,
+                                f        = f,
+                                position = pos)
+            }
+        }
+
+        for (parameter <- parameters) {
+            handle (parameter)
+        }
+
+        // Result
+        (phs, pvs, dps)
+    }
+
 
     /**
      * This SQL string with additional parameter. This value should be used during
@@ -245,13 +353,6 @@ sealed abstract class Statement {
     protected final def thisSqlWithArg : String = sql + " ?"
 
     /**
-     * Returns this SQL string concatenated with the one given as argument to this method.
-     * Should be used during construction of new statements based on this one.
-     */
-    @inline
-    protected final def thisSqlWith (thatSql : String) : String = sql + " " + thatSql
-
-    /**
      * Returns this set of parameters with the additional placeholder of the given JDBC type.
      * This method is used to construct a new set of parameters for a new Statement of higher
      * arity (number of placeholders) than the current one.
@@ -260,19 +361,7 @@ sealed abstract class Statement {
      */
     @inline
     protected final def thisParametersWith (jdbcType : AbstractJdbcType [_]) : Parameters =
-            parameters :+ Parameter (jdbcType, None)
-
-    /**
-     * Returns this set of parameters with the additional provided value of the given JDBC type.
-     * This method is used to construct a new set of parameters for a new Statement with same
-     * arity (number of placeholders) as the current one.
-     *
-     * @tparam Value type of value
-     * @param jdbcType JDBC type object that represent type of placeholder
-     */
-    @inline
-    protected final def thisParametersWith [Value] (jdbcType : AbstractJdbcType [Value], value : Value) : Parameters =
-            parameters :+ Parameter (jdbcType, Some (value))
+            parameters :+ PlaceholderParameter (jdbcType)
 
     /**
      * Get placeholder by its index, This method is not type safe and should only
@@ -297,18 +386,20 @@ sealed abstract class Statement {
  *
  * @define HigherStat Statement1
  */
-final case class Statement0 private [statement] (
+final case class Statement0 [Domain] private [statement] (
                             override val sql : String,
                             protected val parameters : Parameters = emptyCollection)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] = Statement0 [CustomDomain]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement0 (newSql, newParameters).asInstanceOf [this.type]
+        Statement0 (newSql, newParameters)
 
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement1 [JdbcType] =
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement1 [Domain, JdbcType] =
                     Statement1 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
@@ -325,13 +416,16 @@ final case class Statement0 private [statement] (
  *                  passed to DB
  * @define HigherStat Statement2
  */
-final case class Statement1 [JdbcType1 <: AbstractJdbcType [_]] private [statement] (
+final case class Statement1 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_]] private [statement] (
                             override val sql : String,
                             protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] = Statement1 [CustomDomain, JdbcType1]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement1 (newSql, newParameters).asInstanceOf [this.type]
+        Statement1 (newSql, newParameters)
 
     /**
      * Placeholder of the statement.
@@ -341,7 +435,8 @@ final case class Statement1 [JdbcType1 <: AbstractJdbcType [_]] private [stateme
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) : Statement2 [JdbcType1, JdbcType] =
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                            : Statement2 [Domain, JdbcType1, JdbcType] =
                     Statement2 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
@@ -357,14 +452,17 @@ final case class Statement1 [JdbcType1 <: AbstractJdbcType [_]] private [stateme
  * @define placeholdersCount two
  * @define HigherStat Statement3
  */
-final case class Statement2 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement2 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] = Statement2 [CustomDomain, JdbcType1, JdbcType2]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement2 (newSql, newParameters).asInstanceOf [this.type]
+        Statement2 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -379,9 +477,9 @@ final case class Statement2 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement3 [JdbcType1, JdbcType2, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                                : Statement3 [Domain, JdbcType1, JdbcType2, JdbcType] =
+                     Statement3 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -395,15 +493,19 @@ final case class Statement2 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount three
  * @define HigherStat Statement4
  */
-final case class Statement3 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement3 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_],
                              JdbcType3 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement3 [CustomDomain, JdbcType1, JdbcType2, JdbcType3]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement3 (newSql, newParameters).asInstanceOf [this.type]
+        Statement3 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -423,9 +525,9 @@ final case class Statement3 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement4 [JdbcType1, JdbcType2, JdbcType3, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                             : Statement4 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType] =
+                Statement4 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -439,16 +541,20 @@ final case class Statement3 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount four
  * @define HigherStat Statement5
  */
-final case class Statement4 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement4 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_],
                              JdbcType3 <: AbstractJdbcType [_],
                              JdbcType4 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement4 [CustomDomain, JdbcType1, JdbcType2, JdbcType3, JdbcType4]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement4 (newSql, newParameters).asInstanceOf [this.type]
+        Statement4 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -473,9 +579,9 @@ final case class Statement4 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement5 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                   : Statement5 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType] =
+                            Statement5 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 
@@ -490,17 +596,21 @@ final case class Statement4 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount five
  * @define HigherStat Statement6
  */
-final case class Statement5 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement5 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_],
                              JdbcType3 <: AbstractJdbcType [_],
                              JdbcType4 <: AbstractJdbcType [_],
                              JdbcType5 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement5 [CustomDomain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement5 (newSql, newParameters).asInstanceOf [this.type]
+        Statement5 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -530,9 +640,10 @@ final case class Statement5 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement6 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                  : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                JdbcType] =
+                           Statement6 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 
@@ -547,7 +658,8 @@ final case class Statement5 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount six
  * @define HigherStat Statement7
  */
-final case class Statement6 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement6 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_],
                              JdbcType3 <: AbstractJdbcType [_],
                              JdbcType4 <: AbstractJdbcType [_],
@@ -555,10 +667,13 @@ final case class Statement6 [JdbcType1 <: AbstractJdbcType [_],
                              JdbcType6 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement6 [CustomDomain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement6 (newSql, newParameters).asInstanceOf [this.type]
+        Statement6 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -593,10 +708,10 @@ final case class Statement6 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement7 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
-                                JdbcType6, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                  : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                JdbcType6, JdbcType] =
+                        Statement7 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 
@@ -611,7 +726,8 @@ final case class Statement6 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount seven
  * @define HigherStat Statement8
  */
-final case class Statement7 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement7 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_],
                              JdbcType3 <: AbstractJdbcType [_],
                              JdbcType4 <: AbstractJdbcType [_],
@@ -620,10 +736,14 @@ final case class Statement7 [JdbcType1 <: AbstractJdbcType [_],
                              JdbcType7 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement7 [CustomDomain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                    JdbcType6, JdbcType7]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement7 (newSql, newParameters).asInstanceOf [this.type]
+        Statement7 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -663,10 +783,10 @@ final case class Statement7 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement8 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
-                                JdbcType6, JdbcType7, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                  : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                JdbcType6, JdbcType7, JdbcType] =
+                        Statement8 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 
@@ -681,7 +801,8 @@ final case class Statement7 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount 8
  * @define HigherStat Statement9
  */
-final case class Statement8 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement8 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_],
                              JdbcType3 <: AbstractJdbcType [_],
                              JdbcType4 <: AbstractJdbcType [_],
@@ -691,10 +812,14 @@ final case class Statement8 [JdbcType1 <: AbstractJdbcType [_],
                              JdbcType8 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement8 [CustomDomain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                    JdbcType6, JdbcType7, JdbcType8]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement8 (newSql, newParameters).asInstanceOf [this.type]
+        Statement8 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -739,10 +864,10 @@ final case class Statement8 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement9 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
-                                JdbcType6, JdbcType7, JdbcType8, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                  : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                JdbcType6, JdbcType7, JdbcType8, JdbcType] =
+                      Statement9 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 
@@ -757,7 +882,8 @@ final case class Statement8 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount 9
  * @define HigherStat Statement10
  */
-final case class Statement9 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement9 [Domain,
+                             JdbcType1 <: AbstractJdbcType [_],
                              JdbcType2 <: AbstractJdbcType [_],
                              JdbcType3 <: AbstractJdbcType [_],
                              JdbcType4 <: AbstractJdbcType [_],
@@ -768,10 +894,14 @@ final case class Statement9 [JdbcType1 <: AbstractJdbcType [_],
                              JdbcType9 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement9 [CustomDomain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                    JdbcType6, JdbcType7, JdbcType8, JdbcType9]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement9 (newSql, newParameters).asInstanceOf [this.type]
+        Statement9 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
@@ -821,10 +951,10 @@ final case class Statement9 [JdbcType1 <: AbstractJdbcType [_],
     /**
      * $PlusPlus
      */
-    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType) =
-                    Statement10 [JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
-                                 JdbcType6, JdbcType7, JdbcType8, JdbcType9, JdbcType] (
-                            thisSqlWithArg, thisParametersWith (jdbcType))
+    def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
+                  : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                                 JdbcType6, JdbcType7, JdbcType8, JdbcType9, JdbcType] =
+                        Statement10 (thisSqlWithArg, thisParametersWith (jdbcType))
 }
 
 
@@ -839,7 +969,8 @@ final case class Statement9 [JdbcType1 <: AbstractJdbcType [_],
  * @define placeholdersCount 10
  * @define HigherStat Statement11
  */
-final case class Statement10 [JdbcType1 <: AbstractJdbcType [_],
+final case class Statement10 [Domain,
+                              JdbcType1 <: AbstractJdbcType [_],
                               JdbcType2 <: AbstractJdbcType [_],
                               JdbcType3 <: AbstractJdbcType [_],
                               JdbcType4 <: AbstractJdbcType [_],
@@ -851,10 +982,14 @@ final case class Statement10 [JdbcType1 <: AbstractJdbcType [_],
                               JdbcType10 <: AbstractJdbcType [_]] private [statement] (
                                     override val sql : String,
                                     protected val parameters : Parameters)
-                    extends Statement
+                    extends Statement [Domain]
 {
+    protected type ThisWith [CustomDomain] =
+        Statement10 [CustomDomain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                     JdbcType6, JdbcType7, JdbcType8, JdbcType9, JdbcType10]
+
     protected override def sameType (newSql : String, newParameters : Parameters) =
-        Statement10 (newSql, newParameters).asInstanceOf [this.type]
+        Statement10 (newSql, newParameters)
 
     /**
      * $AccPlaceholder1
