@@ -128,13 +128,28 @@ object Statement {
      */
     private[statement] abstract sealed class Parameter [Value]
 
-    private[statement] final case class PlaceholderParameter [Value] (jdbcType : AbstractJdbcType [Value])
+    /**
+     * Parameter that represents a placeholder.
+     */
+    private[statement] final case class PlaceholderParameter [Value] (
+                                        jdbcType : AbstractJdbcType [Value])
                                     extends Parameter [Value]
 
+    /**
+     * Parameter with a value already provided.
+     *
+     * @param value provided value for parameter
+     */
     private[statement] final case class ProvidedParameter [Value] (
                                         jdbcType : AbstractJdbcType [Value], value : Value)
                                     extends Parameter [Value]
 
+    /**
+     * Parameter which values is supposed to be obtained from a domain object later on.
+     *
+     * @tparam Domain type of domain object
+     * @param f function which gets value from a domain object
+     */
     private[statement] final case class DomainParameter [Domain, Value] (
                                         jdbcType : AbstractJdbcType [Value], f : Domain => Value)
                                     extends Parameter [Value]
