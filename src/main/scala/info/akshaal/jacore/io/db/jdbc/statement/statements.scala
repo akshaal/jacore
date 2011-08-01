@@ -205,6 +205,11 @@ import Statement._
  *    @return the new statement object which SQL string is {this.sql + " ?"}, all parameters
  *            are copied from {this} statement with an extra parameter defined by {jdbcType}
  *
+ * @define PlusPlusStatement
+ *    Construct a new statement object by concatenation of sqls and parameters.
+ *
+ *    @param StmtDomain domain type of the statement that is going to be appended to {this} one
+ *
  * @define placeholderOfSt placeholder of the statement.
  * @define AccPlaceholder1 First $placeholderOfSt
  * @define AccPlaceholder2 Second $placeholderOfSt
@@ -243,7 +248,7 @@ sealed abstract class Statement [Domain] {
      * @param sql SQL string to append at the end of the SQL string of this statement
      * @return the new statement object ending with the given SQL string, parameters are preserved
      */
-    final def ++ (sql : String) : ThisWith [Domain] = sameType (this.sql + " " + sql, parameters)
+    final def ++ (sql : String) : ThisWith [Domain] = sameType (thisSqlWith (sql), parameters)
 
     /**
      * Construct a new statement object from this one by appending the given predefined value.
@@ -259,10 +264,11 @@ sealed abstract class Statement [Domain] {
         sameType (thisSqlWithArg, parameters :+ ProvidedParameter (jdbcType, value))
 
     /**
-     * 
+     * $PlusPlusStatement
      */
-    //def ++ [StmtDomain <: Domain] (stmt : Statement0 [StmtDomain]) : ThisWith [ResultDomain] =
-
+    def ++ [AugendDomain] (stmt : Statement0 [AugendDomain]) 
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain]) : ThisWith [Domain] =
+        sameType (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
     /**
      * Construct a new statement object from this one by introducting a new parameter
@@ -365,6 +371,12 @@ sealed abstract class Statement [Domain] {
         (phs, pvs, dps)
     }
 
+    /**
+     * Returns this SQL string concatenated with the one given as argument to this method
+     * Should be used during construction of new statements based on this one.
+     */
+    @inline
+    protected final def thisSqlWith (thatSql : String) : String = sql + " " + thatSql
 
     /**
      * This SQL string with additional parameter. This value should be used during
@@ -372,7 +384,7 @@ sealed abstract class Statement [Domain] {
      * statement.
      */
     @inline
-    protected final def thisSqlWithArg : String = sql + " ?"
+    protected final def thisSqlWithArg : String = thisSqlWith ("?")
 
     /**
      * Returns this set of parameters with the additional placeholder of the given JDBC type.

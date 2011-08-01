@@ -28,6 +28,33 @@ package object statement {
 
 
     // - - - - - - - -  --  - - - - - - - - - - - - - - - - - - - - - - --  - - - - - -
+    // Verification of domain type of Statement to be added to some other statement
+
+    /**
+     * If instance of this class exists it means that AugendDomain type is compatible
+     * with the given Domain when it comes to adding.
+     */
+    @implicitNotFound (
+        msg = "Unable to append the statement with domain type"
+            + " ${AugendDomain} to the statement with domain type ${Domain}")
+    sealed abstract class AugendDomainVerified [-Domain, AugendDomain]
+
+    /**
+     * Method that allows to verify objects of the same type and its variations.
+     *
+     * @param A verifiable domain type
+     */
+    @inline
+    implicit def verifyAugendDomain [A] : AugendDomainVerified [A, A] = null
+
+    /**
+     * This object says that if Statement object with any domain type can append domainless
+     * statement.
+     */
+    implicit object AnyPlusDomainlessComform extends AugendDomainVerified [Any, Domainless]
+
+
+    // - - - - - - - -  --  - - - - - - - - - - - - - - - - - - - - - - --  - - - - - -
     // Verification of domain type changing process for statements
 
     /**
@@ -43,7 +70,10 @@ package object statement {
     /**
      * This method makes sure that it is possible to use domain object of the same
      * type as one that was used before.
+     *
+     * @param A a domain type
      */
+    @inline
     implicit def verifyForIdentityDomain [A] : NewDomainVerified [A, A] = null
 
     /**

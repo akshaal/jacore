@@ -91,6 +91,24 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
             s0_1.domainPlaceholders  must_==  Vector ()
         }
 
+        "append other Statement0" in {
+            val z1 = s0_1 ++ s0_2
+            checkStmt (z1, "select 1 set xxx")
+            checkArgs (z1, manifest [Domainless])
+            z1.domainPlaceholders  must_==  Vector ()
+            z1  must haveClass [Statement0 [_]]
+
+            val x = X (x = 555, y = "asd")
+            val z2 = sd0_1 ++ s0_1
+            checkStmt (z2, "select 1 ? select 1")
+            checkArgs (z2, manifest [X])
+            val z2_dps = z2.domainPlaceholders
+            z2_dps.map (_.jdbcType)  must_==  Vector (JdbcInt)
+            z2_dps.map (_.f (x))     must_==  Vector (555)
+            z2_dps.map (_.position)  must_==  Vector (1)
+            z1  must haveClass [Statement0 [_]]
+        }
+
         "have domain orianted statements" in {
             val x = X (x = 100500, y = "asd")
             val sd0_1_dps = sd0_1.domainPlaceholders
