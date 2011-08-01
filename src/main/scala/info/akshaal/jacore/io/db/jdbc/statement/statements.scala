@@ -259,12 +259,18 @@ sealed abstract class Statement [Domain] {
         sameType (thisSqlWithArg, parameters :+ ProvidedParameter (jdbcType, value))
 
     /**
+     * 
+     */
+    //def ++ [StmtDomain <: Domain] (stmt : Statement0 [StmtDomain]) : ThisWith [ResultDomain] =
+
+
+    /**
      * Construct a new statement object from this one by introducting a new parameter
      * of the given JDBC type and the given function which will be used to get value from
      * domain object.
      *
      * Note that Statement must have Domain type properly specified for the statement before using
-     * this method. Use {/:} method to specify type of domain object for statement.
+     * this method. Use {/::} method to specify type of domain object for statement.
      */
     final def +++ [Ret] (jdbcType : AbstractJdbcType [Ret], f : Domain => Ret) : ThisWith [Domain] =
         sameType (thisSqlWithArg, parameters :+ DomainParameter (jdbcType, f))
@@ -276,12 +282,13 @@ sealed abstract class Statement [Domain] {
      *
      * @param clazz fully typed class, only type information from the given class is used
      * @return statement with domain object type set to the type of the given class
-     * @example classOf [User] /: "INSERT INTO user SET name=" +++ (JdbcString, _.name)
+     * @example classOf [User] /:: "INSERT INTO user SET name=" +++ (JdbcString, _.name)
      */
-    final def /: [NewDomain] (clazz : Class [NewDomain])
-                             (implicit v : NewDomainVerified [Domain, NewDomain]) 
+    final def /:: [NewDomain] (clazz : Class [NewDomain])
+                             (implicit v : NewDomainVerified [Domain, NewDomain])
                         : ThisWith [NewDomain] =
         this.asInstanceOf [ThisWith [NewDomain]]
+
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - --

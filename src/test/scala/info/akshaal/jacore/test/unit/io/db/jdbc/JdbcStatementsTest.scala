@@ -42,12 +42,12 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
     val s9 = s8 ++ JdbcBytes
     val s10 = s9 ++ (JdbcLong, 10L) ++ JdbcInt ++ "x" ++ (JdbcFloat, 1.0f)
 
-    val sd0_1 = classOf [X] /: s0_1 +++ (JdbcInt, ((_ : X).x))
-    val sd0_2 = classOf [Y] /: s0_2 +++ (JdbcString, _.a) +++ (JdbcInt, _.b)
-    val sd0_3 = classOf [X] /: classOf [X] /: s0_1 +++ (JdbcInt, _.x) ++ "abc" +++ (JdbcString, _.y)
+    val sd0_1 = classOf [X] /:: s0_1 +++ (JdbcInt, ((_ : X).x))
+    val sd0_2 = classOf [Y] /:: s0_2 +++ (JdbcString, _.a) +++ (JdbcInt, _.b)
+    val sd0_3 = classOf [X] /:: classOf [X] /:: s0_1 +++ (JdbcInt, _.x) ++ "abc" +++ (JdbcString, _.y)
 
     val sd1 = sd0_2 ++ JdbcRef
-    val sd10 = classOf[X] /: s10 +++ (JdbcString, _.y)
+    val sd10 = classOf[X] /:: s10 +++ (JdbcString, _.y)
 
     // Check statement
     def checkStmt (stmt : Statement [_], sql : String, pvs : Any*) : Unit = {
@@ -114,6 +114,14 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
             sd0_3_dps.map (_.jdbcType)  must_==  Vector (JdbcInt, JdbcString)
             sd0_3_dps.map (_.f (x))     must_==  Vector (100500, "asd")
             sd0_3_dps.map (_.position)  must_==  Vector (1, 2)
+        }
+
+        "provide domain type narrowing method" in {
+            val xs1 = classOf [Object] /:: "hello"
+            val xs2 = classOf [X] /:: xs1
+
+            checkArgs (xs1, manifest [Object])
+            checkArgs (xs2, manifest [X])
         }
 
         "support concatenation with strings for domain orianted statements" in {

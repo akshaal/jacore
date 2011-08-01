@@ -38,7 +38,7 @@ package object statement {
     @implicitNotFound (
         msg = "Statement already works with domain type"
             + " ${CurrentDomain}, but this operator wants to change it to ${TryingDomain}")
-    sealed abstract class NewDomainVerified [CurrentDomain, +TryingDomain]
+    sealed abstract class NewDomainVerified [CurrentDomain, -TryingDomain]
 
     /**
      * This method makes sure that it is possible to use domain object of the same
@@ -50,5 +50,5 @@ package object statement {
      * This object says that if Domainless is currently used in Statement than it is allowed
      * to use any other domain type.
      */
-    implicit object StatementDomainlessToAny extends NewDomainVerified [Domainless, Nothing]
+    implicit object StatementDomainlessToAny extends NewDomainVerified [Domainless, Any]
 }
