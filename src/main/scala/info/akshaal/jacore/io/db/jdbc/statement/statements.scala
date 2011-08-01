@@ -173,7 +173,7 @@ import Statement._
  * Abstract SQL statement. Contains sql statement string which might be parametrized with placeholders.
  *
  * @param Domain type of objects that this statement operates on using accessor functions.
- *               This type is Nothing if Statement doesn't use accessor functions to get values
+ *               This type is Domainless if Statement doesn't use accessor functions to get values
  *               for its parameters.
  *
  * @define ShouldBeLazy
@@ -272,7 +272,7 @@ sealed abstract class Statement [Domain] {
     /**
      * Specifies domain object type for the statement. Must be used before using {+++} method.
      * This method is only available for statements for which no domain type set yet
-     * (i.e. domain type set to Nothing).
+     * (i.e. domain type set to Domainless).
      *
      * @param clazz fully typed class, only type information from the given class is used
      * @return statement with domain object type set to the type of the given class

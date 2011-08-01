@@ -11,14 +11,10 @@ import Statement.{Placeholder => Hdr}
 import Statement.{ProvidedValue => Prov}
 
 class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification") {
-    val s0_1 : Statement0 [Nothing] = "select 1"
-    val s0_2 : Statement0 [Nothing] = "set xxx"
-
     case class X (x : Int, y : String)
 
-    // println ((s0_1 +++ (JdbcInt, ((_ : X).x))).domainPlaceholders)
-    // println ((classOf [X] /: s0_1 +++ (JdbcInt, _.x) +++ (JdbcString, _.y)).domainPlaceholders)
-    // println ((classOf [X] /: classOf [X] /: s0_1 +++ (JdbcInt, _.x) +++ (JdbcString, _.y)).domainPlaceholders)
+    val s0_1 : Statement0 [Domainless] = "select 1"
+    val s0_2 : Statement0 [Domainless] = "set xxx"
 
     val s0_vint = s0_1 ++ (JdbcInt, 4)
     val s0_vstring = s0_2 ++ (JdbcString, "xxx")
@@ -44,6 +40,10 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
     val s8 = s7 ++ JdbcInt
     val s9 = s8 ++ JdbcBytes
     val s10 = s9 ++ (JdbcLong, 10L) ++ JdbcInt ++ "x" ++ (JdbcFloat, 1.0f)
+
+    val sd0_1 = classOf [X] /: s0_1 +++ (JdbcInt, ((_ : X).x))
+    val sd0_2 = classOf [X] /: s0_1 +++ (JdbcInt, _.x) +++ (JdbcString, _.y)
+    val sd0_3 = classOf [X] /: classOf [X] /: s0_1 +++ (JdbcInt, _.x) ++ "abc" +++ (JdbcString, _.y)
 
     // Check statement
     def checkStmt (stmt : Statement [_], sql : String, pvs : Any*) : Unit = {
