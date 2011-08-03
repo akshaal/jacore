@@ -209,6 +209,16 @@ import Statement._
  *    Construct a new statement object by concatenation of sqls and parameters.
  *
  *    @param StmtDomain domain type of the statement that is going to be appended to {this} one
+ *    @param AugendJdbcType1  $JdbcTypeXStart first augend $JdbcTypeXEnd
+ *    @param AugendJdbcType2  $JdbcTypeXStart second augend $JdbcTypeXEnd
+ *    @param AugendJdbcType3  $JdbcTypeXStart third augend $JdbcTypeXEnd
+ *    @param AugendJdbcType4  $JdbcTypeXStart fourth augend $JdbcTypeXEnd
+ *    @param AugendJdbcType5  $JdbcTypeXStart fifth augend $JdbcTypeXEnd
+ *    @param AugendJdbcType6  $JdbcTypeXStart sixth augend $JdbcTypeXEnd
+ *    @param AugendJdbcType7  $JdbcTypeXStart seventh augend $JdbcTypeXEnd
+ *    @param AugendJdbcType8  $JdbcTypeXStart eighth augend $JdbcTypeXEnd
+ *    @param AugendJdbcType9  $JdbcTypeXStart ninth augend $JdbcTypeXEnd
+ *    @param AugendJdbcType10 $JdbcTypeXStart tenth augend $JdbcTypeXEnd
  *
  * @define placeholderOfSt placeholder of the statement.
  * @define AccPlaceholder1 First $placeholderOfSt
@@ -605,6 +615,123 @@ final case class Statement1 [Domain,
     def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
                             : Statement2 [Domain, JdbcType1, JdbcType] =
                     Statement2 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement2 [Domain, JdbcType1, AugendJdbcType1] =
+        Statement2 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement3 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2] =
+        Statement3 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_]]
+                          (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement4 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
+        Statement4 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
+                          (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement5 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
+                              AugendJdbcType4] =
+        Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_]]
+                          (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement6 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
+                              AugendJdbcType4, AugendJdbcType5] =
+        Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_]]
+                          (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement7 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
+                              AugendJdbcType4, AugendJdbcType5, AugendJdbcType6] =
+        Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_],
+            AugendJdbcType7 <: AbstractJdbcType [_]]
+                          (stmt : Statement7 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6, AugendJdbcType7])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement8 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
+                              AugendJdbcType4, AugendJdbcType5, AugendJdbcType6, AugendJdbcType7] =
+        Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_],
+            AugendJdbcType7 <: AbstractJdbcType [_], AugendJdbcType8 <: AbstractJdbcType [_]]
+                          (stmt : Statement8 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6, AugendJdbcType7, AugendJdbcType8])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
+                              AugendJdbcType4, AugendJdbcType5, AugendJdbcType6, AugendJdbcType7,
+                              AugendJdbcType8] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_],
+            AugendJdbcType7 <: AbstractJdbcType [_], AugendJdbcType8 <: AbstractJdbcType [_],
+            AugendJdbcType9 <: AbstractJdbcType [_]]
+                          (stmt : Statement9 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6, AugendJdbcType7, AugendJdbcType8,
+                                              AugendJdbcType9])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
+                              AugendJdbcType4, AugendJdbcType5, AugendJdbcType6, AugendJdbcType7,
+                              AugendJdbcType8, AugendJdbcType9] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 
@@ -647,6 +774,107 @@ final case class Statement2 [Domain,
     def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
                                 : Statement3 [Domain, JdbcType1, JdbcType2, JdbcType] =
                      Statement3 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement3 [Domain, JdbcType1, JdbcType2, AugendJdbcType1] =
+        Statement3 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement4 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2] =
+        Statement4 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_]]
+                          (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement5 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
+                              AugendJdbcType3] =
+        Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
+                          (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement6 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
+                              AugendJdbcType3, AugendJdbcType4] =
+        Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_]]
+                          (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement7 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
+                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5] =
+        Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_]]
+                          (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement8 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
+                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5, AugendJdbcType6] =
+        Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_],
+            AugendJdbcType7 <: AbstractJdbcType [_]]
+                          (stmt : Statement7 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6, AugendJdbcType7])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
+                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5, AugendJdbcType6,
+                              AugendJdbcType7] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_],
+            AugendJdbcType7 <: AbstractJdbcType [_], AugendJdbcType8 <: AbstractJdbcType [_]]
+                          (stmt : Statement8 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6, AugendJdbcType7, AugendJdbcType8])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
+                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5, AugendJdbcType6,
+                               AugendJdbcType7, AugendJdbcType8] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -695,6 +923,93 @@ final case class Statement3 [Domain,
     def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
                              : Statement4 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType] =
                 Statement4 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement4 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1] =
+        Statement4 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement5 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
+                              AugendJdbcType2] =
+        Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_]]
+                          (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
+                              AugendJdbcType2, AugendJdbcType3] =
+        Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
+                          (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
+                              AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
+        Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_]]
+                          (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
+                              AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5] =
+        Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_]]
+                          (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
+                              AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                              AugendJdbcType6] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_],
+            AugendJdbcType7 <: AbstractJdbcType [_]]
+                          (stmt : Statement7 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6, AugendJdbcType7])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
+                               AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                               AugendJdbcType6, AugendJdbcType7] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -749,6 +1064,78 @@ final case class Statement4 [Domain,
     def ++ [JdbcType <: AbstractJdbcType [_]] (jdbcType : JdbcType)
                    : Statement5 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType] =
                             Statement5 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement5 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1] =
+        Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
+                              AugendJdbcType2] =
+        Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_]]
+                          (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
+                              AugendJdbcType2, AugendJdbcType3] =
+        Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
+                          (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
+                              AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
+        Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_]]
+                          (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
+                              AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_], AugendJdbcType6 <: AbstractJdbcType [_]]
+                          (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                                              AugendJdbcType6])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
+                               AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
+                               AugendJdbcType6] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
 }
 
 
@@ -811,6 +1198,64 @@ final case class Statement5 [Domain,
                   : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                                 JdbcType] =
                            Statement6 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                              AugendJdbcType1] =
+        Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                              AugendJdbcType1, AugendJdbcType2] =
+        Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_]]
+                          (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                              AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
+        Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
+                          (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                              AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_],
+            AugendJdbcType5 <: AbstractJdbcType [_]]
+                          (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
+                               AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
+                               AugendJdbcType5] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 
@@ -879,6 +1324,50 @@ final case class Statement6 [Domain,
                   : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                                 JdbcType6, JdbcType] =
                         Statement7 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                              AugendJdbcType1] =
+        Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                              AugendJdbcType1, AugendJdbcType2] =
+        Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_]]
+                          (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                              AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
+                          (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3, AugendJdbcType4])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                               AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 
@@ -954,6 +1443,38 @@ final case class Statement7 [Domain,
                   : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                                 JdbcType6, JdbcType7, JdbcType] =
                         Statement8 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                              JdbcType7, AugendJdbcType1] =
+        Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                              JdbcType7, AugendJdbcType1, AugendJdbcType2] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_],
+            AugendJdbcType3 <: AbstractJdbcType [_]]
+                          (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
+                                              AugendJdbcType3])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                               JdbcType7, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 
@@ -1035,6 +1556,26 @@ final case class Statement8 [Domain,
                   : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                                 JdbcType6, JdbcType7, JdbcType8, JdbcType] =
                       Statement9 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                              JdbcType7, JdbcType8, AugendJdbcType1] =
+        Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
+                          (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                               JdbcType7, JdbcType8, AugendJdbcType1, AugendJdbcType2] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 
@@ -1122,6 +1663,16 @@ final case class Statement9 [Domain,
                   : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                                  JdbcType6, JdbcType7, JdbcType8, JdbcType9, JdbcType] =
                         Statement10 (thisSqlWithArg, thisParametersWith (jdbcType))
+
+    /**
+     * $PlusPlusStatement
+     */
+    def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
+                          (stmt : Statement1 [AugendDomain, AugendJdbcType1])
+                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
+                              JdbcType7, JdbcType8, JdbcType9, AugendJdbcType1] =
+        Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 }
 
 
