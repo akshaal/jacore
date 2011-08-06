@@ -109,6 +109,129 @@ class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification")
             z1  must haveClass [Statement0 [_]]
         }
 
+        "append Statement1" in {
+            val z = s0_1 ++ s1_string
+            checkStmt (z, "select 1 select 1 ?")
+            checkArgs (z, manifest [Domainless], manifestOf (JdbcString))
+            z.domainPlaceholders  must_==  Vector ()
+            z  must haveClass [Statement1 [_, _]]
+            checkPlaceholder (z.placeholder, JdbcString, 1)
+        }
+
+        "append Statement2" in {
+            val z = s0_1 ++ s2_int_vstr_str
+            checkStmt (z,  "select 1 insert into x values ( ? , ? ) ?", Prov (JdbcString, "x", 2))
+            checkArgs (z, manifest [Domainless], manifestOf (JdbcInt), manifestOf (JdbcString))
+            z.domainPlaceholders  must_==  Vector ()
+            z  must haveClass [Statement2 [_, _, _]]
+            checkPlaceholder (z.placeholder1, JdbcInt, 1)
+            checkPlaceholder (z.placeholder2, JdbcString, 3)
+        }
+
+        "append Statement3" in {
+            val z = s0_2 ++ s3_int_blob_short_vstr
+
+            checkStmt (z,
+                       "set xxx select 1 ? ? test ? ?",
+                       Prov (JdbcString, "x", 4))
+
+            z  must haveClass [Statement3 [_, _, _, _]]
+            checkArgs (z, manifest [Domainless], manifestOf (JdbcInt), manifestOf (JdbcBlob), manifestOf (JdbcShort))
+
+            checkPlaceholder (z.placeholder1, JdbcInt, 1)
+            checkPlaceholder (z.placeholder2, JdbcBlob, 2)
+            checkPlaceholder (z.placeholder3, JdbcShort, 3)
+            z.domainPlaceholders  must_==  Vector ()
+        }
+
+        "append Statement4" in {
+            val z = sd0_1 ++ s4
+
+            checkStmt (z,
+                       "select 1 ? select 1 ? ? test ? ? blah ?",
+                       Prov (JdbcString, "x", 5))
+
+            checkPlaceholder (z.placeholder1, JdbcInt, 2)
+            checkPlaceholder (z.placeholder2, JdbcBlob, 3)
+            checkPlaceholder (z.placeholder3, JdbcShort, 4)
+            checkPlaceholder (z.placeholder4, JdbcBytes, 6)
+
+            s4  must haveClass [Statement4 [_, _, _, _, _]]
+            checkArgs (z,
+                       manifest [X],
+                       manifestOf (JdbcInt),
+                       manifestOf (JdbcBlob),
+                       manifestOf (JdbcShort),
+                       manifestOf (JdbcBytes))
+
+            val x = X (x = 15, y = "gom")
+            val z_dps = z.domainPlaceholders
+            z_dps.map (_.jdbcType)  must_==  Vector (JdbcInt)
+            z_dps.map (_.f (x))     must_==  Vector (15)
+            z_dps.map (_.position)  must_==  Vector (1)
+        }
+
+        "append Statement5" in {
+            val z = sd0_1 ++ s5
+
+            checkStmt (z,
+                       "select 1 ? select 1 ? ? test ? ? blah ? ?",
+                       Prov (JdbcString, "x", 5))
+
+            checkPlaceholder (z.placeholder1, JdbcInt, 2)
+            checkPlaceholder (z.placeholder2, JdbcBlob, 3)
+            checkPlaceholder (z.placeholder3, JdbcShort, 4)
+            checkPlaceholder (z.placeholder4, JdbcBytes, 6)
+            checkPlaceholder (z.placeholder5, JdbcLong, 7)
+
+            z  must haveClass [Statement5 [_, _, _, _, _, _]]
+            checkArgs (z,
+                       manifest [X],
+                       manifestOf (JdbcInt),
+                       manifestOf (JdbcBlob),
+                       manifestOf (JdbcShort),
+                       manifestOf (JdbcBytes),
+                       manifestOf (JdbcLong))
+
+            val x = X (x = 666, y = "gom")
+            val z_dps = z.domainPlaceholders
+            z_dps.map (_.jdbcType)  must_==  Vector (JdbcInt)
+            z_dps.map (_.f (x))     must_==  Vector (666)
+            z_dps.map (_.position)  must_==  Vector (1)
+        }
+
+        "append Statement6" in {
+            val s = sd0_1 ++ s6
+
+            checkStmt (s,
+                       "select 1 ? select 1 ? ? test ? ? blah ? ? ? ?",
+                       Prov (JdbcString, "x", 5),
+                       Prov (JdbcString, "test", 8))
+
+            checkPlaceholder (s.placeholder1, JdbcInt, 2)
+            checkPlaceholder (s.placeholder2, JdbcBlob, 3)
+            checkPlaceholder (s.placeholder3, JdbcShort, 4)
+            checkPlaceholder (s.placeholder4, JdbcBytes, 6)
+            checkPlaceholder (s.placeholder5, JdbcLong, 7)
+            checkPlaceholder (s.placeholder6, JdbcInt, 9)
+
+            s  must haveClass [Statement6 [_, _, _, _, _, _, _]]
+            checkArgs (s,
+                       manifest [X],
+                       manifestOf (JdbcInt),
+                       manifestOf (JdbcBlob),
+                       manifestOf (JdbcShort),
+                       manifestOf (JdbcBytes),
+                       manifestOf (JdbcLong),
+                       manifestOf (JdbcInt))
+
+            val x = X (x = 13, y = "gom")
+            val s_dps = s.domainPlaceholders
+            s_dps.map (_.jdbcType)  must_==  Vector (JdbcInt)
+            s_dps.map (_.f (x))     must_==  Vector (13)
+            s_dps.map (_.position)  must_==  Vector (1)
+        }
+
         "have domain orianted statements" in {
             val x = X (x = 100500, y = "asd")
             val sd0_1_dps = sd0_1.domainPlaceholders
