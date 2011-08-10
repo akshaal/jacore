@@ -45,33 +45,26 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
         // =================================================================================
         // =================================================================================
 
-        "must have correct variance for domainless PreparedAction0" in {
+        "must have correct variance for PreparedAction0" in {
             new MockedJdbc {
-                val command1 : PreparedAction0 [JC] = prepare (JdbcCommand, "")
+                val command1 : PreparedAction0 [JC] = "" |> prepare (JdbcCommand)
                 val command2 : PreparedAction0 [AbstractJdbcAction] = command1
 
-                val query1 : PreparedAction0 [JQ] = prepare (JdbcQuery, "")
+                val query1 : PreparedAction0 [JQ] = prepare (JdbcQuery) ("")
                 val query2 : PreparedAction0 [AbstractJdbcAction] = query1
 
-                val update1 : PreparedAction0 [JU] = prepare (JdbcUpdate, "")
+                val update1 : PreparedAction0 [JU] = "" ++ "" |> prepare (JdbcUpdate)
                 val update2 : PreparedAction0 [AbstractJdbcAction] = update1
 
-                val batch1 : PreparedAction0 [JB] = prepare (JdbcBatch, "")
+                val batch1 : PreparedAction0 [JB] = prepare (JdbcBatch) ("")
                 val batch2 : PreparedAction0 [AbstractJdbcAction] = batch1
             }
 
             mustPass ()
         }
-    }
 
-/*
-        "must have correct variance for PreparedActions" in {
-            // - - -- - -- --- - - - 0 arguments
-
-
-            // - - -- - -- --- - - - 1 argument
-
-            new MockedJdbc {
+        "must have correct variance for PreparedAction1" in {
+/*            new MockedJdbc {
                 // command
                 val command1 : PreparedAction1 [Date, JC] = prepare (JdbcCommand ("?"), JdbcDate)
                 val command2 : PreparedAction1 [MyDate, AbstractJdbcAction] = command1
@@ -94,7 +87,14 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
 
                 val batch2 : PreparedAction1 [MyObject, AbstractJdbcAction] = batch1
             }
+*/
 
+            mustPass ()
+        }
+    }
+
+/*
+        "must have correct variance for PreparedActions" in {
             // - - -- - -- --- - - - 2 arguments
 
             new MockedJdbc {

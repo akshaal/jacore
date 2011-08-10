@@ -237,7 +237,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * $prepareMethod
      */
     protected final def prepare [Action <: AbstractJdbcAction]
-                                (action : Action, stmt : Statement0 [Domainless], dummy : Null = null)
+                                (action : Action)
+                                (stmt : Statement0 [Domainless])
                                     : PreparedAction0 [Action] =
         new {
             protected override val jdbcAction = action
@@ -254,8 +255,9 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      *
      * $prepareMethod
      */
-/*    protected final def prepare [Action <: AbstractJdbcAction, Domain]
-                                (action : Action, stmt : Statement0 [Domain])
+    protected final def prepare [Action <: AbstractJdbcAction, Domain]
+                                (action : Action, dummy : Null = null)
+                                (stmt : Statement0 [Domain])
                                     : PreparedAction1 [Domain, Action] =
         new {
             protected override val jdbcAction = action
@@ -269,7 +271,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                 runAction ()
             }
         }
-*/
+
 
     // =====================================================================================
     // =====================================================================================

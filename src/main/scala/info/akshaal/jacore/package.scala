@@ -240,9 +240,15 @@ package object jacore {
          * @return value returned by function {f}
          */
         @inline
-        def |> [U] (f : T => U) : U = f (x)
+        def |> [U, A] (f : A => U) (implicit v : T => A) : U = f (x)
     }
 
+    /**
+     * Implicit conversion to provide more operations for any possible type.
+     *
+     * @tparam T type of value to operate on
+     * @param x value which needs more operations
+     */
     @inline
     implicit def newRichOperations [T] (x : T) : RichOperations [T] = new RichOperations (x)
 
