@@ -19,12 +19,12 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
 
     def nextIdx = nextInt.abs % 10
 
-    "AbstractJdbcSetter" should {
+    "JdbcSetter" should {
         "provide proper setter for JdbcArray type" in {
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.Array]
-            val setter = AbstractJdbcSetter.getFor (JdbcArray)
+            val setter = getSetterForJdbcType (JdbcArray)
 
             setter  must_==  ArraySetter
 
@@ -37,7 +37,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.io.InputStream]
-            val setter = AbstractJdbcSetter.getFor (JdbcAsciiStream)
+            val setter = getSetterForJdbcType (JdbcAsciiStream)
 
             setter  must_==  AsciiStreamSetter
 
@@ -50,7 +50,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.math.BigDecimal]
-            val setter = AbstractJdbcSetter.getFor (JdbcBigDecimal)
+            val setter = getSetterForJdbcType (JdbcBigDecimal)
 
             setter  must_==  BigDecimalSetter
 
@@ -63,7 +63,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.io.InputStream]
-            val setter = AbstractJdbcSetter.getFor (JdbcBinaryStream)
+            val setter = getSetterForJdbcType (JdbcBinaryStream)
 
             setter  must_==  BinaryStreamSetter
 
@@ -76,7 +76,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.Blob]
-            val setter = AbstractJdbcSetter.getFor (JdbcBlob)
+            val setter = getSetterForJdbcType (JdbcBlob)
 
             setter  must_==  BlobSetter
 
@@ -89,7 +89,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.io.InputStream]
-            val setter = AbstractJdbcSetter.getFor (JdbcBlobStream)
+            val setter = getSetterForJdbcType (JdbcBlobStream)
 
             setter  must_==  BlobStreamSetter
 
@@ -102,7 +102,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextBoolean
-            val setter = AbstractJdbcSetter.getFor (JdbcBoolean)
+            val setter = getSetterForJdbcType (JdbcBoolean)
 
             setter  must_==  BooleanSetter
 
@@ -115,7 +115,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextInt.asInstanceOf [Byte]
-            val setter = AbstractJdbcSetter.getFor (JdbcByte)
+            val setter = getSetterForJdbcType (JdbcByte)
 
             setter  must_==  ByteSetter
 
@@ -130,7 +130,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val value = new Array [Byte] (10)
             nextBytes (value)
             
-            val setter = AbstractJdbcSetter.getFor (JdbcBytes)
+            val setter = getSetterForJdbcType (JdbcBytes)
 
             setter  must_==  BytesSetter
 
@@ -143,7 +143,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.io.Reader]
-            val setter = AbstractJdbcSetter.getFor (JdbcCharacterStream)
+            val setter = getSetterForJdbcType (JdbcCharacterStream)
 
             setter  must_==  CharacterStreamSetter
 
@@ -156,7 +156,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.Clob]
-            val setter = AbstractJdbcSetter.getFor (JdbcClob)
+            val setter = getSetterForJdbcType (JdbcClob)
 
             setter  must_==  ClobSetter
 
@@ -169,7 +169,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.io.Reader]
-            val setter = AbstractJdbcSetter.getFor (JdbcClobStream)
+            val setter = getSetterForJdbcType (JdbcClobStream)
 
             setter  must_==  ClobStreamSetter
 
@@ -182,7 +182,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = new java.util.Date
-            val setter = AbstractJdbcSetter.getFor (JdbcDate)
+            val setter = getSetterForJdbcType (JdbcDate)
 
             setter  must_==  DateSetter
 
@@ -195,7 +195,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextDouble
-            val setter = AbstractJdbcSetter.getFor (JdbcDouble)
+            val setter = getSetterForJdbcType (JdbcDouble)
 
             setter  must_==  DoubleSetter
 
@@ -208,7 +208,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextFloat
-            val setter = AbstractJdbcSetter.getFor (JdbcFloat)
+            val setter = getSetterForJdbcType (JdbcFloat)
 
             setter  must_==  FloatSetter
 
@@ -221,7 +221,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextInt
-            val setter = AbstractJdbcSetter.getFor (JdbcInt)
+            val setter = getSetterForJdbcType (JdbcInt)
 
             setter  must_==  IntSetter
 
@@ -234,7 +234,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextLong
-            val setter = AbstractJdbcSetter.getFor (JdbcLong)
+            val setter = getSetterForJdbcType (JdbcLong)
 
             setter  must_==  LongSetter
 
@@ -247,7 +247,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.io.Reader]
-            val setter = AbstractJdbcSetter.getFor (JdbcNCharacterStream)
+            val setter = getSetterForJdbcType (JdbcNCharacterStream)
 
             setter  must_==  NCharacterStreamSetter
 
@@ -260,7 +260,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.NClob]
-            val setter = AbstractJdbcSetter.getFor (JdbcNClob)
+            val setter = getSetterForJdbcType (JdbcNClob)
 
             setter  must_==  NClobSetter
 
@@ -273,7 +273,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.io.Reader]
-            val setter = AbstractJdbcSetter.getFor (JdbcNClobStream)
+            val setter = getSetterForJdbcType (JdbcNClobStream)
 
             setter  must_==  NClobStreamSetter
 
@@ -286,7 +286,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextInt.toString
-            val setter = AbstractJdbcSetter.getFor (JdbcNString)
+            val setter = getSetterForJdbcType (JdbcNString)
 
             setter  must_==  NStringSetter
 
@@ -299,7 +299,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [Object]
-            val setter = AbstractJdbcSetter.getFor (JdbcObject)
+            val setter = getSetterForJdbcType (JdbcObject)
 
             setter  must_==  ObjectSetter
 
@@ -312,7 +312,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.Ref]
-            val setter = AbstractJdbcSetter.getFor (JdbcRef)
+            val setter = getSetterForJdbcType (JdbcRef)
 
             setter  must_==  RefSetter
 
@@ -325,7 +325,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.RowId]
-            val setter = AbstractJdbcSetter.getFor (JdbcRowId)
+            val setter = getSetterForJdbcType (JdbcRowId)
 
             setter  must_==  RowIdSetter
 
@@ -338,7 +338,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextInt.asInstanceOf [Short]
-            val setter = AbstractJdbcSetter.getFor (JdbcShort)
+            val setter = getSetterForJdbcType (JdbcShort)
 
             setter  must_==  ShortSetter
 
@@ -351,7 +351,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.Date]
-            val setter = AbstractJdbcSetter.getFor (JdbcSqlDate)
+            val setter = getSetterForJdbcType (JdbcSqlDate)
 
             setter  must_==  SqlDateSetter
 
@@ -364,7 +364,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.SQLXML]
-            val setter = AbstractJdbcSetter.getFor (JdbcSqlXml)
+            val setter = getSetterForJdbcType (JdbcSqlXml)
 
             setter  must_==  SqlXmlSetter
 
@@ -377,7 +377,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = nextLong.toString
-            val setter = AbstractJdbcSetter.getFor (JdbcString)
+            val setter = getSetterForJdbcType (JdbcString)
 
             setter  must_==  StringSetter
 
@@ -390,7 +390,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.Time]
-            val setter = AbstractJdbcSetter.getFor (JdbcTime)
+            val setter = getSetterForJdbcType (JdbcTime)
 
             setter  must_==  TimeSetter
 
@@ -403,7 +403,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = mock [java.sql.Timestamp]
-            val setter = AbstractJdbcSetter.getFor (JdbcTimestamp)
+            val setter = getSetterForJdbcType (JdbcTimestamp)
 
             setter  must_==  TimestampSetter
 
@@ -416,7 +416,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val idx = nextIdx
             val ps = mock [PreparedStatement]
             val value = new java.net.URL ("http://x" + nextInt.toString)
-            val setter = AbstractJdbcSetter.getFor (JdbcUrl)
+            val setter = getSetterForJdbcType (JdbcUrl)
 
             setter  must_==  UrlSetter
 

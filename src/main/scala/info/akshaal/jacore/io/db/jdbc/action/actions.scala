@@ -8,65 +8,74 @@ package action
 
 /**
  * Abstract action that JDBC can possible perform.
- *
- * @param statement action statement
- * @param validate whether to validate given sql statement or not
  */
-sealed abstract class AbstractJdbcAction (val statement : String, val validate : Boolean) {
+sealed abstract class AbstractJdbcAction {
     /**
      * Type of result of this action.
      */
     type Result
 }
 
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Command
+
 /**
  * Some arbitrary JDBC operation.
- *
- * @param statement sql statement
- * @param validate validate sql statement if true
  */
-final case class JdbcCommand (override val statement : String,
-                              override val validate : Boolean = true)
-                    extends AbstractJdbcAction (statement = statement, validate = validate)
-{
+sealed case class JdbcCommand () extends AbstractJdbcAction {
     type Result = Boolean
 }
 
 /**
- * JDBC query.
- *
- * @param statement sql statement
- * @param validate validate sql statement if true
+ * Some arbitrary JDBC operation with default action parameters.
  */
-final case class JdbcQuery (override val statement : String,
-                            override val validate : Boolean = true)
-                    extends AbstractJdbcAction (statement = statement, validate = validate)
-{
+object JdbcCommand extends JdbcCommand ()
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Query
+
+/**
+ * JDBC query.
+ */
+sealed case class JdbcQuery () extends AbstractJdbcAction {
     type Result = java.sql.ResultSet
 }
 
 /**
- * JDBC update.
- *
- * @param statement sql statement
- * @param validate validate sql statement if true
+ * JDBC query with default action parameters.
  */
-final case class JdbcUpdate (override val statement : String,
-                             override val validate : Boolean = true)
-                    extends AbstractJdbcAction (statement = statement, validate = validate)
-{
+object JdbcQuery extends JdbcQuery ()
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Update
+
+/**
+ * JDBC update.
+ */
+sealed case class JdbcUpdate () extends AbstractJdbcAction {
     type Result = Int
 }
 
 /**
- * JDBC batch.
- *
- * @param statement sql statement
- * @param validate validate sql statement if true
+ * JDBC update with default action parameters.
  */
-final case class JdbcBatch (override val statement : String,
-                            override val validate : Boolean = true)
-                    extends AbstractJdbcAction (statement = statement, validate = validate)
-{
+object JdbcUpdate extends JdbcUpdate ()
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Batch
+
+/**
+ * JDBC batch.
+ */
+sealed case class JdbcBatch () extends AbstractJdbcAction {
     type Result = Unit
 }
+
+/**
+ * JDBC batch with default action parameters.
+ */
+object JdbcBatch extends JdbcBatch ()
