@@ -4,11 +4,12 @@ package info.akshaal.jacore
 package test
 package unit.io.db.jdbc
 
-import io.db.jdbc.`type`._
-import io.db.jdbc.statement._
+import io.db.jdbc._
+import statement._
 
 import Statement.{Placeholder => Hdr}
 import Statement.{ProvidedValue => Prov}
+
 
 class JdbcStatementsTest extends JacoreSpecWithJUnit ("Statement specification") {
     case class X (x : Int, y : String)

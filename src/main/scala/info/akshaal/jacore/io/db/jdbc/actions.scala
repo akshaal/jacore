@@ -4,7 +4,7 @@ package info.akshaal.jacore
 package io
 package db
 package jdbc
-package action
+
 
 /**
  * Abstract action that JDBC can possible perform.

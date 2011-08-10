@@ -13,10 +13,8 @@ import org.specs.mock.Mockito
 import scala.runtime.{RichInt, RichLong, RichBoolean}
 
 import unit.UnitTestHelper._
-import io.db.jdbc.AbstractJdbcActor
-import io.db.jdbc.`type`._
-import io.db.jdbc.action._
-import io.db.jdbc.statement._
+import io.db.jdbc._
+
 
 class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor specification")
                                with Mockito

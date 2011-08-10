@@ -10,9 +10,7 @@ import java.sql.{Connection, PreparedStatement}
 import actor.{Actor, LowPriorityActorEnv}
 import utils.io.db.SqlUtils
 
-import `type`._
-import `type`.setter._
-import action._
+import setter._
 import statement._
 
 

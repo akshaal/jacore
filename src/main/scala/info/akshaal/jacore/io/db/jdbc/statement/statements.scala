@@ -6,12 +6,6 @@ package db
 package jdbc
 package statement
 
-import `type`.AbstractJdbcType
-
-
-// /////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Companion object for Statement class.
@@ -430,7 +424,7 @@ sealed abstract class Statement [Domain] {
  *
  * @define HigherStat Statement1
  */
-final case class Statement0 [Domain] private [statement] (
+final case class Statement0 [Domain] private [jdbc] (
                             override val sql : String,
                             protected[statement] val parameters : Parameters = emptyCollection)
                     extends Statement [Domain]

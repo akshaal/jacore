@@ -8,8 +8,9 @@ import java.util.Random
 import java.sql.PreparedStatement
 import org.specs.mock.Mockito
 
-import io.db.jdbc.`type`._
-import io.db.jdbc.`type`.setter._
+import io.db.jdbc._
+import io.db.jdbc.setter._
+
 
 class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
                          with Mockito

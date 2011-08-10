@@ -4,7 +4,6 @@ package info.akshaal.jacore
 package io
 package db
 package jdbc
-package `type`
 
 import java.sql.PreparedStatement
 

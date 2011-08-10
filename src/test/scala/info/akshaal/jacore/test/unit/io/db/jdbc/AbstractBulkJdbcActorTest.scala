@@ -12,6 +12,7 @@ import actor.Operation
 import io.db.jdbc.AbstractBulkJdbcActor
 import utils.io.db.ConnectionProvider
 
+
 class AbstractBulkJdbcActorTest extends JacoreSpecWithJUnit ("AbstractBulkJdbcActor specification")
                                    with Mockito
 {

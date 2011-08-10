@@ -3,12 +3,12 @@
 package info.akshaal.jacore
 package io
 package db
-package jdbc
+
 
 /**
  * Package object that contains implicit to be useful for Statement types.
  */
-package object statement {
+package object jdbc {
     import _root_.scala.annotation.implicitNotFound
 
     /**
@@ -24,7 +24,7 @@ package object statement {
      * @return object created from the given string
      */
     @inline
-    implicit def string2statement (sql : String) = Statement0 [Domainless] (sql = sql)
+    implicit def string2statement (sql : String) = statement.Statement0 [Domainless] (sql = sql)
 
 
     // - - - - - - - -  --  - - - - - - - - - - - - - - - - - - - - - - --  - - - - - -
