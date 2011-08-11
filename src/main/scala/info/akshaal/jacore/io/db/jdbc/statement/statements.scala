@@ -271,7 +271,8 @@ sealed abstract class Statement [Domain] {
      * $PlusPlusStatement
      */
     def ++ [AugendDomain] (stmt : Statement0 [AugendDomain])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain]) : ThisWith [Domain] =
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
+                        : ThisWith [Domain] =
         sameType (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
     /**
@@ -295,7 +296,7 @@ sealed abstract class Statement [Domain] {
      * @example classOf [User] /:: "INSERT INTO user SET name=" +++ (JdbcString, _.name)
      */
     final def /:: [NewDomain] (clazz : Class [NewDomain])
-                             (implicit v : NewDomainVerified [Domain, NewDomain])
+                             (implicit ev : NewDomainCompatibilityEvidence [Domain, NewDomain])
                         : ThisWith [NewDomain] =
         this.asInstanceOf [ThisWith [NewDomain]]
 
@@ -445,7 +446,7 @@ final case class Statement0 [Domain] private [jdbc] (
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement1 [Domain, AugendJdbcType1] =
         Statement1 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -454,7 +455,7 @@ final case class Statement0 [Domain] private [jdbc] (
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement2 [Domain, AugendJdbcType1, AugendJdbcType2] =
         Statement2 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -465,7 +466,7 @@ final case class Statement0 [Domain] private [jdbc] (
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement3 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
         Statement3 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -476,7 +477,7 @@ final case class Statement0 [Domain] private [jdbc] (
             AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
                           (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement4 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
         Statement4 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -488,7 +489,7 @@ final case class Statement0 [Domain] private [jdbc] (
             AugendJdbcType5 <: AbstractJdbcType [_]]
                           (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement5 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
                               AugendJdbcType5] =
         Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -502,7 +503,7 @@ final case class Statement0 [Domain] private [jdbc] (
                           (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement6 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
                               AugendJdbcType5, AugendJdbcType6] =
         Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -517,7 +518,7 @@ final case class Statement0 [Domain] private [jdbc] (
                           (stmt : Statement7 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement7 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
                               AugendJdbcType5, AugendJdbcType6, AugendJdbcType7] =
         Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -532,7 +533,7 @@ final case class Statement0 [Domain] private [jdbc] (
                           (stmt : Statement8 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7, AugendJdbcType8])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
                               AugendJdbcType5, AugendJdbcType6, AugendJdbcType7, AugendJdbcType8] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -549,7 +550,7 @@ final case class Statement0 [Domain] private [jdbc] (
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7, AugendJdbcType8,
                                               AugendJdbcType9])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
                               AugendJdbcType5, AugendJdbcType6, AugendJdbcType7, AugendJdbcType8,
                               AugendJdbcType9] =
@@ -567,7 +568,7 @@ final case class Statement0 [Domain] private [jdbc] (
                                                AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                                AugendJdbcType6, AugendJdbcType7, AugendJdbcType8,
                                                AugendJdbcType9, AugendJdbcType10])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
                                AugendJdbcType5, AugendJdbcType6, AugendJdbcType7, AugendJdbcType8,
                                AugendJdbcType9, AugendJdbcType10] =
@@ -615,7 +616,7 @@ final case class Statement1 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement2 [Domain, JdbcType1, AugendJdbcType1] =
         Statement2 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -624,7 +625,7 @@ final case class Statement1 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement3 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2] =
         Statement3 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -635,7 +636,7 @@ final case class Statement1 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement4 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
         Statement4 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -646,7 +647,7 @@ final case class Statement1 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
                           (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement5 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
                               AugendJdbcType4] =
         Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -659,7 +660,7 @@ final case class Statement1 [Domain,
             AugendJdbcType5 <: AbstractJdbcType [_]]
                           (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement6 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
                               AugendJdbcType4, AugendJdbcType5] =
         Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -673,7 +674,7 @@ final case class Statement1 [Domain,
                           (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement7 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
                               AugendJdbcType4, AugendJdbcType5, AugendJdbcType6] =
         Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -688,7 +689,7 @@ final case class Statement1 [Domain,
                           (stmt : Statement7 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
                               AugendJdbcType4, AugendJdbcType5, AugendJdbcType6, AugendJdbcType7] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -703,7 +704,7 @@ final case class Statement1 [Domain,
                           (stmt : Statement8 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7, AugendJdbcType8])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
                               AugendJdbcType4, AugendJdbcType5, AugendJdbcType6, AugendJdbcType7,
                               AugendJdbcType8] =
@@ -721,7 +722,7 @@ final case class Statement1 [Domain,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7, AugendJdbcType8,
                                               AugendJdbcType9])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3,
                               AugendJdbcType4, AugendJdbcType5, AugendJdbcType6, AugendJdbcType7,
                               AugendJdbcType8, AugendJdbcType9] =
@@ -774,7 +775,7 @@ final case class Statement2 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement3 [Domain, JdbcType1, JdbcType2, AugendJdbcType1] =
         Statement3 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -783,7 +784,7 @@ final case class Statement2 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement4 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2] =
         Statement4 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -794,7 +795,7 @@ final case class Statement2 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement5 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
                               AugendJdbcType3] =
         Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -806,7 +807,7 @@ final case class Statement2 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
                           (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement6 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
                               AugendJdbcType3, AugendJdbcType4] =
         Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -819,7 +820,7 @@ final case class Statement2 [Domain,
             AugendJdbcType5 <: AbstractJdbcType [_]]
                           (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement7 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5] =
         Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -833,7 +834,7 @@ final case class Statement2 [Domain,
                           (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5, AugendJdbcType6] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -848,7 +849,7 @@ final case class Statement2 [Domain,
                           (stmt : Statement7 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5, AugendJdbcType6,
                               AugendJdbcType7] =
@@ -864,7 +865,7 @@ final case class Statement2 [Domain,
                           (stmt : Statement8 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7, AugendJdbcType8])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, AugendJdbcType1, AugendJdbcType2,
                                AugendJdbcType3, AugendJdbcType4, AugendJdbcType5, AugendJdbcType6,
                                AugendJdbcType7, AugendJdbcType8] =
@@ -923,7 +924,7 @@ final case class Statement3 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement4 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1] =
         Statement4 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -932,7 +933,7 @@ final case class Statement3 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement5 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
                               AugendJdbcType2] =
         Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -944,7 +945,7 @@ final case class Statement3 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
                               AugendJdbcType2, AugendJdbcType3] =
         Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -956,7 +957,7 @@ final case class Statement3 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
                           (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
                               AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
         Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -969,7 +970,7 @@ final case class Statement3 [Domain,
             AugendJdbcType5 <: AbstractJdbcType [_]]
                           (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
                               AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -983,7 +984,7 @@ final case class Statement3 [Domain,
                           (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
                               AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                               AugendJdbcType6] =
@@ -999,7 +1000,7 @@ final case class Statement3 [Domain,
                           (stmt : Statement7 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6, AugendJdbcType7])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, AugendJdbcType1,
                                AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                AugendJdbcType6, AugendJdbcType7] =
@@ -1064,7 +1065,7 @@ final case class Statement4 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement5 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1] =
         Statement5 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
 
@@ -1073,7 +1074,7 @@ final case class Statement4 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
                               AugendJdbcType2] =
         Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1085,7 +1086,7 @@ final case class Statement4 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
                               AugendJdbcType2, AugendJdbcType3] =
         Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1097,7 +1098,7 @@ final case class Statement4 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
                           (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
                               AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1110,7 +1111,7 @@ final case class Statement4 [Domain,
             AugendJdbcType5 <: AbstractJdbcType [_]]
                           (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
                               AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5] =
         Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1124,7 +1125,7 @@ final case class Statement4 [Domain,
                           (stmt : Statement6 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                               AugendJdbcType6])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, AugendJdbcType1,
                                AugendJdbcType2, AugendJdbcType3, AugendJdbcType4, AugendJdbcType5,
                                AugendJdbcType6] =
@@ -1198,7 +1199,7 @@ final case class Statement5 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement6 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                               AugendJdbcType1] =
         Statement6 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1208,7 +1209,7 @@ final case class Statement5 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                               AugendJdbcType1, AugendJdbcType2] =
         Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1220,7 +1221,7 @@ final case class Statement5 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                               AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1232,7 +1233,7 @@ final case class Statement5 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
                           (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                               AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
         Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1245,7 +1246,7 @@ final case class Statement5 [Domain,
             AugendJdbcType5 <: AbstractJdbcType [_]]
                           (stmt : Statement5 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4, AugendJdbcType5])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5,
                                AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4,
                                AugendJdbcType5] =
@@ -1324,7 +1325,7 @@ final case class Statement6 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement7 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                               AugendJdbcType1] =
         Statement7 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1334,7 +1335,7 @@ final case class Statement6 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                               AugendJdbcType1, AugendJdbcType2] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1346,7 +1347,7 @@ final case class Statement6 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                               AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
         Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1358,7 +1359,7 @@ final case class Statement6 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_], AugendJdbcType4 <: AbstractJdbcType [_]]
                           (stmt : Statement4 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3, AugendJdbcType4])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                                AugendJdbcType1, AugendJdbcType2, AugendJdbcType3, AugendJdbcType4] =
         Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1443,7 +1444,7 @@ final case class Statement7 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement8 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                               JdbcType7, AugendJdbcType1] =
         Statement8 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1453,7 +1454,7 @@ final case class Statement7 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                               JdbcType7, AugendJdbcType1, AugendJdbcType2] =
         Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1465,7 +1466,7 @@ final case class Statement7 [Domain,
             AugendJdbcType3 <: AbstractJdbcType [_]]
                           (stmt : Statement3 [AugendDomain, AugendJdbcType1, AugendJdbcType2,
                                               AugendJdbcType3])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                                JdbcType7, AugendJdbcType1, AugendJdbcType2, AugendJdbcType3] =
         Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1556,7 +1557,7 @@ final case class Statement8 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement9 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                               JdbcType7, JdbcType8, AugendJdbcType1] =
         Statement9 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1566,7 +1567,7 @@ final case class Statement8 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_], AugendJdbcType2 <: AbstractJdbcType [_]]
                           (stmt : Statement2 [AugendDomain, AugendJdbcType1, AugendJdbcType2])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                                JdbcType7, JdbcType8, AugendJdbcType1, AugendJdbcType2] =
         Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)
@@ -1663,7 +1664,7 @@ final case class Statement9 [Domain,
      */
     def ++ [AugendDomain, AugendJdbcType1 <: AbstractJdbcType [_]]
                           (stmt : Statement1 [AugendDomain, AugendJdbcType1])
-                          (implicit v : AugendDomainVerified [Domain, AugendDomain])
+                          (implicit ev : AugendDomainCompatibilityEvidence [Domain, AugendDomain])
                 : Statement10 [Domain, JdbcType1, JdbcType2, JdbcType3, JdbcType4, JdbcType5, JdbcType6,
                               JdbcType7, JdbcType8, JdbcType9, AugendJdbcType1] =
         Statement10 (thisSqlWith (stmt.sql), this.parameters ++ stmt.parameters)

@@ -45,6 +45,18 @@ class AbstractJdbcActorTest extends JacoreSpecWithJUnit ("AbstractJdbcActor spec
         // =================================================================================
         // =================================================================================
 
+        "must expose operations for batch actions" in {
+            new MockedJdbc {
+                val batch : PreparedAction0 [JdbcBatch] = "" |> prepare (JdbcBatch)
+
+                // The idea is that this snippet should compile
+                def test1 () = batch.isBatchDirty
+                def test2 () = batch.executeBatch
+            }
+
+            mustPass ()
+        }
+
         "must have correct variance for PreparedAction0" in {
             new MockedJdbc {
                 val command1 : PreparedAction0 [JC] = "" |> prepare (JdbcCommand)

@@ -37,21 +37,22 @@ package object jdbc {
     @implicitNotFound (
         msg = "Unable to append the statement with domain type"
             + " ${AugendDomain} to the statement with domain type ${Domain}")
-    sealed abstract class AugendDomainVerified [-Domain, AugendDomain]
+    sealed abstract class AugendDomainCompatibilityEvidence [-Domain, AugendDomain]
 
     /**
-     * Method that allows to verify objects of the same type and its variations.
+     * Method that provides evidence of augend domain compatiblity. Same type are
+     * considered compatible.
      *
-     * @param A verifiable domain type
+     * @param A compatible domain type
      */
     @inline
-    implicit def verifyAugendDomain [A] : AugendDomainVerified [A, A] = null
+    implicit def verifyAugendDomain [A] : AugendDomainCompatibilityEvidence [A, A] = null
 
     /**
-     * This object says that if Statement object with any domain type can append domainless
+     * This object says that Statement object with any domain type can append domainless
      * statement.
      */
-    implicit object AnyPlusDomainlessComform extends AugendDomainVerified [Any, Domainless]
+    implicit object AnyPlusDomainlessEvidence extends AugendDomainCompatibilityEvidence [Any, Domainless]
 
 
     // - - - - - - - -  --  - - - - - - - - - - - - - - - - - - - - - - --  - - - - - -
@@ -65,7 +66,7 @@ package object jdbc {
     @implicitNotFound (
         msg = "Statement already works with domain type"
             + " ${CurrentDomain}, but this operator wants to change it to ${TryingDomain}")
-    sealed abstract class NewDomainVerified [CurrentDomain, -TryingDomain]
+    sealed abstract class NewDomainCompatibilityEvidence [CurrentDomain, -TryingDomain]
 
     /**
      * This method makes sure that it is possible to use domain object of the same
@@ -74,11 +75,11 @@ package object jdbc {
      * @param A a domain type
      */
     @inline
-    implicit def verifyForIdentityDomain [A] : NewDomainVerified [A, A] = null
+    implicit def verifyForIdentityDomain [A] : NewDomainCompatibilityEvidence [A, A] = null
 
     /**
      * This object says that if Domainless is currently used in Statement than it is allowed
      * to use any other domain type.
      */
-    implicit object StatementDomainlessToAny extends NewDomainVerified [Domainless, Any]
+    implicit object StatementDomainlessToAny extends NewDomainCompatibilityEvidence [Domainless, Any]
 }

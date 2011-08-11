@@ -65,6 +65,7 @@ import statement._
   *    @param param9JdbcType JDBC type object of the ninth parameter
   *    @param param10JdbcType JDBC type object of the tenth parameter
   *
+  * @define batchOnly This method can only be used with for prepared JdbcBatch actions.
   */
 abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
                                 extends Actor (actorEnv = lowPriorityActorEnv)
@@ -86,6 +87,14 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
      * @param connection connection to be prepared
      */
     protected def prepareConnection (connection : Connection) : Unit = {}
+
+
+    /**
+     * Evidence instance of BatchActionEvidence class for type JdbcBatch.
+     * An action is considered 'batch' if instance of BatchActionEvidence with
+     * the action type exists for it. Thus this instance exists for JdbcBatch type only.
+     */
+    implicit object BatchActionEvidenceInstance extends BatchActionEvidence [JdbcBatch]
 
 
     // =====================================================================================
@@ -266,8 +275,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             private val domainSetter = createDomainSetter (stmt)
 
             override def apply (domain : Domain) : Result = {
-                val jdbcPS = getPreparedStatement ()
-                domainSetter (jdbcPS, domain)
+                val jdbcPs = getPreparedStatement ()
+                domainSetter (jdbcPs, domain)
                 runAction ()
             }
         }
@@ -315,10 +324,9 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
         private var jdbcPsOption : Option [PreparedStatement] = None
 
         /**
-         * True indicates that somthing was added to batch but not executed yet.
-         * Should only be used by routines from this file only.
+         * True indicates that something was added to batch but not executed yet.
          */
-        private[AbstractJdbcActor] var batchDirty : Boolean = false
+        private var batchDirty : Boolean = false
 
         /**
          * Execute action that is associated with this prepared action.
@@ -326,7 +334,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          * when all parameters are set.
          */
         @inline
-        private[AbstractJdbcActor] final def runAction () : Result = actionRunner ()
+        protected final def runAction () : Result = actionRunner ()
 
         /**
          * Returns JDBC PreparedStatement if it already created for this action.
@@ -346,7 +354,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          */
         final def getPreparedStatement () : PreparedStatement =
             jdbcPsOption match {
-                case Some (jdbcPS) => jdbcPS
+                case Some (jdbcPs) => jdbcPs
                 case None =>
                     // jdbcPs is not defined, so we have to define it
                     associateNewPreparedStatement ()
@@ -363,9 +371,9 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
             assert (jdbcPsOption.isEmpty)
 
             val connection = getConnection ()
-            val jdbcPS = createAndInitPreparedStatement (connection, jdbcAction, statement)
+            val jdbcPs = createAndInitPreparedStatement (connection, jdbcAction, statement)
 
-            jdbcPsOption = Some (jdbcPS)
+            jdbcPsOption = Some (jdbcPs)
         }
 
         /**
@@ -377,15 +385,53 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          * $lowlevel
          */
         final def reset () : Unit = {
+            // First of all, reset all states
             batchDirty = false
 
             // Close underlying prepared statement
-            for (jdbcPS <- jdbcPsOption) {
+            for (jdbcPs <- jdbcPsOption) {
                 // First forget about the underlying prepared statement
                 jdbcPsOption = None
 
                 // Now close it
-                jdbcPS.close ()
+                jdbcPs.close ()
+            }
+        }
+
+        // ---------------------------------------------------------------------------
+        // Batch section
+
+        /**
+         * Check if batch statement was added but not yet executed.
+         * $batchOnly
+         *
+         * @return true if there is a batch to execute
+         */
+        @inline
+        def isBatchDirty () (implicit ev : BatchActionEvidence [Action]) : Boolean = batchDirty
+
+        /**
+         * Execute batch.
+         * $batchOnly
+         *
+         * If no batch is found then returns empty array.
+         *
+         * @see PreparedStatement.executeBatch for more information
+         */
+        def executeBatch () (implicit ev : BatchActionEvidence [Action]) : Array [Int] = {
+            if (isBatchDirty) {
+                // Execute batch
+                val jdbcPs = jdbcPsOption.get // We know it is here, because it is dirty
+                val result = jdbcPs.executeBatch ()
+                jdbcPs.clearBatch ()
+
+                // No longer dirty if we were able to reach this point
+                batchDirty = false
+
+                // Return result
+                result
+            } else {
+                Array.empty
             }
         }
 
@@ -402,60 +448,6 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          */
         sealed trait ActionRunner extends Function0 [Result]
     }
-
-
-    // =====================================================================================
-    // =====================================================================================
-    // =====================================================================================
-    // =====================================================================================
-    // Specialized PreparedActions wrappers for different JDBC Actions
-
-    /**
-     * Implicit method that creates specialized version of prepared action with methods
-     * suitable for batch action.
-     */
-    protected implicit def toPreparedBatchAction (preparedAction : PreparedAction [JdbcBatch])
-                             : PreparedBatchAction =
-        new PreparedBatchAction (preparedAction)
-
-    /**
-     * Class provides additional methods for PreparedAction of Batch type.
-     *
-     * @param preparedAction prepared action of batch type
-     */
-    protected final class PreparedBatchAction (preparedAction : PreparedAction [JdbcBatch]) {
-        /**
-         * Check if batch statement was added but not yet executed.
-         *
-         * @return true if there is batch to execute
-         */
-        @inline
-        def isBatchDirty () : Boolean = preparedAction.batchDirty
-
-        /**
-         * Execute batch.
-         *
-         * If no batch is found then returns empty array.
-         *
-         * @see PreparedStatement.executeBatch for more information
-         */
-        def executeBatch () : Array [Int] = {
-            if (isBatchDirty) {
-                // Execute batch
-                val jdbcPS = preparedAction.getPreparedStatement ()
-                val result = jdbcPS.executeBatch ()
-                jdbcPS.clearBatch ()
-
-                // No longer dirty
-                preparedAction.batchDirty = false
-
-                // Return result
-                result
-            } else {
-                Array.empty
-            }
-        }
-    }
 }
 
 
@@ -470,6 +462,8 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
  * Companion object for AbstractJdbcActor.
  */
 private[jdbc] object AbstractJdbcActor {
+    import _root_.scala.annotation.implicitNotFound
+
     /**
      * Create new prepared statement using the given connection for the given action.
      * All initialization for the actions is supposed to be done in this method.
@@ -483,12 +477,12 @@ private[jdbc] object AbstractJdbcActor {
                                         statement : Statement [_]) : PreparedStatement =
     {
         // Create
-        val jdbcPS = conn.prepareStatement (statement.sql)
+        val jdbcPs = conn.prepareStatement (statement.sql)
 
         // Init
         def setProvidedValue [Value] (pv : Statement.ProvidedValue [Value, AbstractJdbcType [Value]]) {
             val setter = getSetterForJdbcType (pv.jdbcType)
-            setter (jdbcPS, pv.position, pv.value)
+            setter (jdbcPs, pv.position, pv.value)
         }
 
         for (pv <- statement.providedValues) {
@@ -496,7 +490,7 @@ private[jdbc] object AbstractJdbcActor {
         }
 
         // Return result
-        jdbcPS
+        jdbcPs
     }
 
 
@@ -526,7 +520,7 @@ private[jdbc] object AbstractJdbcActor {
             val setter = getSetterForJdbcType (ph.jdbcType)
 
             // Return function which will set placeholder value using 'setter'
-            (jdbcPS : PreparedStatement, domain : Domain) => setter (jdbcPS, ph.position, ph.f (domain))
+            (jdbcPs : PreparedStatement, domain : Domain) => setter (jdbcPs, ph.position, ph.f (domain))
         }
 
         // Make a collection of domain setters (one for each domain placeholder). This action is done
@@ -534,6 +528,15 @@ private[jdbc] object AbstractJdbcActor {
         val setters = statement.domainPlaceholders.map (mkSetter (_))
 
         // Return function which will invoke each setter from 'setters' collection
-        (jdbcPS : PreparedStatement, domain : Domain) => setters.foreach (_ (jdbcPS, domain))
+        (jdbcPs : PreparedStatement, domain : Domain) => setters.foreach (_ (jdbcPs, domain))
     }
+
+
+    // ==========================================================================================
+    // Evidences
+
+    @implicitNotFound (
+        msg = "This method is only for prepared batch actions."
+              + " But this invocation is on prepared ${Action}!")
+    sealed abstract class BatchActionEvidence [-Action]
 }
