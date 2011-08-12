@@ -130,7 +130,7 @@ class JdbcSettersTest extends JacoreSpecWithJUnit ("JdbcSetter specification")
             val ps = mock [PreparedStatement]
             val value = new Array [Byte] (10)
             nextBytes (value)
-            
+
             val setter = getSetterForJdbcType (JdbcBytes)
 
             setter  must_==  BytesSetter

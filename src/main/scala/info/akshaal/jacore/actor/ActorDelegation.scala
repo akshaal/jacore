@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * This trait provides a way for actor to delegate a code execution by passing
  * code in a message.
  */
-trait ActorDelegation {    
+trait ActorDelegation {
     this : Actor =>
 
     // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ trait ActorDelegation {
     // Operation
 
     import Operation._
-    
+
     /**
      * Implicit value that will be used by <code>OperationWithResult<code> to
      * apply result to a result matching function. This values is supposed to be passed
@@ -174,7 +174,7 @@ object Operation {
         /**
          * Run operation passing result of computation as a future object. The operation can't
          * be interrupted.
-         * 
+         *
          * @return future object that can be used to get results of computation.
          */
         def runWithFutureAsy () : Future [A]

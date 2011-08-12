@@ -134,10 +134,10 @@ class TimeValueTest extends JacoreSpecWithJUnit ("TimeValue class specification"
 
             "2hours 5secs 7us"  must_==
                 (2.hours + 5.seconds + 7.microseconds).toString
-                          
+
             "11mins 33ms 55ns"  must_==
                 (11.minutes + 33.milliseconds + 55.nanoseconds).toString
-            
+
             "1min"  must_==  60.seconds.toString
 
             "0ns"  must_==  0.seconds.toString

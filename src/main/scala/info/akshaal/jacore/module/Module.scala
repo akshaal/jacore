@@ -126,7 +126,7 @@ class Module extends AbstractModule with Logging {
               .annotatedWith (Names.named ("jacore.pool.normal.execution"))
               .toInstance (normalPriorityPoolExecutionLimit)
 
-        
+
         // Low priority pool parameters
 
         bind (classOf[Int])
@@ -162,7 +162,7 @@ class Module extends AbstractModule with Logging {
         bind (classOf[Scheduler]).to (classOf[SchedulerImpl])
 
         // - - - - - - - - - - - - AOP - - - - - - - - - - - -  -- -
-        
+
         bindInterceptor(Matchers.subclassesOf(classOf[Actor]),
                         Matchers.annotatedWith (classOf[CallByMessage]),
                         new CallByMessageMethodInterceptor)

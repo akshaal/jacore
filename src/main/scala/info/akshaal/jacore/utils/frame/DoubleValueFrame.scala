@@ -22,7 +22,7 @@ final class DoubleValueFrame (maximum : Int) extends NotNull {
      */
     def put (value : Double) = {
         pos += 1
-        
+
         if (pos == maximum) {
             pos = 0;
         }

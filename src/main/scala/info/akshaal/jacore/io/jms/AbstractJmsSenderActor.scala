@@ -79,7 +79,7 @@ abstract class AbstractJmsSenderActor[T] (lowPriorityActorEnv : LowPriorityActor
     private[this] def initContext () : (MessageProducer, Session) = {
         val session = createSession (connection)
         val producer = createProducer (session)
-        
+
         (producer, session)
     }
 

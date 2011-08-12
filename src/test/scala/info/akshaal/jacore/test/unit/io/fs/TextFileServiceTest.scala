@@ -29,7 +29,7 @@ class TextFileServiceTest extends JacoreSpecWithJUnit ("TextFileService specific
 
             writeLine (file, "Hi")
             readByActor (file)  must_==  Success ("Hi")
-            
+
             writeLine (file, "Bye")
             readByActor (file)  must_==  Success ("Bye")
 

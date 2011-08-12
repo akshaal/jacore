@@ -21,11 +21,11 @@ import scala.collection.{ mutable, immutable, generic }
  *  </p>
  *  <p>
  *    Each call to a <code>Value</code> method adds a new unique value to the
- *    enumeration. To be accessible, these values are usually defined as 
+ *    enumeration. To be accessible, these values are usually defined as
  *    <code>val</code> members of the evaluation.
  *  </p>
  *  <p>
- *    All values in an enumeration share a common, unique type defined as the 
+ *    All values in an enumeration share a common, unique type defined as the
  *    <code>Value</code> type member of the enumeration (<code>Value</code>
  *    selected on the stable identifier path of the enumeration instance).
  *  </p>
@@ -41,13 +41,13 @@ import scala.collection.{ mutable, immutable, generic }
  *    <b>import</b> WeekDay._
  *
  *    <b>def</b> isWorkingDay(d: WeekDay) = ! (d == Sat || d == Sun)
- * 
+ *
  *    WeekDay.values filter isWorkingDay foreach println
  *  }</pre>
  *
  *  Value is hidden. So in order to make it visiable, one must extend it. This makes
  *  it possible to identify enumeration by class.
- * 
+ *
  *  @param initial The initial value from which to count the integers that
  *                 identifies values at run-time.
  *  @param names   The sequence of names to give to this enumeration's values.
@@ -59,7 +59,7 @@ import scala.collection.{ mutable, immutable, generic }
 @SerialVersionUID(8476000850333817230L)
 abstract class JacoreEnum(initial: Int, names: String*) {
   thisenum =>
-    
+
   def this() = this(0, null)
   def this(names: String*) = this(0, names: _*)
 
@@ -67,10 +67,10 @@ abstract class JacoreEnum(initial: Int, names: String*) {
      the JVM does not invoke it when deserializing subclasses. */
   protected def readResolve(): AnyRef = thisenum.getClass.getField("MODULE$").get()
 
-  /** The name of this enumeration.  
+  /** The name of this enumeration.
    */
   override def toString = (getClass.getName stripSuffix "$" split '.' last) split '$' last
-  
+
   /** The mapping from the integer used to identify values to the actual
     * values. */
   private val vmap: mutable.Map[Int, Value] = new mutable.HashMap
@@ -95,7 +95,7 @@ abstract class JacoreEnum(initial: Int, names: String*) {
 
   /** The integer to use to identify the next created value. */
   protected var nextId = initial
-  
+
   /** The string to use to name the next created value. */
   protected var nextName = names.iterator
   private def nextNameOrElse(orElse: => String) =
@@ -113,7 +113,7 @@ abstract class JacoreEnum(initial: Int, names: String*) {
    */
   final def apply(x: Int): Value = vmap(x)
 
-  /** Returns a Value from this JacoreEnum whose name matches 
+  /** Returns a Value from this JacoreEnum whose name matches
    * the argument <var>s</var>.
    *
    * You can pass a String* set of names to the constructor, or
@@ -134,7 +134,7 @@ abstract class JacoreEnum(initial: Int, names: String*) {
   private def populateNameMap() {
     // The list of possible Value methods: 0-args which return a conforming type
     val methods = getClass.getMethods filter (m => m.getParameterTypes.isEmpty && classOf[Value].isAssignableFrom(m.getReturnType))
-    
+
     methods foreach { m =>
       val name = m.getName
       // invoke method to obtain actual `Value` instance
@@ -198,10 +198,10 @@ abstract class JacoreEnum(initial: Int, names: String*) {
 
     override def hashCode: Int = id.##
   }
-  
+
   /** A class for sets of values
    *  Iterating through this set will yield values in increasing order of their ids.
-   *  @param   ids   The set of ids of values, organized as a BitSet. 
+   *  @param   ids   The set of ids of values, organized as a BitSet.
    */
   class ValueSet private[JacoreEnum] (val ids: immutable.BitSet) extends Set[Value] with SetLike[Value, ValueSet] {
     override def empty = ValueSet.empty
@@ -219,15 +219,15 @@ abstract class JacoreEnum(initial: Int, names: String*) {
 
     /** The empty value set */
     val empty = new ValueSet(immutable.BitSet.empty)
-    /** A value set consisting of given elements */ 
+    /** A value set consisting of given elements */
     def apply(elems: Value*): ValueSet = empty ++ elems
     /** A builder object for value sets */
     def newBuilder: Builder[Value, ValueSet] = new AddingBuilder(empty)
     /** The implicit builder for value sets */
-    implicit def canBuildFrom: CanBuildFrom[ValueSet, Value, ValueSet] = 
-      new CanBuildFrom[ValueSet, Value, ValueSet] { 
-        def apply(from: ValueSet) = newBuilder 
-        def apply() = newBuilder 
+    implicit def canBuildFrom: CanBuildFrom[ValueSet, Value, ValueSet] =
+      new CanBuildFrom[ValueSet, Value, ValueSet] {
+        def apply(from: ValueSet) = newBuilder
+        def apply() = newBuilder
       }
   }
 }

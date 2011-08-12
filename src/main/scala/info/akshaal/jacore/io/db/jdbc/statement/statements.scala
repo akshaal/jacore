@@ -193,7 +193,7 @@ import Statement._
  *
  * @define PlusPlus
  *    Constructs a new $HigherStat object from this one and the given {jdbcType} placeholder.
- * 
+ *
  *    @tparam JdbcType type of JDBC type case object
  *    @param jdbcType case object that defined JDBC type of the placeholder
  *    @return the new statement object which SQL string is {this.sql + " ?"}, all parameters
@@ -737,7 +737,7 @@ final case class Statement1 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount two
  * @define HigherStat Statement3
  */
@@ -879,7 +879,7 @@ final case class Statement2 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount three
  * @define HigherStat Statement4
  */
@@ -1014,7 +1014,7 @@ final case class Statement3 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount four
  * @define HigherStat Statement5
  */
@@ -1141,7 +1141,7 @@ final case class Statement4 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount five
  * @define HigherStat Statement6
  */
@@ -1261,7 +1261,7 @@ final case class Statement5 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount six
  * @define HigherStat Statement7
  */
@@ -1373,7 +1373,7 @@ final case class Statement6 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount seven
  * @define HigherStat Statement8
  */
@@ -1480,7 +1480,7 @@ final case class Statement7 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount 8
  * @define HigherStat Statement9
  */
@@ -1581,7 +1581,7 @@ final case class Statement8 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount 9
  * @define HigherStat Statement10
  */
@@ -1678,7 +1678,7 @@ final case class Statement9 [Domain,
 
 /**
  * $StatementX
- * 
+ *
  * @define placeholdersCount 10
  * @define HigherStat Statement11
  */

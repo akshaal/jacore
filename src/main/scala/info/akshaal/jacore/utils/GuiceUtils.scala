@@ -70,7 +70,7 @@ object GuiceUtils {
                     keys += key
                 }
             }
-            
+
             val parentInjector = currentInjector.getParent
             if (parentInjector != null) {
                 addKeysForInjector (parentInjector)
@@ -88,7 +88,7 @@ object GuiceUtils {
         val renderer = graphInjector.getInstanceOf [GraphvizRenderer]
 
         renderer.setOut (out).setRankdir ("TB");
-        
+
         graphInjector.getInstanceOf [JacoreInjectorGrapher].graph (injector, keys)
     }
 

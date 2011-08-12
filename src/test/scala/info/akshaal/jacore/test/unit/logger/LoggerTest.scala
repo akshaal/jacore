@@ -33,7 +33,7 @@ class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
                 logger.warnLazy (sideEffect ("warn lazy"), group = true)
                 logger.errorLazy (sideEffect ("error lazy"), group = true)
             }
-            
+
             T must not be null
         }
 
@@ -81,11 +81,11 @@ class LoggerTest extends JacoreSpecWithJUnit ("Logging trait specification")
                 warnLazy (sideEffect ("2 warn lazy"), group = true)
                 errorLazy (sideEffect ("2 error lazy"), group = true)
             }
-            
+
             T must not be null
         }
     }
- 
+
     private def sideEffect (str : String) = {
         logger.debug ("Computing argument for lazy log message" +:+ str)
         str

@@ -27,7 +27,7 @@ object ResourceUtils {
 
     /**
      * Returns true if the given url is file.
-     * 
+     *
      * @param url url
      */
     def isFileUrl (url : URL) : Boolean = {

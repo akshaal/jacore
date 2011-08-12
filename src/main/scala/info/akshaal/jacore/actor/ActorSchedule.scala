@@ -22,7 +22,7 @@ trait ActorSchedule {
     /**
      * Schedule to be used by this actor.
      */
-    protected object schedule {        
+    protected object schedule {
         def in (number : Long)      = new ScheduleWhen (number, ScheduleIn)
         def every (number : Long)   = new ScheduleWhen (number, ScheduleEvery)
 
@@ -49,7 +49,7 @@ trait ActorSchedule {
 
                 case ScheduleEvery =>
                     recurrentSchedules += ((payload, when))
-                    
+
                     if (actorStarted.get) {
                         val control = actorEnv.scheduler.every (ActorSchedule.this, payload, when)
                         scheduleControls.put (control, null)

@@ -75,14 +75,14 @@ final class TimeValue (nano : Long) extends NotNull
 
     /**
      * Calculate sum of this time value and some other ('that') time value.
-     * 
+     *
      * @param that value to add
      * @return sum
      */
     def + (that : TimeValue) : TimeValue = new TimeValue (nano + that.inNanoseconds)
 
     /**
-     * Calculate difference between this time value and some other ('that') time value.    
+     * Calculate difference between this time value and some other ('that') time value.
      *
      * @param that value to substruct from this one
      * @return difference
@@ -91,7 +91,7 @@ final class TimeValue (nano : Long) extends NotNull
 
     /**
      * Multiply (upscale) this time value by the given value 'n'.
-     * 
+     *
      * @param n a value to multiply by
      * @return scaled version of this time value
      */
@@ -114,7 +114,7 @@ final class TimeValue (nano : Long) extends NotNull
 
     /**
      * Rerturns true if other object might be equal to this one.
-     * 
+     *
      * @param other value to test
      * @return true if this object can be compared with 'other' object
      */
@@ -158,7 +158,7 @@ final class TimeValue (nano : Long) extends NotNull
      *
      * @param that value to compare with
      * @return true if this value is greater or equal than that value
-     */ 
+     */
     def >= (that: TimeValue) : Boolean = nano >= that.inNanoseconds
 
     /**
@@ -174,7 +174,7 @@ final class TimeValue (nano : Long) extends NotNull
      *
      * @param that value to compare with
      * @return true if this value is greater than that value
-     */ 
+     */
     def > (that: TimeValue) : Boolean = nano > that.inNanoseconds
 
     /**

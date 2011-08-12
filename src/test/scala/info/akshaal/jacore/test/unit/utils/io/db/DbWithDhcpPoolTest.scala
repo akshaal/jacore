@@ -82,7 +82,7 @@ class DbWithDhcpPoolTest extends JacoreSpecWithJUnit ("DbWithDhcpPool class spec
             val qrs = q.executeQuery ("SELECT * FROM x")
             qrs.next ()
             qrs.getInt (1) must_== 13
-            
+
             db.close (conn)
             db.close ()
         }

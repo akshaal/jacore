@@ -47,12 +47,12 @@ class VcdWriter (writer : Writer, signals : List[(String, Int)]) {
         lastTime match {
             case Some (timeV) if timeV >= time =>
                 ()
-                
+
             case _ =>
                 writer.append ("#" + time + "\n")
                 lastTime = Some (time)
         }
-        
+
         writer.append (formatValueChange (name, value) + "\n")
     }
 

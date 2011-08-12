@@ -23,7 +23,7 @@ final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
      */
     def put (option : Option[Double]) = {
         pos += 1
-        
+
         if (count < maximum) {
             count += 1
 
@@ -31,7 +31,7 @@ final class OptionDoubleValueFrame (maximum : Int) extends NotNull {
                 case None         => nans += 1
                 case Some (value) => sum += value
             }
-            
+
             array (pos) = option
         } else {
             if (pos == maximum) {

@@ -78,7 +78,7 @@ object ClassUtils {
             val pkgUrlPath = pkgUrl.getPath
             val pkgUrlPathSize = pkgUrlPath.size
             val urlBuf = new ListBuffer [URL]
-            
+
             ResourceUtils.findResources (urlBuf, pkgUrl, _.getPath.endsWith(".class"))
 
             for (url <- urlBuf) {
@@ -125,7 +125,7 @@ object ClassUtils {
         if (isModule (clazz)) {
             val realClazz = Class.forName (clazz.getName)
             val moduleField = realClazz.getField ("MODULE$")
-            
+
             Some (moduleField.get (null).asInstanceOf [A])
         } else {
             None

@@ -57,7 +57,7 @@ final private[scheduler] class OneTimeSchedule (actor : Actor,
 {
     override def nextSchedule () = {
         control.currentSchedule = None
-        
+
         None
     }
 

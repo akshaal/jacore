@@ -136,7 +136,7 @@ abstract class Actor (protected val actorEnv : ActorEnv) extends ActorDelegation
     @inline
     private[this] def invokeAct (msg : Any, sentFrom : Option[Actor]) = {
         sender = sentFrom
-        
+
         var userMessage = true
         try {
             msg match {

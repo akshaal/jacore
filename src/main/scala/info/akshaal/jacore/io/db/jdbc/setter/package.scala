@@ -26,7 +26,7 @@ package object setter {
      *
      * @tparam Value type of Scala value that JDBC type represents
      * @param jdbcType object that represents JDBC type
-     * @return instance of setter that is able to set value given type on JDBC Prepared Statement 
+     * @return instance of setter that is able to set value given type on JDBC Prepared Statement
      */
     def getSetterForJdbcType [Value] (jdbcType : AbstractJdbcType [Value]) : JdbcSetter [Value] =
         jdbcType match {

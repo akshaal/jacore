@@ -18,7 +18,7 @@ final class DaemonStatus @Inject() (
 
     @volatile
     private[this] var dying = false
-    
+
     @volatile
     private[this] var lastAliveTimestamp = System.nanoTime.nanoseconds
 
@@ -82,7 +82,7 @@ final class DaemonStatus @Inject() (
         // Dying
         error ("Soon will die, but first... postmortum information:")
         ThreadUtils.dumpThreads ("Dumping threads")
-        
+
         // Shutdown gracefully if possible
         shutdown
     }

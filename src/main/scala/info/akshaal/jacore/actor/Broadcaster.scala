@@ -130,7 +130,7 @@ private[jacore] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
     @CallByMessage
     override def broadcast (msg : Any) : Unit = {
         executed.clear
-        
+
         iterate (subscriptionEntries) (
             subscriptionEntry =>
                 if (subscriptionEntry.getKey.isAcceptable (msg)) {
@@ -180,10 +180,10 @@ private[jacore] class BroadcasterActor @Inject() (hiPriorityActorEnv : HiPriorit
         val matcher = getCachedMatcher (matcherDefinition)
 
         var actorsMap = subscriptions.get (matcher)
-        
+
         if (actorsMap != null) {
             actorsMap.remove (actor)
-            
+
             if (actorsMap.isEmpty) {
                 subscriptions.remove (matcher)
             }

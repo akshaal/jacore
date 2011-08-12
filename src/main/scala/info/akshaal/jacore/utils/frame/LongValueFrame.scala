@@ -22,7 +22,7 @@ final class LongValueFrame (maximum : Int) extends NotNull {
      */
     def put (value : Long) = {
         pos += 1
-        
+
         if (pos == maximum) {
             pos = 0;
         }

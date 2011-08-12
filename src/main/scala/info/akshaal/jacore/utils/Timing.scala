@@ -67,7 +67,7 @@ private[jacore] final class Timing (limit : TimeValue, daemonStatus : DaemonStat
             }
         }
     }
-    
+
     override def average : TimeValue = frame.average.nanoseconds
 }
 
@@ -116,7 +116,7 @@ private[jacore] final class ThreadSafeTiming (limit : TimeValue,
             }
         }
     }
-    
+
     override def average : TimeValue = {
         var totalSum = 0L
         var totalCount = 0L

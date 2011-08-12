@@ -136,7 +136,7 @@ final class Slf4jLogger (name : String) extends Logger {
         slfLogger.error (if (group) groupableBusinessMarker else businessMarker, str)
 
     // Log with exception -  - - -  -- - - - - - - - - - - -  - - - - - - - - - -
-    
+
     @inline
     override def debug (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
         if (group)
@@ -164,21 +164,21 @@ final class Slf4jLogger (name : String) extends Logger {
             slfLogger.error (groupableMarker, str, exc)
         else
             slfLogger.error (str, exc)
-    
+
     // Lazy log -  - - -  -- - - - - - - - - - - -  - - - - - - - - - -
-        
+
     @inline
     override def debugLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         if (slfLogger.isDebugEnabled) this.debug (obj.toString, exc = exc, group = group)
-    
+
     @inline
     override def infoLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         if (slfLogger.isInfoEnabled) this.info (obj.toString, exc = exc, group = group)
-    
+
     @inline
     override def warnLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         if (slfLogger.isWarnEnabled) this.warn (obj.toString, exc = exc, group = group)
-    
+
     @inline
     override def errorLazy (obj : AnyRef, exc : Throwable = null, group : Boolean = false) : Unit =
         if (slfLogger.isErrorEnabled) this.error (obj.toString, exc = exc, group = group)
@@ -222,7 +222,7 @@ sealed class DummyLogger extends Logger {
     @inline
     override def debug (str : String, exc : Throwable = null, group : Boolean = false) : Unit =
         ()
-    
+
     @inline
     override def info (str : String, exc : Throwable = null, group : Boolean = false) : Unit = {
         println (formattedCurrentTime + " ::: INFO" +:+ str)

@@ -88,13 +88,13 @@
           <optional>true</optional>
         </dependency>
 
-    	<dependency>
+        <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>jms</artifactId>
             <version>${jms.version}</version>
         </dependency>
 
-    	<dependency>
+        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
@@ -106,7 +106,7 @@
             <version>${mockito.version}</version>
         </dependency>
 
-    	<dependency>
+        <dependency>
             <groupId>org.scala-tools.testing</groupId>
             <artifactId>specs_${scala.version}</artifactId>
             <version>${specs.version}</version>
@@ -117,7 +117,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
-        </dependency>       
+        </dependency>
 
         <dependency>
             <groupId>aopalliance</groupId>
@@ -248,15 +248,15 @@
 
             <!-- Surefire -->
             <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-surefire-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
-		<configuration>
-		    <argLine>
+                <configuration>
+                    <argLine>
                         -Dcglib.debugLocation=${project.build.directory}/cglib -Djacore.module.debug.dir=${project.build.directory}/jacore
                     </argLine>
-		</configuration>
-	    </plugin>
+                </configuration>
+            </plugin>
 
             <!-- Java -->
             <plugin>
@@ -270,7 +270,7 @@
             </plugin>
 
             <!-- Scala -->
-    	    <plugin>
+            <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
                 <version>${maven-scala-plugin.version}</version>
@@ -287,7 +287,7 @@
                         <!-- <arg>-Xcheck-null</arg> -->
                         <!-- <arg>-Xstrict-warnings</arg> -->
                     </args>
-                </configuration>                
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

@@ -108,10 +108,10 @@ object H2Url {
      * Location of h2 database.
      */
     sealed abstract trait Location
-    
+
     /**
      * File based h2 database.
-     * 
+     *
      * @param path path for database file
      */
     case class File (path : String) extends Location

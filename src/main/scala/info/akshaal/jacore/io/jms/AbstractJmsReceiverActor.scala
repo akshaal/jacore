@@ -20,7 +20,7 @@ abstract class AbstractJmsReceiverActor[T] (lowPriorityActorEnv : LowPriorityAct
 {
     private[this] var session : Session = null
     private[this] var messageConsumer : MessageConsumer = null
-    
+
     /**
      * Message must convert message from JMS Message type to domain object.
      * No processing is supposed to happen here. This method is executed outside of actor context.

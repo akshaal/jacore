@@ -21,7 +21,7 @@ trait SimpleJmx {
 
     private val attrMap : Map[String, JmxGeneralAttr] = new HashMap ()
     private val operMap : Map[String, JmxOper] = new HashMap ()
-    
+
     private val jmxTrueObjectName = new ObjectName(jmxObjectName)
 
     // Fill in attribute and operation maps

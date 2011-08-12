@@ -223,10 +223,10 @@ private[actor] class ActorMethodDispatcherGenerator (actor : Actor,
                 mv.visitTypeInsn(Opcodes.CHECKCAST,
                                  internalNameOf (ClassUtils.box (param.clazz)))
             }
-            
+
             emitUnboxObjectTo (mv, param.clazz)
         }
-        
+
         mv.visitMethodInsn (Opcodes.INVOKEVIRTUAL,
                             actorClassIN,
                             method.name,
@@ -414,7 +414,7 @@ private[actor] object ActorMethodDispatcherGenerator {
             val map2 = mapFromExtraction (extractions2)
             val extractors1 = map1.keySet
             val extractors2 = map2.keySet
-            
+
             // Compare by common extractors
             val commonExtractors = extractors1.intersect (extractors2)
             var commonSupers1 = 0

@@ -144,7 +144,7 @@ class DbWithDbcpPool (val url : String,
         config.testWhileIdle = false
         config.maxWait = maxWaitForConnection.inMicroseconds
         config.lifo = false
-        
+
         config
     }
 

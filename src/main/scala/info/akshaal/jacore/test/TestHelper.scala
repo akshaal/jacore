@@ -18,7 +18,7 @@ trait TestHelper {
      * Injector to use for tests.
      */
     val injector : Injector
-    
+
     /**
      * Create graph definition if property jacore.module.debug.dir is defined.
      * @param ilenameSuffix suffix for name of the file to create

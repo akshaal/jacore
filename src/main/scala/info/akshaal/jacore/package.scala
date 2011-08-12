@@ -234,7 +234,7 @@ package object jacore {
     final class RichOperations [T] (x : T) {
         /**
          * Pipepline operator. Applies value on the left from oeprator to the right side.
-         * 
+         *
          * @param f function to be applied with argument {x}
          * @tparam U type of value returned by function {f}
          * @return value returned by function {f}
@@ -341,7 +341,7 @@ package object jacore {
 
     /**
      * Wrapper class for ExecutorService. This class provides additional convenient methods.
-     * 
+     *
      * @param executorService executor service instance to wrap
      */
     final class RichExecutorService (executorService : ExecutorService) {
@@ -361,7 +361,7 @@ package object jacore {
 
     /**
      * Implicit method to implicitly construct RichExecutorService out of ExecutorService.
-     * 
+     *
      * @param executorService executor service to wrap
      * @return wrapped executor service
      */

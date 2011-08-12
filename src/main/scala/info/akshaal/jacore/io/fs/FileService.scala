@@ -23,7 +23,7 @@ trait FileService {
 
     /**
      * Open file and initiate reading from the file.
-     * 
+     *
      * @param file file to read from
      * @param size maximum number of bytes to read, if not given, then the whole file will be read
      *        and some time will be spent to obtain file size

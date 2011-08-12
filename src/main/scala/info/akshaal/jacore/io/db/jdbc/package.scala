@@ -19,7 +19,7 @@ package object jdbc {
 
     /**
      * Implicit function to convert string into placeholderless statement.
-     * 
+     *
      * @param sql string statement to be converted to Statement0 object
      * @return object created from the given string
      */

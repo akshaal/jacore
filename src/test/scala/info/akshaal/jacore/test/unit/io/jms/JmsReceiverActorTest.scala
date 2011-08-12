@@ -47,7 +47,7 @@ class JmsReceiverActorTest extends JacoreSpecWithJUnit ("AbstractJmsReceiverActo
                 messageListener.onMessage (null)
                 actor.waitForMessageBatchesAfter (2) {messageListener.onMessage (msg2)}
                 actor.waitForMessageBatchesAfter (2) {messageListener.onMessage (msg3)}
-                
+
                 actor.stop ()
 
                 there was one(connection).createSession (false, Session.AUTO_ACKNOWLEDGE)   then
@@ -80,7 +80,7 @@ class JmsReceiverActorTest extends JacoreSpecWithJUnit ("AbstractJmsReceiverActo
                 session.close () throws new JMSException ("test2")
 
                 actor.start ()
-                actor.stop () must throwA[JMSException] 
+                actor.stop () must throwA[JMSException]
 
                 there was one(connection).createSession (false, Session.AUTO_ACKNOWLEDGE)   then
                           one(session).createConsumer (MockHelper.destination)              then

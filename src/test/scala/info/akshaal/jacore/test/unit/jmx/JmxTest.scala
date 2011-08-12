@@ -48,7 +48,7 @@ class JmxTest extends JacoreSpecWithJUnit ("JMX support specification") {
 
         "invokable methods" in {
             JmxTestObject.operCalled  must beFalse
-            
+
             srv.invoke (obj, "invoke", Array(), Array())
 
             JmxTestObject.operCalled  must beTrue

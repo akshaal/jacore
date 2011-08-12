@@ -15,7 +15,7 @@
   <logger name="com.ibatis" level="INFO" />
 
   <logger name="info.akshaal" level="TRACE" />
-  
+
   <root level="INFO">
      <appender-ref ref="FILE" />
   </root>

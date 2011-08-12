@@ -290,7 +290,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
 
     /**
      * Abstract prepared action to be used to access database.
-     * 
+     *
      * Call it as a function to perform requested action.
      *
      * @tparam Action type of JDBC action that this prepared action is supposed to perform
@@ -381,7 +381,7 @@ abstract class AbstractJdbcActor (lowPriorityActorEnv : LowPriorityActorEnv)
          *
          * Underlying prepared statement gets closed as well.
          * Calling this method may result in losing uncommitting changes, batches...
-         * 
+         *
          * $lowlevel
          */
         final def reset () : Unit = {

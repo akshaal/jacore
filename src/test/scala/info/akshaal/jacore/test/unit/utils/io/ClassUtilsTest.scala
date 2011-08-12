@@ -118,7 +118,7 @@ class ClassUtilsTest extends JacoreSpecWithJUnit ("ClassUtils specification") {
 package ismodule {
     object A {
         object B
-        
+
         class D
     }
 

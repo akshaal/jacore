@@ -427,7 +427,7 @@ class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito
                     reqActor.waitForMessageAfter {
                         reqActor.request (respActor)
                     }
-                    
+
                     reqActor.responses  must_==  0
 
                     reqActor.waitForMessageAfter {
@@ -473,9 +473,9 @@ class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito
         "cast exception if actor tries to yield result more than once" in {
             withStartedActor [ResponserDupTestActor] (actor => {
                 actor.errors   must_== 0
-                
+
                 val future = actor.justCallBack runWithFutureAsy
-                
+
                 future.get     must_== 123
 
                 Thread.sleep (50)
@@ -509,7 +509,7 @@ class ActorTest extends JacoreSpecWithJUnit ("Actor specification") with Mockito
                     reqActor.waitForMessageBatchesAfter (2) {
                         reqActor.request (respActor)
                     }
-                    
+
                     reqActor.responses   must_==  2
                     reqActor.exceptions  must_==  2
                 }
@@ -566,7 +566,7 @@ object ActorTest {
 
     class ResponseRequesterTestActor extends TestActor {
         var responses = 0
-        
+
         @CallByMessage
         def request (responser : ResponserTestActor) : Unit = {
             responser.justCallBack runMatchingResultAsy {
@@ -608,7 +608,7 @@ object ActorTest {
 
     class PostponedTestActor extends TestActor {
         var called = 0
-        
+
         def test () : Unit = {
             postponed {
                 called += 1

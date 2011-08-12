@@ -11,7 +11,7 @@ import actor.{MessageExtractor, Broadcaster}
 
 class BroadcasterTest extends JacoreSpecWithJUnit ("Broadcaster specification") {
     import BroadcasterTest._
-    
+
     "Broadcaster" should {
         "broadcast messages to subscribers" in {
             withStartedActors [StringBroadcasterTestActor,

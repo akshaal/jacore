@@ -19,7 +19,7 @@ public class PrivateTestActor extends Actor {
     public PrivateTestActor (final HiPriorityActorEnv actorEnv) {
         super (actorEnv);
     }
-    
+
     @Act
     private void test (int msg) {
     }

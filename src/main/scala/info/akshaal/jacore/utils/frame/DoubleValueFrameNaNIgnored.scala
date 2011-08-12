@@ -23,7 +23,7 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
      */
     def put (value : Double) = {
         pos += 1
-        
+
         if (count < maximum) {
             count += 1
             if (value != value) {
@@ -31,7 +31,7 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
             } else {
                 sum += value
             }
-            
+
             array (pos) = value
         } else {
             if (pos == maximum) {
@@ -48,11 +48,11 @@ final class DoubleValueFrameNaNIgnored (maximum : Int) extends NotNull {
             } else {
                 if (old_slot_val != old_slot_val) {
                     sum += value
-                    nans -= 1                    
+                    nans -= 1
                 } else {
                     sum += value - old_slot_val
                 }
-                
+
                 array (pos) = value
             }
         }
